@@ -39,6 +39,7 @@
 #include <upright_control/dynamics/BaseType.h>
 #include <upright_control/dynamics/SystemDynamics.h>
 #include <upright_control/dynamics/SystemPinocchioMapping.h>
+#include <upright_control/dynamics/MobileManipulatorInfo.h>
 
 #include <upright_control/InertialAlignment.h>
 #include <upright_control/common/PinocchioInterface.h>
