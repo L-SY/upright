@@ -5,7 +5,9 @@ add_compile_options(-std=c++14)
 
 # Generate compile_commands.json for clang tools
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+add_definitions(-DBOOST_MPL_CFG_NO_PREPROCESSED_HEADERS)
 add_definitions(-DBOOST_MPL_LIMIT_LIST_SIZE=30)
+
 
 set(CATKIN_PACKAGE_DEPENDENCIES
         tf
