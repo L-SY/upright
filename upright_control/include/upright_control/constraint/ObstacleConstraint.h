@@ -1,8 +1,8 @@
 #pragma once
 
-#include <upright_control/constraint/constraint_type.h>
-#include <upright_control/reference_trajectory.h>
-#include <upright_control/types.h>
+#include <upright_control/common/Types.h>
+#include <upright_control/common/ReferenceTrajectory.h>
+#include <upright_control/constraint/ConstraintType.h>
 
 namespace upright {
 
