@@ -1,0 +1,8 @@
+//
+// Created by lsy on 24-3-12.
+//
+
+#ifndef SRC_OBSTACLECONSTRAINT_H
+#define SRC_OBSTACLECONSTRAINT_H
+
+#endif //SRC_OBSTACLECONSTRAINT_H

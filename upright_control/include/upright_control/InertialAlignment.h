@@ -1,0 +1,8 @@
+//
+// Created by lsy on 24-3-12.
+//
+
+#ifndef SRC_INERTIALALIGNMENT_H
+#define SRC_INERTIALALIGNMENT_H
+
+#endif //SRC_INERTIALALIGNMENT_H
