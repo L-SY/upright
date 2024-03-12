@@ -25,6 +25,7 @@
 #include <ocs2_self_collision/SelfCollisionConstraintCppAd.h>
 #include <ocs2_sqp/MultipleShootingMpc.h>
 
+#include <upright_control/constraint/ConstraintType.h>
 #include <upright_control/constraint/BoundedBalancingConstraints.h>
 #include <upright_control/constraint/EndEffectorBoxConstraint.h>
 #include <upright_control/constraint/JointStateInputLimits.h>
