@@ -138,14 +138,14 @@ MobileManipulatorInfo createMobileManipulatorInfo(const ocs2::PinocchioInterface
         case RobotBaseType::Nonholonomic: {
             info.OCPDim.robot.q = 9; // base: x,y,theta ; arm: q0,q1,q2,q3,q4,q5,q6
             info.OCPDim.robot.v = 8; // base: Vx, Vyaw ; arm: v0,v1,v2,v3,v4,v5,v6
-            info.OCPDim.robot.x = info.OCPDim.robot.q + info.OCPDim.robot.v; // 9 + 8
+            info.OCPDim.robot.x = info.OCPDim.robot.q + info.OCPDim.robot.v + info.OCPDim.robot.v; // 8 + 9 +9
             info.OCPDim.robot.u = 8; // // base: Jerk_x, Jerk_yaw ; arm: Jerk0,Jerk1,Jerk2,Jerk3,Jerk4,Jerk5,Jerk6
             break;
         }
         case RobotBaseType::Omnidirectional: {
             info.OCPDim.robot.q = 9; // base: x,y,theta ; arm: q0,q1,q2,q3,q4,q5,q6
             info.OCPDim.robot.v = 9; // base: Vx,Vy,Vyaw ; arm: v0,v1,v2,v3,v4,v5,v6
-            info.OCPDim.robot.x = info.OCPDim.robot.q + info.OCPDim.robot.v; // 9 + 9
+            info.OCPDim.robot.x = info.OCPDim.robot.q + info.OCPDim.robot.v; info.OCPDim.robot.v; // 9 + 9 + 9
             info.OCPDim.robot.u = 9; // // base: Jerk_x,Jerk_y,Jerk_yaw ; arm: Jerk0,Jerk1,Jerk2,Jerk3,Jerk4,Jerk5,Jerk6
             break;
         }
