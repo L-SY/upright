@@ -40,11 +40,9 @@ catkin build
 
 # Clone OCS2 
 # It is better to delete the ocs2_doc, for it may bring error when build.
-git clone git@github.com:leggedrobotics/ocs2.git
-------------
-cd ocs2
-git checkout tags/11.2
-------------
+# The https://github.com/utiasDSL/upright owner change some kinematic code in ocs2.
+git clone -b upright https://github.com/utiasDSL/ocs2
+
 # Clone pinocchio
 git clone --recurse-submodules https://github.com/leggedrobotics/pinocchio.git
 # Clone hpp-fcl
