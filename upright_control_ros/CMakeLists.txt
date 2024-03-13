@@ -80,6 +80,18 @@ target_link_libraries(mobile_manipulator_controller
 )
 target_compile_options(mobile_manipulator_controller PUBLIC ${OCS2_CXX_FLAGS})
 
+# Mobile manipulator target node
+add_executable(ddt_mobile_manipulator_target
+        src/DDTMobileManipulatorTarget.cpp
+)
+add_dependencies(ddt_mobile_manipulator_target
+        ${catkin_EXPORTED_TARGETS}
+)
+target_link_libraries(ddt_mobile_manipulator_target
+        ${catkin_LIBRARIES}
+)
+target_compile_options(ddt_mobile_manipulator_target PRIVATE ${OCS2_CXX_FLAGS})
+
 # Dummy node
 add_executable(mobile_manipulator_dummy_node
         src/DummyManipulatorNode.cpp
@@ -118,6 +130,7 @@ if (cmake_clang_tools_FOUND)
             ${PROJECT_NAME}
             mobile_manipulator_mpc
             mobile_manipulator_dummy_node
+            ddt_mobile_manipulator_target
             SOURCE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/include
             CT_HEADER_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include
             CF_WERROR
@@ -137,7 +150,7 @@ install(TARGETS ${PROJECT_NAME}
 install(DIRECTORY include/${PROJECT_NAME}/
         DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
 )
-install(TARGETS mobile_manipulator_dummy_node mobile_manipulator_mpc
+install(TARGETS mobile_manipulator_dummy_node mobile_manipulator_mpc ddt_mobile_manipulator_target
         RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 install(DIRECTORY launch rviz
