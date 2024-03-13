@@ -106,8 +106,8 @@ namespace upright {
         geom_model.addGeometryObject(ground_obj);
     }
 
-    ControllerInterface::ControllerInterface(const ControllerSettings& settings)
-            : settings_(settings) {
+    ControllerInterface::ControllerInterface(const std::string& taskFile, const std::string& libraryFolder,const std::string& urdfFile, const MobileManipulatorInfo model_info){
+        settings_ = creatControllerSetting(taskFile,libraryFolder,urdfFile,model_info);
         std::cerr << "library folder = " << settings_.lib_folder << std::endl;
 
         // Pinocchio interface

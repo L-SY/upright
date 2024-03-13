@@ -18,12 +18,13 @@
 #include <upright_control/constraint/ObstacleConstraint.h>
 #include <upright_control/common/InterfaceSettings.h>
 #include <upright_control/common/Types.h>
+#include <upright_control/dynamics/MobileManipulatorInfo.h>
 
 namespace upright {
 
     class ControllerInterface final : public ocs2::RobotInterface {
     public:
-        explicit ControllerInterface(const ControllerSettings& settings);
+        explicit ControllerInterface(const std::string& taskFile, const std::string& libraryFolder,const std::string& urdfFileconst, MobileManipulatorInfo model_info);
 
         const ocs2::OptimalControlProblem& getOptimalControlProblem()
         const override {

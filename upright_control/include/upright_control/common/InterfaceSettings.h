@@ -4,6 +4,7 @@
 
 #include <ocs2_core/reference/TargetTrajectories.h>
 #include <ocs2_sqp/MultipleShootingSettings.h>
+#include <ocs2_sqp/MultipleShootingMpc.h>
 #include <ocs2_mpc/MPC_Settings.h>
 #include <ocs2_oc/rollout/RolloutSettings.h>
 
@@ -13,6 +14,7 @@
 #include <upright_control/constraint/ConstraintType.h>
 #include <upright_control/constraint/BoundedBalancingConstraints.h>
 #include <upright_control/constraint/ObstacleConstraint.h>
+#include <upright_control/common/SqpSettings.h>
 
 namespace upright {
 
@@ -78,6 +80,11 @@ namespace upright {
         MatXd state_weight;
         MatXd end_effector_weight;
 
+        // End effector position box constraint
+        bool end_effector_box_constraint_enabled = false;
+        VecXd xyz_lower;
+        VecXd xyz_upper;
+
         // Limits
         ConstraintType limit_constraint_type = ConstraintType::Soft;
         VecXd input_limit_lower;
@@ -89,11 +96,6 @@ namespace upright {
         VecXd state_limit_upper;
         ocs2::scalar_t state_limit_mu = 1e-2;
         ocs2::scalar_t state_limit_delta = 1e-3;
-
-        // End effector position box constraint
-        bool end_effector_box_constraint_enabled = false;
-        VecXd xyz_lower;
-        VecXd xyz_upper;
 
         // Constraint to avoid the path of the projectile
         bool projectile_path_constraint_enabled = false;
