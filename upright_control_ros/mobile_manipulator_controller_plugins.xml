@@ -1,0 +1,10 @@
+<library path="lib/libmobile_manipulator_controller">
+
+    <class name="ddt/MobileManipulatorController" type="ddt::MobileManipulatorController"
+           base_class_type="controller_interface::ControllerBase">
+        <description>
+            The mobile manipulator controller use ocs2 to realize mpc.
+        </description>
+    </class>
+
+</library>
