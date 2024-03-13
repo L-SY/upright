@@ -1,0 +1,8 @@
+//
+// Created by lsy on 24-3-13.
+//
+
+#ifndef SRC_ROSREFERENCEMANAGER_H
+#define SRC_ROSREFERENCEMANAGER_H
+
+#endif //SRC_ROSREFERENCEMANAGER_H
