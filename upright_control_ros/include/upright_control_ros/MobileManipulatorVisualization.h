@@ -13,6 +13,8 @@
 #include <upright_control/MobileManipulatorInterface.h>
 #include <ocs2_self_collision_visualization/GeometryInterfaceVisualization.h>
 
+#include "upright_control/dynamics/MobileManipulatorInfo.h"
+
 namespace ddt {
 
     class MobileManipulatorDummyVisualization final : public ocs2::DummyObserver {
@@ -34,7 +36,7 @@ namespace ddt {
         void publishOptimizedTrajectory(const ros::Time& timeStamp, const ocs2::PrimalSolution& policy);
 
         ocs2::PinocchioInterface pinocchioInterface_;
-        const ManipulatorModelInfo modelInfo_;
+        const upright::MobileManipulatorInfo modelInfo_;
         std::vector<std::string> removeJointNames_;
 
         std::unique_ptr<robot_state_publisher::RobotStatePublisher> robotStatePublisherPtr_;

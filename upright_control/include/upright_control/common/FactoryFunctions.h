@@ -41,7 +41,7 @@ ocs2::PinocchioInterface createPinocchioInterface(const std::string& robotUrdfPa
                                                     const std::vector<std::string>& jointNames);
 
 /** Load ManipulatorModelType for a config file */
-RobotBaseType loadRobotBaseType(const std::string& configFilePath, const std::string& fieldName = "robotBaseType");
+RobotBaseType loadRobotBaseType(const std::string& configFilePath, const std::string& fieldName);
 
 
 MobileManipulatorInfo createMobileManipulatorInfo(const ocs2::PinocchioInterface& interface, const RobotBaseType& type,

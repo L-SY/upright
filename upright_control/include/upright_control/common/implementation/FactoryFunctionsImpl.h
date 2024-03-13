@@ -74,7 +74,7 @@ ocs2::PinocchioInterface createPinocchioInterface(const std::string& robotUrdfPa
 /******************************************************************************************************/
 /******************************************************************************************************/
 /******************************************************************************************************/
-RobotBaseType loadRobotBaseType(const std::string& configFilePath, const std::string& fieldName = "robotBaseType")
+RobotBaseType loadRobotBaseType(const std::string& configFilePath, const std::string& fieldName)
 {
     boost::property_tree::ptree pt;
     boost::property_tree::read_info(configFilePath, pt);
