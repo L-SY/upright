@@ -24,12 +24,12 @@ namespace ddt{
         controller_nh.getParam("/libFolder", libFolder);
         controller_nh.getParam("/urdfFile", urdfFile);
 
-        UR5Interface_ = std::make_shared<ocs2::mobile_manipulator::MobileManipulatorInterface>(taskFile, libFolder, urdfFile);
+        mobileManipulatorInterface_ = std::make_shared<ocs2::mobile_manipulator::MobileManipulatorInterface>(taskFile, libFolder, urdfFile);
         setupMpc(controller_nh);
         setupMrt();
 //    // Visualization
 //    ros::NodeHandle nh;
-//    visualizer_ = std::make_shared<ocs2::mobile_manipulator::MobileManipulatorDummyVisualization>(nh, *UR5Interface_);
+//    visualizer_ = std::make_shared<ocs2::mobile_manipulator::MobileManipulatorDummyVisualization>(nh, *mobileManipulatorInterface_);
 
         currentObservation_.time = 0.0;
         currentObservation_.state.setZero(STATE_DIM);
@@ -100,7 +100,7 @@ namespace ddt{
         ROS_INFO_STREAM("Waiting for the initial policy ...");
         while (!mpcMrtInterface_->initialPolicyReceived() && ros::ok()) {
             mpcMrtInterface_->advanceMpc();
-            ros::WallRate(UR5Interface_->mpcSettings().mrtDesiredFrequency_).sleep();
+            ros::WallRate(mobileManipulatorInterface_->mpcSettings().mrtDesiredFrequency_).sleep();
         }
         ROS_INFO_STREAM("Initial policy has been received.");
         mpcRunning_ = true;
@@ -121,12 +121,12 @@ namespace ddt{
         const std::string robotName = "ur5";
 
         // ROS ReferenceManager
-        auto rosReferenceManagerPtr = std::make_shared<ocs2::RosReferenceManager>("/mobile_manipulator",UR5Interface_->getReferenceManagerPtr());
+        auto rosReferenceManagerPtr = std::make_shared<ocs2::RosReferenceManager>("/mobile_manipulator",mobileManipulatorInterface_->getReferenceManagerPtr());
         rosReferenceManagerPtr->subscribe(nh);
 
         // MPC
-        mpc_ = std::make_shared<ocs2::GaussNewtonDDP_MPC>(UR5Interface_->mpcSettings(), UR5Interface_->ddpSettings(), UR5Interface_->getRollout(),
-                                                          UR5Interface_->getOptimalControlProblem(), UR5Interface_->getInitializer());
+        mpc_ = std::make_shared<ocs2::GaussNewtonDDP_MPC>(mobileManipulatorInterface_->mpcSettings(), mobileManipulatorInterface_->ddpSettings(), mobileManipulatorInterface_->getRollout(),
+                                                          mobileManipulatorInterface_->getOptimalControlProblem(), mobileManipulatorInterface_->getInitializer());
         mpc_->getSolverPtr()->setReferenceManager(rosReferenceManagerPtr);
 
         observationPublisher_ = nh.advertise<ocs2_msgs::mpc_observation>("/mobile_manipulator_mpc_observation", 1);
@@ -145,7 +145,7 @@ namespace ddt{
 
     void MobileManipulatorController::setupMrt() {
         mpcMrtInterface_ = std::make_shared<ocs2::MPC_MRT_Interface>(*mpc_);
-        mpcMrtInterface_->initRollout(&UR5Interface_->getRollout());
+        mpcMrtInterface_->initRollout(&mobileManipulatorInterface_->getRollout());
         mpcTimer_.reset();
 
         controllerRunning_ = true;
@@ -160,7 +160,7 @@ namespace ddt{
                                     mpcTimer_.endTimer();
                                 }
                             },
-                            UR5Interface_->mpcSettings().mpcDesiredFrequency_);
+                            mobileManipulatorInterface_->mpcSettings().mpcDesiredFrequency_);
                 } catch (const std::exception& e) {
                     controllerRunning_ = false;
                     ROS_ERROR_STREAM("[Ocs2 MPC thread] Error : " << e.what());
@@ -168,7 +168,7 @@ namespace ddt{
                 }
             }
         });
-        ocs2::setThreadPriority(UR5Interface_->ddpSettings().threadPriority_, mpcThread_);
+        ocs2::setThreadPriority(mobileManipulatorInterface_->ddpSettings().threadPriority_, mpcThread_);
     }
 
     void MobileManipulatorController::normal(const ros::Time &time, const ros::Duration &period) {

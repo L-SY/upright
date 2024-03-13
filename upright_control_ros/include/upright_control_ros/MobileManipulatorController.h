@@ -5,6 +5,7 @@
 #pragma once
 
 #include "definitions.h"
+#include "MobileManipulatorControlCmd.h"
 
 #include <controller_interface/multi_interface_controller.h>
 #include <effort_controllers/joint_velocity_controller.h>
@@ -23,7 +24,12 @@
 namespace ddt{
     class MobileManipulatorController
             : public controller_interface::MultiInterfaceController<hardware_interface::EffortJointInterface>{
-        enum ControllerState { NORMAL, UPRIGHT, UPRIGHT_AVOID, EE_SPACE_LOCK};
+        enum ControllerState {
+            NORMAL,         // Only try to achieve EE to reach a specified point in space
+            UPRIGHT,        // On the basis of normal, increase the importance of keeping the objects on EE upright
+            UPRIGHT_AVOID,  // On the basis of upright, increase the function of avoid obstacle
+            EE_SPACE_LOCK   // Try to lock the EE on a space point while move the  robot base
+        };
 
     public:
         MobileManipulatorController() = default;
@@ -45,7 +51,7 @@ namespace ddt{
         virtual void setupMrt();
 
         // Interface
-        std::shared_ptr<ocs2::mobile_manipulator::MobileManipulatorInterface> UR5Interface_;
+        std::shared_ptr<ocs2::mobile_manipulator::MobileManipulatorInterface> mobileManipulatorInterface_;
         std::vector<hardware_interface::JointHandle> jointHandles_;
 //    hardware_interface::ImuSensorHandle imuSensorHandle_;
 
