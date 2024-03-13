@@ -14,7 +14,6 @@
 #include <upright_control/constraint/ConstraintType.h>
 #include <upright_control/constraint/BoundedBalancingConstraints.h>
 #include <upright_control/constraint/ObstacleConstraint.h>
-#include <upright_control/common/SqpSettings.h>
 
 namespace upright {
 

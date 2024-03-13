@@ -19,6 +19,7 @@
 #include <upright_control/common/InterfaceSettings.h>
 #include <upright_control/common/Types.h>
 #include <upright_control/dynamics/MobileManipulatorInfo.h>
+#include <upright_control/common/AccessHelpFunctions.h>
 
 namespace upright {
 
