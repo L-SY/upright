@@ -1,0 +1,222 @@
+; Parameters of the robot
+robot
+{
+  dims  ; system dimensions
+  {
+    q: int, positive  ; generalized position dimension
+    v: int, positive  ; generalized velocity dimension
+    x: int, positive  ; state dimension
+    u: int, positive  ; input dimension
+  }
+
+  x0: list of float  ; initial state
+
+  tool_link_name: str  ; the name of the link representing the tool (i.e., the tray)
+
+  base_type: omnidirectional | nonholonomic ; type of mobile base
+}
+
+; mobile_manipulator_interface settings
+mobile_manipulator_interface
+{
+  recompileLibraries       1    ; put this flag to 1 to force recompilation of dynamics library
+  debug                    0    ;
+  solver_method            SQP  ; Currently only `SQP` is supported.
+}
+
+; Rollout settings
+rollout
+{
+  timeStep                      1e-2
+  maxNumStepsPerSecond          100000
+  checkNumericalStability       false
+}
+
+; MPC settings
+mpc
+{
+  timeHorizon                    2.0   ; [s]
+  solutionTimeWindow             0.2   ; [s]
+  coldStart                      false
+
+  debugPrint                     false
+
+  mpcDesiredFrequency            250   ; [Hz]
+  mrtDesiredFrequency            500   ; [Hz]
+}
+
+; settings for the sequential quadratic programming solver
+sqp
+{
+  dt: float, non-negative            ; time step of the optimized trajectory [s]
+  sqp_iteration: int, positive       ; max number of SQP iterations per solve
+  init_sqp_iteration: int, positive  ; max number of SQP iterations during first solve
+
+  ; convergence parameters
+  delta_tol: float, non-negative
+  cost_tol: float, non-negative
+
+  ; set `true` for MPC to compute a linear feedback policy
+  use_feedback_policy: bool
+
+  ; set true to project the state and input onto the lower-dimensional space
+  ; defined by the affine inequality constraints
+  project_state_input_equality_constraints: bool
+
+  ; print solver information
+  print_solver_status: bool
+  print_solver_statistics: bool
+  print_line_search: bool
+}
+
+; settings for the inertial alignment method, an alternative to the balancing
+; constraints
+; inertial alignment tries to tilt the tray so that its normal is always
+; aligned opposite to the gravito-inertial acceleration
+
+inertial_alignment
+{
+  ; set `true` to add inertial alignment as a cost
+  cost_enabled: bool
+
+  ; set `true` to add inertial alignment as a constraint
+  ; should not be used in conjunction with `cost_enabled`
+  constraint_enabled: bool
+
+  ; take the angular acceleration of the specified `com` into account when
+  ; computing alignment
+  use_angular_acceleration: bool
+
+  ; the point around which to compute the acceleration, with respect to the
+  ; tray's origin
+  com: list of float, length 3
+
+  ; instead of aligning with the acceleration vector, set to `true` to align
+  ; with `contact_plane_normal`, expressed in the world frame
+  ; this is useful for keeping the tray flat
+  align_with_fixed_vector: bool
+
+  ; the world-frame normal vector to align with if `align_with_fixed_vector` is
+  ; true
+  contact_plane_normal: list of float, length 3
+}
+
+; the controller can be initialized around some operating points may not fully supported
+operating_points
+{
+  enabled: bool  ; leave `false`
+}
+
+; estimation settings
+estimation
+{
+  robot_init_variance: float, non-negative         ; initial pose variance
+  robot_process_variance: float, non-negative      ; process variance
+  robot_measurement_variance: float, non-negative  ; measurement variance
+}
+
+; settings for low-level reference tracking
+tracking
+{
+  rate: int, non-negative                      ; controller frequency [Hz]
+  min_policy_update_time: float, non-negative  ; don't switch the MPC policy more often than this [s]
+
+  ; state feedback gains
+  ; these should be set to zero if sqp.use_feedback_policy = true, since the
+  ; controller computes its own optimal feedback policy in that case
+  kp, kv, ka; float, non-negative
+
+  ; for each of these options, if it is `true`, then the controller with stop
+  ; when the state, input, or EE position limits are violated, respectively
+  enforce_state_limits: bool
+  enforce_input_limits: bool
+  enforce_ee_position_limits: bool
+
+  ; margins for violation of the state, input, and EE position bounds
+  state_violation_margin: float, non-negative
+  input_violation_margin: float, non-negative
+  ee_position_violation_margin: float, non-negative
+
+  ; set to `true` when doing projectile experiments
+  use_projective: bool
+}
+
+Cost
+{
+  input  ; input weight
+  {
+    scale: float, non-negative         ; scale coefficient for the whole weight matrix
+    diag: list of float, non-negative  ; weight matrix diagonal
+  }
+  state  ; state weight
+  {
+    scale: float, non-negative
+    diag: list of float, non-negative
+  }
+  end_effector  ; EE pose weight
+  {
+    scale: float, non-negative
+    diag: list of float, non-negative, length 3  ; 3 position DOFs, 3 orientation DOFs
+  }
+}
+
+; robot move constraint
+Constraint
+{
+    ; for safety, the end effector can be restricted to lie inside of a box
+    endEffectorBoxConstraint
+    {
+      enabled: bool                       ; set `true` to enable this constraint in the controller
+      xyz_lower: list of float, length 3  ; task-space lower bound
+      xyz_upper: list of float, length 3  ; task-space upper bound
+    }
+
+    ; settings for constraining the robot to avoid the path of a projectile
+    projectile_path_constraint
+    {
+      enabled: bool  ; set `true` to enable this constraint in the controller
+
+      ; the names of the links to constrain to avoid collision with the projectile
+      collision_links: list of str
+
+      ; the minimum distance that should be maintained between the projectile and
+      ; each link in `collision_links`
+      distances: list of float
+
+      ; scale the constraints by this value
+      scale: float, non-negative
+    }
+
+    ; state and input limits
+    limits
+    {
+      constraint_type: hard | soft
+      input:  ; input limits
+        lower: list of float
+        upper: list of float
+      state:  ; state limits
+        lower: list of float
+        upper: list of float
+    }
+
+    ; settings for the balancing constraints
+    balancing
+    {
+      enabled: bool  ; set `true` to enable the balancing constraints
+
+      ; name of the arrangement of objects being balanced
+      arrangement: str
+
+      ; `hard` for hard constraints; `soft` to enforce constraints via cost penalties
+      ; soft constraints have not been extensively tested
+      constraint_type: hard | soft
+
+      ; set `true` to use contact-forced based constraints, or `false` to use
+      ; constraints based on the zero-moment point and limit surface
+      ; the latter constraints are less flexible and are no longer fully supported
+      use_force_constraints: bool
+
+      ; weight on the contact forces in the objective function
+      force_weight: float, non-negative
+    }
+}
