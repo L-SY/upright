@@ -16,7 +16,6 @@
 #include <ocs2_self_collision/PinocchioGeometryInterface.h>
 
 #include <upright_control/constraint/ObstacleConstraint.h>
-#include <upright_control/common/implementation/SqpSettingsImpl.h>
 #include <upright_control/common/Types.h>
 #include <upright_control/dynamics/MobileManipulatorInfo.h>
 #include <upright_control/common/implementation/AccessHelperFunctionsImpl.h>
@@ -28,11 +27,10 @@ namespace upright {
     public:
         explicit ControllerInterface(const std::string& taskFile, const std::string& libraryFolder,const std::string& urdfFileconst);
 
-        const VecXd& get_initial_state() { return initial_state_; }
-//        const ocs2::vector_t& getInitialState() { return initial_state_; }
+        const ocs2::vector_t& getInitialState() { return initial_state_; }
 
-        ocs2::sqp::Settings& sqpSettings() { return sqpSettings_; }
-        ocs2::mpc::Settings& mpcSettings() { return mpcSettings_; }
+        ocs2::multiple_shooting::Settings& sqpSettings() { return settings_.sqp; }
+        ocs2::mpc::Settings& mpcSettings() { return settings_.mpc; }
 
         const ocs2::OptimalControlProblem& getOptimalControlProblem()const override {return problem_;}
 
@@ -41,19 +39,13 @@ namespace upright {
         const ocs2::RolloutBase& getRollout() const { return *rollout_ptr_; }
         const ocs2::Initializer& getInitializer() const override {return *initializer_ptr_;}
 
-
         std::unique_ptr<ocs2::MPC_BASE> get_mpc();
-
-
-
 
         const ocs2::PinocchioInterface& getPinocchioInterface() const {return *pinocchio_interface_ptr;}
 
         ocs2::PinocchioEndEffectorKinematicsCppAd& get_end_effector_kinematics() const {return *end_effector_kinematics_ptr_;}
 
     private:
-        ocs2::sqp::Settings sqpSettings_;
-        ocs2::mpc::Settings mpcSettings_;
         ControllerSettings settings_;
         ocs2::OptimalControlProblem problem_;
         std::unique_ptr<ocs2::RolloutBase> rollout_ptr_;
