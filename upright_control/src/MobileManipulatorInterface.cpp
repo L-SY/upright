@@ -108,13 +108,13 @@ namespace upright {
 
     ControllerInterface::ControllerInterface(const std::string& taskFile, const std::string& libraryFolder,const std::string& urdfFile){
         settings_ = creatControllerSetting(taskFile,libraryFolder,urdfFile);
-        std::cerr << "library folder = " << settings_.lib_folder << std::endl;
-
         // Pinocchio interface
         std::cerr << "Robot URDF: " << settings_.robot_urdf_path << std::endl;
         pinocchio_interface_ptr.reset(
                 new ocs2::PinocchioInterface(createPinocchioInterface(
                         settings_.robot_urdf_path, settings_.robot_base_type)));
+
+        mobileManipulatorInfo_.reset(new MobileManipulatorInfo(createMobileManipulatorInfo(getPinocchioInterface(),settings_)));
 
         const bool recompile_libraries = settings_.recompile_libraries;
         settings_.sqp.integratorType = ocs2::SensitivityIntegratorType::RK4;

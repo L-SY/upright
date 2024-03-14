@@ -30,17 +30,17 @@ int main(int argc, char** argv) {
 
     // Interface
     const std::string taskFile = ros::package::getPath("upright_control") + "/config" + "/task.info";
-    const std::string libFolder = ros::package::getPath("upright_control") + "/auto_generated";
+    const std::string libFolder = ros::package::getPath("mobile_manipulator_assets") + "/auto_generated";
     const std::string urdfFile = ros::package::getPath("mobile_manipulator_assets") + "/description/urdf/ridgeback_ur5.urdf";
-    upright::ControllerInterface mobileManipulatorInetface(taskFile, libFolder, urdfFile,);
+    upright::ControllerInterface mobileManipulatorInetface(taskFile, libFolder, urdfFile);
 
     // MRT
     ocs2::MRT_ROS_Interface mrt(robotName);
-    mrt.initRollout(&mobileManipulatorInetface.get_rollout());
+    mrt.initRollout(&mobileManipulatorInetface.getRollout());
     mrt.launchNodes(nodeHandle);
 
     // Visualization
-//    auto manipulatorDummyVisualization = std::make_shared<ddt::MobileManipulatorVisualization>(nodeHandle, true, );
+    auto manipulatorDummyVisualization = std::make_shared<ddt::MobileManipulatorDummyVisualization>(nodeHandle, mobileManipulatorInetface);
 
     // Dummy balance
     ocs2::MRT_ROS_Dummy_Loop dummyMobileManipulator(mrt, mobileManipulatorInetface.mpcSettings().mrtDesiredFrequency_,

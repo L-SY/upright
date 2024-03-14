@@ -86,14 +86,13 @@ RobotBaseType loadRobotBaseType(const std::string& configFilePath, const std::st
 /******************************************************************************************************/
 /******************************************************************************************************/
 /******************************************************************************************************/
-MobileManipulatorInfo createMobileManipulatorInfo(const ocs2::PinocchioInterface& interface, const RobotBaseType& type,
-                                                  const std::string& baseFrame, const std::string& eeFrame) {
+MobileManipulatorInfo createMobileManipulatorInfo(const ocs2::PinocchioInterface& interface, const ControllerSettings& settings) {
     const auto& model = interface.getModel();
 
     MobileManipulatorInfo info;
-    info.robotBaseType = type;
+    info.robotBaseType = settings.robot_base_type;
     // Use six-axis arm
-    switch (type) {
+    switch (info.robotBaseType) {
         case RobotBaseType::Nonholonomic: {
             info.OCPDim.robot.q = 9; // base: x,y,theta ; arm: q0,q1,q2,q3,q4,q5,q6
             info.OCPDim.robot.v = 8; // base: Vx, Vyaw ; arm: v0,v1,v2,v3,v4,v5,v6
@@ -114,8 +113,8 @@ MobileManipulatorInfo createMobileManipulatorInfo(const ocs2::PinocchioInterface
     }
 
     // store frame names for using later.
-    info.eeFrame = eeFrame;
-    info.baseFrame = baseFrame;
+    info.eeFrame = settings.end_effector_link_name;
+    info.baseFrame = settings.base_link_name;
     // get name of arm joints.
     const auto& jointNames = model.names;
     info.dofNames = std::vector<std::string>(jointNames.end() - info.armDim, jointNames.end());

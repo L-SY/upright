@@ -32,13 +32,13 @@ int main(int argc, char** argv) {
     // Robot interface
 //    const std::string taskFile = ros::package::getPath("upright_control") + "/config/" + taskFileFolderName + "/task.info";
     const std::string taskFile = ros::package::getPath("upright_control") + "/config" + "/task.info";
-    const std::string libFolder = ros::package::getPath("upright_control") + "/auto_generated";
+    const std::string libFolder = ros::package::getPath("mobile_manipulator_assets") + "/auto_generated";
     const std::string urdfFile = ros::package::getPath("mobile_manipulator_assets") + "/description/urdf/ridgeback_ur5.urdf";
-    upright::ControllerInterface mobileManipulatorInetface(taskFile, libFolder, urdfFile,);
+    upright::ControllerInterface mobileManipulatorInetface(taskFile, libFolder, urdfFile);
 
     // ROS ReferenceManager
     auto rosReferenceManagerPtr =
-            std::make_shared<ddt::RosReferenceManager>(mobileManipulatorInetface.getReferenceManagerPtr());
+            std::make_shared<ddt::RosReferenceManager>("/mobile_manipulator",mobileManipulatorInetface.getReferenceManagerPtr());
     rosReferenceManagerPtr->subscribe(nodeHandle);
 
     // MPC

@@ -15,6 +15,8 @@ set(CATKIN_PACKAGE_DEPENDENCIES
         upright_control
 )
 
+add_definitions(-DBOOST_MPL_LIMIT_LIST_SIZE=30)
+
 find_package(catkin REQUIRED COMPONENTS
         ${CATKIN_PACKAGE_DEPENDENCIES}
 )
@@ -156,3 +158,6 @@ install(TARGETS mobile_manipulator_dummy_node mobile_manipulator_mpc ddt_mobile_
 install(DIRECTORY launch rviz
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
+
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)

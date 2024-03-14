@@ -44,8 +44,7 @@ ocs2::PinocchioInterface createPinocchioInterface(const std::string& robotUrdfPa
 RobotBaseType loadRobotBaseType(const std::string& configFilePath, const std::string& fieldName);
 
 
-MobileManipulatorInfo createMobileManipulatorInfo(const ocs2::PinocchioInterface& interface, const RobotBaseType& type,
-                                                  const std::string& baseFrame, const std::string& eeFrame);
+MobileManipulatorInfo createMobileManipulatorInfo(const ocs2::PinocchioInterface& interface, const ControllerSettings& controllerSettings);
 
 ControllerSettings creatControllerSetting(const std::string& taskFile, const std::string& libraryFolder,const std::string& urdfFile);
 

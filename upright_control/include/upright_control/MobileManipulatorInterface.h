@@ -43,6 +43,8 @@ namespace upright {
 
         const ocs2::PinocchioInterface& getPinocchioInterface() const {return *pinocchio_interface_ptr;}
 
+        const MobileManipulatorInfo& getManipulatorModelInfo() const { return *mobileManipulatorInfo_; }
+
         ocs2::PinocchioEndEffectorKinematicsCppAd& get_end_effector_kinematics() const {return *end_effector_kinematics_ptr_;}
 
     private:
@@ -50,6 +52,7 @@ namespace upright {
         ocs2::OptimalControlProblem problem_;
         std::unique_ptr<ocs2::RolloutBase> rollout_ptr_;
         std::unique_ptr<ocs2::Initializer> initializer_ptr_;
+        std::unique_ptr<MobileManipulatorInfo> mobileManipulatorInfo_;
         std::shared_ptr<ocs2::ReferenceManager> reference_manager_ptr_;
         std::unique_ptr<ocs2::PinocchioInterface> pinocchio_interface_ptr;
         std::unique_ptr<ocs2::PinocchioEndEffectorKinematicsCppAd> end_effector_kinematics_ptr_;
