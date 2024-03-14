@@ -1,0 +1,249 @@
+; Parameters of the robot
+robot
+{
+  dims  ; system dimensions
+  {
+    q 9  ; generalized position dimension
+    v 8  ; generalized velocity dimension
+    x 8  ; state dimension
+    u 8  ; input dimension
+  }
+
+  x0 [-1, 1, 0, 0.5pi, -0.25pi, 0.5pi, -0.25pi, 0.5pi, 0.417pi, 0rep9, 0rep9]  ; initial state
+
+  tool_link_name "gripped_object"  ; the name of the link representing the tool (i.e., the tray)
+  base_link_name "base_link"
+
+  arm_dim 6 ; the dof of arm
+  base_type "nonholonomic" ; type of mobile base
+}
+
+; mobile_manipulator_interface settings
+mobile_manipulator_interface
+{
+  recompileLibraries       1    ; put this flag to 1 to force recompilation of dynamics library
+  debug                    0    ;
+  solver_method            SQP  ; Currently only `SQP` is supported.
+}
+
+; Rollout settings
+rollout
+{
+  timeStep                      1e-2
+  maxNumStepsPerSecond          100000
+  checkNumericalStability       false
+}
+
+; MPC settings
+mpc
+{
+  timeHorizon                    2.0   ; [s]
+  solutionTimeWindow             0.2   ; [s]
+  coldStart                      false
+
+  debugPrint                     false
+
+  mpcDesiredFrequency            250   ; [Hz]
+  mrtDesiredFrequency            500   ; [Hz]
+}
+
+; settings for the sequential quadratic programming solver
+sqp
+{
+   dt 0.1
+   sqp_iteration 1
+   init_sqp_iteration 1
+   delta_tol 1e-3
+   cost_tol 1e-4
+   use_feedback_policy true
+   project_state_input_equality_constraints false
+   print_solver_status true
+   print_solver_statistics true
+   print_line_search true
+   hpipm
+     iter_max 30
+     warm_start true
+     slacks
+       enabled true
+}
+
+
+Cost
+{
+  input  ; input weight
+  {
+    scale 1e-3         ; scale coefficient for the whole weight matrix
+    ; weight matrix diagonal
+    (0,0) 1.0    ; M(0,0)
+    (1,1) 1.0    ; M(1,1)
+    (2,2) 1.0    ; M(2,2)
+    (3,3) 1.0    ; M(3,3)
+    (4,4) 1.0    ; M(4,4)
+    (5,5) 1.0    ; M(5,5)
+    (6,6) 1.0    ; M(6,6)
+    (7,7) 1.0    ; M(7,7)
+  }
+  state  ; state weight
+  {
+    scale 1e-2
+
+    ; the pos weight
+    (0,0) 0.0    ; M(0,0)
+    (1,1) 0.0    ; M(1,1)
+    (2,2) 0.0    ; M(2,2)
+    (3,3) 0.0    ; M(3,3)
+    (4,4) 0.0    ; M(4,4)
+    (5,5) 0.0    ; M(5,5)
+    (6,6) 0.0    ; M(6,6)
+    (7,7) 0.0    ; M(7,7)
+    (8,8) 0.0    ; M(8,8)
+
+    ; the vel weight
+    (9,9) 10.0   ; M(9,9)
+    (10,10) 10.0 ; M(10,10)
+    (11,11) 10.0 ; M(11,11)
+    (12,12) 10.0 ; M(12,12)
+    (13,13) 10.0 ; M(13,13)
+    (14,14) 10.0 ; M(14,14)
+    (15,15) 10.0 ; M(15,15)
+    (16,16) 10.0 ; M(16,16)
+
+    ; the acc weight
+    (17,17) 1.0  ; M(17,17)
+    (18,18) 1.0  ; M(18,18)
+    (19,19) 1.0  ; M(19,19)
+    (20,20) 1.0  ; M(20,20)
+    (21,21) 1.0  ; M(21,21)
+    (22,22) 1.0  ; M(22,22)
+    (23,23) 1.0  ; M(23,23)
+    (24,24) 1.0  ; M(24,24)
+  }
+  end_effector  ; EE pose weight
+  {
+    scale 1e+0
+    ; 3 position DOFs, 3 orientation DOFs
+    (0,0) 1.0    ; M(0,0)
+    (1,1) 1.0    ; M(1,1)
+    (2,2) 1.0    ; M(2,2)
+    (3,3) 0.0    ; M(3,3)
+    (4,4) 0.0    ; M(4,4)
+    (5,5) 0.0    ; M(5,5)
+  }
+}
+
+; robot move constraint
+Constraint
+{
+    ; for safety, the end effector can be restricted to lie inside of a box
+    endEffectorBoxConstraint
+    {
+        enabled false
+        xyz_lower [-1., -1., -0.5]
+        xyz_upper [1., 1., 0.5]
+    }
+
+    ; settings for constraining the robot to avoid the path of a projectile
+    projectile_path_constraint
+    {
+        enabled false
+        distances []
+        scale 1
+        collision_links []
+    }
+
+    ; state and input limits
+    limits
+    {
+        constraint_type hard
+        input
+        {
+          lower [-20, -20, -80, -80, -80, -80, -80, -80]
+          upper [20, 20, 80, 80, 80, 80, 80, 80]
+        }
+        state
+        {
+          lower [-10, -10, -10, -2pi, -2pi, -2pi, -2pi, -2pi, -2pi,
+                  -1.1, -1.1, -2, -2, -2, -3, -3, -3, -3,
+                  -2.5, -2.5, -1, -10, -10, -10, -10, -10, -10]
+          upper [10, 10, 10, 2pi, 2pi, 2pi, 2pi, 2pi, 2pi,
+                  1.1, 1.1, 2, 2, 2, 3, 3, 3, 3,
+                  2.5, 2.5, 1, 10, 10, 10, 10, 10, 10]
+        }
+    }
+
+    ; settings for the balancing constraints
+    balancing
+    {
+          enabled false
+          arrangement nothing
+          constraint_type hard
+          use_force_constraints true
+          frictionless true
+          enable_normal_constraint true
+          enable_friction_constraint true
+          enable_zmp_constraint true
+
+          force_weight 0.001
+
+          mu 1e-3
+          delta 1e-3
+    }
+}
+
+; settings for the inertial alignment method, an alternative to the balancing
+; constraints
+; inertial alignment tries to tilt the tray so that its normal is always
+; aligned opposite to the gravito-inertial acceleration
+
+inertial_alignment
+{
+inertial_alignment
+  cost_enabled false
+  constraint_enabled false
+  ; take angular acceleration into account (only has an affect if com has non-zero height)
+  use_angular_acceleration false
+  align_with_fixed_vector false  ; set to true to align with the contact_plane_normal
+  cost_weight 1
+  contact_plane_normal [0, 0, 1]
+  com [0, 0, 0]  ; set CoM offset
+}
+
+; the controller can be initialized around some operating points may not fully supported
+operating_points
+{
+  enabled bool  ; leave `false`
+}
+
+; estimation settings
+estimation
+{
+  robot_init_variance 0.1
+  robot_process_variance 10
+  robot_measurement_variance 0.001
+}
+
+; settings for low-level reference tracking
+tracking
+{
+    rate 125  ; Hz
+    min_policy_update_time 0.01  ; seconds
+
+    ; state feedback gains
+    ; for stability we want kv * ka > kp (third-order Routh-Hurwitz criterion)
+    ; these should be set to zero if sqp.use_feedback_policy = true, since the
+    ; controller computes its own optimal feedback policy in that case
+    kp 0
+    kv 0
+    ka 0
+
+    enforce_state_limits true
+    enforce_input_limits false
+    enforce_ee_position_limits false
+
+    use_projectile true
+
+    state_violation_margin 0.1
+    input_violation_margin 1.0
+    ee_position_violation_margin 0.1
+}
+

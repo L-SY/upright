@@ -26,7 +26,7 @@ namespace upright {
 
     class ControllerInterface final : public ocs2::RobotInterface {
     public:
-        explicit ControllerInterface(const std::string& taskFile, const std::string& libraryFolder,const std::string& urdfFileconst, MobileManipulatorInfo model_info);
+        explicit ControllerInterface(const std::string& taskFile, const std::string& libraryFolder,const std::string& urdfFileconst);
 
         const VecXd& get_initial_state() { return initial_state_; }
 //        const ocs2::vector_t& getInitialState() { return initial_state_; }

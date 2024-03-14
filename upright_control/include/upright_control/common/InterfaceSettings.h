@@ -123,7 +123,10 @@ namespace upright {
         // Robot settings
         RobotBaseType robot_base_type = RobotBaseType::Nonholonomic;
         OptimizationDimensions dims;
+        size_t arm_dim = 6;
         std::string end_effector_link_name;
+        std::string base_link_name;
+
         Vec3d base_pose; // optional, only affects the fixed base configuration
         std::map<std::string, ocs2::scalar_t> locked_joints;
 

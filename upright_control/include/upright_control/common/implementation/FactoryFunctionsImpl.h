@@ -126,7 +126,7 @@ MobileManipulatorInfo createMobileManipulatorInfo(const ocs2::PinocchioInterface
 /******************************************************************************************************/
 /******************************************************************************************************/
 /******************************************************************************************************/
-ControllerSettings creatControllerSetting(const std::string& taskFile, const std::string& libraryFolder,const std::string& urdfFile, MobileManipulatorInfo robot_info){
+ControllerSettings creatControllerSetting(const std::string& taskFile, const std::string& libraryFolder,const std::string& urdfFile){
     // check that task file exists
     boost::filesystem::path taskFilePath(taskFile);
     if (boost::filesystem::exists(taskFilePath)) {
@@ -159,14 +159,48 @@ ControllerSettings creatControllerSetting(const std::string& taskFile, const std
     settings.lib_folder = libraryFolder;
 
 //  Robot setting
-    settings.robot_base_type = robot_info.robotBaseType;
-    settings.dims = robot_info.OCPDim;
-    settings.end_effector_link_name = robot_info.eeFrame;
+
+    ocs2::loadData::loadCppDataType(taskFile, "robot.dims.q", settings.dims.robot.q);
+    ocs2::loadData::loadCppDataType(taskFile, "robot.dims.v", settings.dims.robot.v);
+    ocs2::loadData::loadCppDataType(taskFile, "robot.dims.x", settings.dims.robot.x);
+    ocs2::loadData::loadCppDataType(taskFile, "robot.dims.u", settings.dims.robot.u);
+    ocs2::loadData::loadCppDataType(taskFile, "robot.tool_link_name", settings.end_effector_link_name);
+    ocs2::loadData::loadCppDataType(taskFile, "robot.base_link_name", settings.base_link_name);
+    ocs2::loadData::loadCppDataType(taskFile, "robot.arm_dim", settings.arm_dim);
+    std::string baseTypeStr;
+    ocs2::loadData::loadCppDataType(taskFile, "robot.base_type", baseTypeStr);
+    settings.robot_base_type = robot_base_type_from_string(baseTypeStr);
 
 //    settings.initial_state = VecXd::setZero(robot_info.OCPDim.robot.x);
 //    settings.gravity
     ocs2::loadData::loadCppDataType(taskFile, "mobile_manipulator_interface.recompileLibraries", settings.recompile_libraries);
     ocs2::loadData::loadCppDataType(taskFile, "mobile_manipulator_interface.debug", settings.debug);
+// Weights Matrix
+    ocs2::matrix_t inputMatrix(settings.dims.robot.u, settings.dims.robot.u);
+    ocs2::matrix_t stateMatrix(settings.dims.robot.x, settings.dims.robot.x);
+    ocs2::matrix_t EEMatrix(settings.arm_dim, settings.arm_dim);
+    ocs2::loadData::loadEigenMatrix(taskFile, "Cost.input", inputMatrix);
+    ocs2::loadData::loadEigenMatrix(taskFile, "Cost.state", stateMatrix);
+    ocs2::loadData::loadEigenMatrix(taskFile, "Cost.end_effector", EEMatrix);
+    settings.input_weight = inputMatrix;
+    settings.state_weight = stateMatrix;
+    settings.end_effector_weight = EEMatrix;
+// Constraint
+// EE box constraint
+    ocs2::loadData::loadCppDataType(taskFile,"Constraint.endEffectorBoxConstraint.enabled",settings.end_effector_box_constraint_enabled);
+    ocs2::loadData::loadEigenMatrix(taskFile,"Constraint.endEffectorBoxConstraint.xyz_lower",settings.xyz_lower);
+    ocs2::loadData::loadEigenMatrix(taskFile,"Constraint.endEffectorBoxConstraint.xyz_lower",settings.xyz_upper);
+
+//    Limit constraint
+//    ocs2::loadData::loadCppDataType(taskFile, "Constraint.endEffectorBoxConstraint.input_limit_mu", settings.input_limit_mu);
+//    ocs2::loadData::loadCppDataType(taskFile, "Constraint.endEffectorBoxConstraint.input_limit_delta", settings.input_limit_delta);
+    std::string limit_constraint_type;
+    ocs2::loadData::loadCppDataType(taskFile,"Constraint.limits.constraint_type",limit_constraint_type);
+    settings.limit_constraint_type = constraint_type_from_string(limit_constraint_type);
+    ocs2::loadData::loadEigenMatrix(taskFile,"Constraint.limits.input.lower",settings.input_limit_lower);
+    ocs2::loadData::loadEigenMatrix(taskFile,"Constraint.limits.input.upper",settings.input_limit_upper);
+    ocs2::loadData::loadEigenMatrix(taskFile,"Constraint.limits.state.lower",settings.state_limit_lower);
+    ocs2::loadData::loadEigenMatrix(taskFile,"Constraint.limits.state.upper",settings.state_limit_upper);
 
     EstimationSettings estimationSettings;
     TrackingSettings trackingSettings;
@@ -190,32 +224,6 @@ ControllerSettings creatControllerSetting(const std::string& taskFile, const std
     ocs2::loadData::loadCppDataType(taskFile, "tracking.ee_position_violation_margin", trackingSettings.ee_position_violation_margin);
     ocs2::loadData::loadCppDataType(taskFile, "tracking.use_projective", trackingSettings.use_projectile);
     settings.tracking = trackingSettings;
-// Weights Matrix
-    ocs2::matrix_t inputMatrix(robot_info.OCPDim.robot.u, robot_info.OCPDim.robot.u);
-    ocs2::matrix_t stateMatrix(robot_info.OCPDim.robot.x, robot_info.OCPDim.robot.x);
-    ocs2::matrix_t EEMatrix(robot_info.armDim, robot_info.armDim);
-    ocs2::loadData::loadEigenMatrix(taskFile, "Cost.input.diag", inputMatrix);
-    ocs2::loadData::loadEigenMatrix(taskFile, "Cost.state.diag", stateMatrix);
-    ocs2::loadData::loadEigenMatrix(taskFile, "Cost.end_effector.diag", EEMatrix);
-    settings.input_weight = inputMatrix;
-    settings.state_weight = stateMatrix;
-    settings.end_effector_weight = EEMatrix;
-// Constraint
-// EE box constraint
-    ocs2::loadData::loadCppDataType(taskFile,"Constraint.endEffectorBoxConstraint.enabled",settings.end_effector_box_constraint_enabled);
-    ocs2::loadData::loadEigenMatrix(taskFile,"Constraint.endEffectorBoxConstraint.xyz_lower",settings.xyz_lower);
-    ocs2::loadData::loadEigenMatrix(taskFile,"Constraint.endEffectorBoxConstraint.xyz_lower",settings.xyz_upper);
-
-//    Limit constraint
-//    ocs2::loadData::loadCppDataType(taskFile, "Constraint.endEffectorBoxConstraint.input_limit_mu", settings.input_limit_mu);
-//    ocs2::loadData::loadCppDataType(taskFile, "Constraint.endEffectorBoxConstraint.input_limit_delta", settings.input_limit_delta);
-    std::string limit_constraint_type;
-    ocs2::loadData::loadCppDataType(taskFile,"Constraint.limits.constraint_type",limit_constraint_type);
-    settings.limit_constraint_type = constraint_type_from_string(limit_constraint_type);
-    ocs2::loadData::loadEigenMatrix(taskFile,"Constraint.limits.input.lower",settings.input_limit_lower);
-    ocs2::loadData::loadEigenMatrix(taskFile,"Constraint.limits.input.upper",settings.input_limit_upper);
-    ocs2::loadData::loadEigenMatrix(taskFile,"Constraint.limits.state.lower",settings.state_limit_lower);
-    ocs2::loadData::loadEigenMatrix(taskFile,"Constraint.limits.state.upper",settings.state_limit_upper);
 
     //  TODO:  Add Constraint to avoid the path of the projectile
 

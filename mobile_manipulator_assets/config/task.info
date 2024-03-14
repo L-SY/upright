@@ -12,7 +12,9 @@ robot
   x0: [-1, 1, 0, 0.5pi, -0.25pi, 0.5pi, -0.25pi, 0.5pi, 0.417pi, 0rep9, 0rep9]  ; initial state
 
   tool_link_name: "gripped_object"  ; the name of the link representing the tool (i.e., the tray)
+  base_link_name: "base_link"
 
+  arm_dim: 6 ; the dof of arm
   base_type: nonholonomic ; type of mobile base
 }
 
@@ -127,7 +129,7 @@ Cost
   input  ; input weight
   {
     scale: 0.001         ; scale coefficient for the whole weight matrix
-    diag: [1rep9]        ; weight matrix diagonal
+    diag: [1rep8]        ; weight matrix diagonal
   }
   state  ; state weight
   {
@@ -166,15 +168,19 @@ Constraint
     {
         constraint_type: hard
         input:
+        {
           lower: [-20, -20, -80, -80, -80, -80, -80, -80]
           upper: [20, 20, 80, 80, 80, 80, 80, 80]
+        }
         state:
+        {
           lower: [-10, -10, -10, -2pi, -2pi, -2pi, -2pi, -2pi, -2pi,
                   -1.1, -1.1, -2, -2, -2, -3, -3, -3, -3,
                   -2.5, -2.5, -1, -10, -10, -10, -10, -10, -10]
           upper: [10, 10, 10, 2pi, 2pi, 2pi, 2pi, 2pi, 2pi,
                   1.1, 1.1, 2, 2, 2, 3, 3, 3, 3,
                   2.5, 2.5, 1, 10, 10, 10, 10, 10, 10]
+        }
     }
 
     ; settings for the balancing constraints

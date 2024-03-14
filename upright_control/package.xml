@@ -28,7 +28,7 @@
   <depend>ocs2_self_collision</depend>
   <depend>ocs2_self_collision_visualization</depend>
   <depend>pinocchio</depend>
-
+  <depend>roscpp</depend>
   <depend>upright_core</depend>
-
+  <depend>mobile_manipulator_assets</depend>
 </package>

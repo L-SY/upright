@@ -26,7 +26,9 @@ set(CATKIN_PACKAGE_DEPENDENCIES
         ocs2_pinocchio_interface
         ocs2_self_collision
         ocs2_self_collision_visualization
+        roscpp
 
+        mobile_manipulator_assets
         upright_core
 )
 
@@ -51,15 +53,10 @@ find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 ###################################
 
 catkin_package(
-        INCLUDE_DIRS
-        include
-        LIBRARIES
-        ${PROJECT_NAME}
-        CATKIN_DEPENDS
-        ${CATKIN_PACKAGE_DEPENDENCIES}
-        DEPENDS
-        Boost
-        pinocchio
+        INCLUDE_DIRS include
+        LIBRARIES ${PROJECT_NAME}
+        CATKIN_DEPENDS ${CATKIN_PACKAGE_DEPENDENCIES}
+        DEPENDS Boost pinocchio
 )
 
 ########### ## Build ##
@@ -89,7 +86,7 @@ link_directories(
 )
 
 # upright_control interface library
-add_library(${PROJECT_NAME}
+add_library(${PROJECT_NAME} SHARED
         src/InertialAlignment.cpp
         src/MobileManipulatorInterface.cpp
         src/constraint/BoundedBalancingConstraints.cpp
@@ -117,3 +114,22 @@ install(DIRECTORY include/${PROJECT_NAME}/
         DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
 )
 
+#############
+## Testing ##
+#############
+add_executable(${PROJECT_NAME}_test
+        test/TestConfig.cpp)
+
+target_link_libraries(${PROJECT_NAME}_test ${PROJECT_NAME} ${catkin_LIBRARIES})
+#if (CATKIN_ENABLE_TESTING)
+#    catkin_add_gtest(${PROJECT_NAME}_test
+#            test/TestConfig.cpp
+#    )
+#
+#    target_link_libraries(${PROJECT_NAME}_test
+#            ${PROJECT_NAME}
+#            gtest_main
+#    )
+#
+#    target_compile_options(${PROJECT_NAME}_test PUBLIC ${FLAGS})
+#endif (CATKIN_ENABLE_TESTING)
