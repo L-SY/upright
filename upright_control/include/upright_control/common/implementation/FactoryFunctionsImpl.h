@@ -171,10 +171,13 @@ ControllerSettings creatControllerSetting(const std::string& taskFile, const std
     ocs2::loadData::loadCppDataType(taskFile, "robot.base_type", baseTypeStr);
     settings.robot_base_type = robot_base_type_from_string(baseTypeStr);
 
-//    settings.initial_state = VecXd::setZero(robot_info.OCPDim.robot.x);
+    ocs2::matrix_t initState(settings.dims.robot.x,1);
+    ocs2::loadData::loadEigenMatrix(taskFile,"robot.x0",initState);
+    settings.initial_state = initState;
 //    settings.gravity
     ocs2::loadData::loadCppDataType(taskFile, "mobile_manipulator_interface.recompileLibraries", settings.recompile_libraries);
     ocs2::loadData::loadCppDataType(taskFile, "mobile_manipulator_interface.debug", settings.debug);
+
 // Weights Matrix
     ocs2::matrix_t inputMatrix(settings.dims.robot.u, settings.dims.robot.u);
     ocs2::matrix_t stateMatrix(settings.dims.robot.x, settings.dims.robot.x);
@@ -185,47 +188,58 @@ ControllerSettings creatControllerSetting(const std::string& taskFile, const std
     settings.input_weight = inputMatrix;
     settings.state_weight = stateMatrix;
     settings.end_effector_weight = EEMatrix;
+
+
+
 // Constraint
 // EE box constraint
+    ocs2::matrix_t xyzLower(3,1), xyzUpper(3,1);
+    xyzLower.setZero();xyzUpper.setZero();
     ocs2::loadData::loadCppDataType(taskFile,"Constraint.endEffectorBoxConstraint.enabled",settings.end_effector_box_constraint_enabled);
-    ocs2::loadData::loadEigenMatrix(taskFile,"Constraint.endEffectorBoxConstraint.xyz_lower",settings.xyz_lower);
-    ocs2::loadData::loadEigenMatrix(taskFile,"Constraint.endEffectorBoxConstraint.xyz_lower",settings.xyz_upper);
-
+    ocs2::loadData::loadEigenMatrix(taskFile,"Constraint.endEffectorBoxConstraint.xyz_lower",xyzLower);
+    ocs2::loadData::loadEigenMatrix(taskFile,"Constraint.endEffectorBoxConstraint.xyz_upper",xyzUpper);
+    settings.xyz_lower = xyzLower;
+    settings.xyz_upper = xyzUpper;
 //    Limit constraint
-//    ocs2::loadData::loadCppDataType(taskFile, "Constraint.endEffectorBoxConstraint.input_limit_mu", settings.input_limit_mu);
-//    ocs2::loadData::loadCppDataType(taskFile, "Constraint.endEffectorBoxConstraint.input_limit_delta", settings.input_limit_delta);
     std::string limit_constraint_type;
     ocs2::loadData::loadCppDataType(taskFile,"Constraint.limits.constraint_type",limit_constraint_type);
     settings.limit_constraint_type = constraint_type_from_string(limit_constraint_type);
-    ocs2::loadData::loadEigenMatrix(taskFile,"Constraint.limits.input.lower",settings.input_limit_lower);
-    ocs2::loadData::loadEigenMatrix(taskFile,"Constraint.limits.input.upper",settings.input_limit_upper);
-    ocs2::loadData::loadEigenMatrix(taskFile,"Constraint.limits.state.lower",settings.state_limit_lower);
-    ocs2::loadData::loadEigenMatrix(taskFile,"Constraint.limits.state.upper",settings.state_limit_upper);
+    ocs2::matrix_t inputLower(8,1), inputUpper(8,1),stateLower(25,1), stateUpper(25,1);
 
-    EstimationSettings estimationSettings;
-    TrackingSettings trackingSettings;
-    ocs2::loadData::loadCppDataType(taskFile, "estimation.robot_init_variance", estimationSettings.robot_init_variance);
-    ocs2::loadData::loadCppDataType(taskFile, "estimation.robot_process_variance", estimationSettings.robot_process_variance);
-    ocs2::loadData::loadCppDataType(taskFile, "estimation.robot_measurement_variance", estimationSettings.robot_measurement_variance);
-    settings.estimation = estimationSettings;
-    ocs2::loadData::loadCppDataType(taskFile, "tracking.rate", trackingSettings.rate);
-    ocs2::loadData::loadCppDataType(taskFile, "tracking.min_policy_update_time", trackingSettings.min_policy_update_time);
+    ocs2::loadData::loadEigenMatrix(taskFile,"Constraint.limits.input_lower",inputLower);
+    ocs2::loadData::loadEigenMatrix(taskFile,"Constraint.limits.input_upper",inputUpper);
+    ocs2::loadData::loadEigenMatrix(taskFile,"Constraint.limits.state_lower",stateLower);
+    ocs2::loadData::loadEigenMatrix(taskFile,"Constraint.limits.state_upper",stateUpper);
+    settings.input_limit_lower = inputLower;
+    settings.input_limit_upper = inputUpper;
+    settings.state_limit_lower = stateLower;
+    settings.state_limit_upper = stateUpper;
+    std::cout << "Finish Get Basic Info" << std::endl;
 
-    ocs2::loadData::loadCppDataType(taskFile, "tracking.kp", trackingSettings.kp);
-    ocs2::loadData::loadCppDataType(taskFile, "tracking.kv", trackingSettings.kv);
-    ocs2::loadData::loadCppDataType(taskFile, "tracking.ka", trackingSettings.ka);
+//  TODO:  Add The last config after basic function is done
 
-    ocs2::loadData::loadCppDataType(taskFile, "tracking.enforce_state_limits", trackingSettings.enforce_state_limits);
-    ocs2::loadData::loadCppDataType(taskFile, "tracking.enforce_input_limits", trackingSettings.enforce_input_limits);
-    ocs2::loadData::loadCppDataType(taskFile, "tracking.enforce_ee_position_limits", trackingSettings.enforce_ee_position_limits);
-
-    ocs2::loadData::loadCppDataType(taskFile, "tracking.state_violation_margin", trackingSettings.state_violation_margin);
-    ocs2::loadData::loadCppDataType(taskFile, "tracking.input_violation_margin", trackingSettings.input_violation_margin);
-    ocs2::loadData::loadCppDataType(taskFile, "tracking.ee_position_violation_margin", trackingSettings.ee_position_violation_margin);
-    ocs2::loadData::loadCppDataType(taskFile, "tracking.use_projective", trackingSettings.use_projectile);
-    settings.tracking = trackingSettings;
-
-    //  TODO:  Add Constraint to avoid the path of the projectile
+//    EstimationSettings estimationSettings;
+//    TrackingSettings trackingSettings;
+//    ocs2::loadData::loadCppDataType(taskFile, "estimation.robot_init_variance", estimationSettings.robot_init_variance);
+//    ocs2::loadData::loadCppDataType(taskFile, "estimation.robot_process_variance", estimationSettings.robot_process_variance);
+//    ocs2::loadData::loadCppDataType(taskFile, "estimation.robot_measurement_variance", estimationSettings.robot_measurement_variance);
+//    settings.estimation = estimationSettings;
+//    ocs2::loadData::loadCppDataType(taskFile, "tracking.rate", trackingSettings.rate);
+//    ocs2::loadData::loadCppDataType(taskFile, "tracking.min_policy_update_time", trackingSettings.min_policy_update_time);
+//
+//    ocs2::loadData::loadCppDataType(taskFile, "tracking.kp", trackingSettings.kp);
+//    ocs2::loadData::loadCppDataType(taskFile, "tracking.kv", trackingSettings.kv);
+//    ocs2::loadData::loadCppDataType(taskFile, "tracking.ka", trackingSettings.ka);
+//
+//    ocs2::loadData::loadCppDataType(taskFile, "tracking.enforce_state_limits", trackingSettings.enforce_state_limits);
+//    ocs2::loadData::loadCppDataType(taskFile, "tracking.enforce_input_limits", trackingSettings.enforce_input_limits);
+//    ocs2::loadData::loadCppDataType(taskFile, "tracking.enforce_ee_position_limits", trackingSettings.enforce_ee_position_limits);
+//
+//    ocs2::loadData::loadCppDataType(taskFile, "tracking.state_violation_margin", trackingSettings.state_violation_margin);
+//    ocs2::loadData::loadCppDataType(taskFile, "tracking.input_violation_margin", trackingSettings.input_violation_margin);
+//    ocs2::loadData::loadCppDataType(taskFile, "tracking.ee_position_violation_margin", trackingSettings.ee_position_violation_margin);
+//    ocs2::loadData::loadCppDataType(taskFile, "tracking.use_projective", trackingSettings.use_projectile);
+//    settings.tracking = trackingSettings;
 
     return settings;
 }

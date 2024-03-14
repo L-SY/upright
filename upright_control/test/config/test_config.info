@@ -5,11 +5,45 @@ robot
   {
     q 9  ; generalized position dimension
     v 8  ; generalized velocity dimension
-    x 8  ; state dimension
+    x 25  ; state dimension
     u 8  ; input dimension
   }
 
-  x0 [-1, 1, 0, 0.5pi, -0.25pi, 0.5pi, -0.25pi, 0.5pi, 0.417pi, 0rep9, 0rep9]  ; initial state
+  x0 ; initial state
+  {
+    ; init pos
+    (0,0) -1.0       ; initial state x0_1
+    (1,0) 1.0        ; initial state x0_2
+    (2,0) 0.0        ; initial state x0_3
+    (3,0) 1.570795   ; initial state x0_4 (0.5pi)
+    (4,0) -0.7853975 ; initial state x0_5 (-0.25pi)
+    (5,0) 1.570795   ; initial state x0_6 (0.5pi)
+    (6,0) -0.7853975 ; initial state x0_7 (-0.25pi)
+    (7,0) 1.570795   ; initial state x0_8 (0.5pi)
+    (8,0) 1.31065263 ; initial state x0_9 (0.417pi)
+
+    ; init vel
+    (9,0) 0.0        ; initial state x0_10
+    (10,0) 0.0       ; initial state x0_11
+    (11,0) 0.0       ; initial state x0_12
+    (12,0) 0.0       ; initial state x0_13
+    (13,0) 0.0       ; initial state x0_14
+    (14,0) 0.0       ; initial state x0_15
+    (15,0) 0.0       ; initial state x0_16
+    (16,0) 0.0       ; initial state x0_17
+    (17,0) 0.0       ; initial state x0_18
+
+    ;  init acc
+    (18,0) 0.0       ; initial state x0_19
+    (19,0) 0.0       ; initial state x0_20
+    (20,0) 0.0       ; initial state x0_21
+    (21,0) 0.0       ; initial state x0_22
+    (22,0) 0.0       ; initial state x0_23
+    (23,0) 0.0       ; initial state x0_24
+    (24,0) 0.0       ; initial state x0_25
+    (25,0) 0.0       ; initial state x0_26
+    (26,0) 0.0       ; initial state x0_27
+  }
 
   tool_link_name "gripped_object"  ; the name of the link representing the tool (i.e., the tray)
   base_link_name "base_link"
@@ -138,8 +172,20 @@ Constraint
     endEffectorBoxConstraint
     {
         enabled false
-        xyz_lower [-1., -1., -0.5]
-        xyz_upper [1., 1., 0.5]
+        xyz_lower
+        {
+          scale 1e+0
+          (0,0) -1.0   ; xyz_lower_x
+          (1,0) -1.0   ; xyz_lower_y
+          (2,0) -0.5   ; xyz_lower_z
+        }
+        xyz_upper
+        {
+          scale 1e+0
+          (0,0) 1.0    ; xyz_upper_x
+          (1,0) 1.0    ; xyz_upper_y
+          (2,0) 0.5    ; xyz_upper_z
+        }
     }
 
     ; settings for constraining the robot to avoid the path of a projectile
@@ -155,19 +201,90 @@ Constraint
     limits
     {
         constraint_type hard
-        input
+        input_lower
         {
-          lower [-20, -20, -80, -80, -80, -80, -80, -80]
-          upper [20, 20, 80, 80, 80, 80, 80, 80]
+          scale 1e+0
+          (0,0) -20.0  ; input_lower_1
+          (1,0) -20.0  ; input_lower_2
+          (2,0) -80.0  ; input_lower_3
+          (3,0) -80.0  ; input_lower_4
+          (4,0) -80.0  ; input_lower_5
+          (5,0) -80.0  ; input_lower_6
+          (6,0) -80.0  ; input_lower_7
+          (7,0) -80.0  ; input_lower_8
         }
-        state
+
+        input_upper
         {
-          lower [-10, -10, -10, -2pi, -2pi, -2pi, -2pi, -2pi, -2pi,
-                  -1.1, -1.1, -2, -2, -2, -3, -3, -3, -3,
-                  -2.5, -2.5, -1, -10, -10, -10, -10, -10, -10]
-          upper [10, 10, 10, 2pi, 2pi, 2pi, 2pi, 2pi, 2pi,
-                  1.1, 1.1, 2, 2, 2, 3, 3, 3, 3,
-                  2.5, 2.5, 1, 10, 10, 10, 10, 10, 10]
+          scale 1e+0
+          (0,0) 20.0   ; input_upper_1
+          (1,0) 20.0   ; input_upper_2
+          (2,0) 80.0   ; input_upper_3
+          (3,0) 80.0   ; input_upper_4
+          (4,0) 80.0   ; input_upper_5
+          (5,0) 80.0   ; input_upper_6
+          (6,0) 80.0   ; input_upper_7
+          (7,0) 80.0   ; input_upper_8
+        }
+
+        state_lower
+        {
+          scale 1e+0
+          (0,0) -10.0   ; state_lower_1
+          (1,0) -10.0   ; state_lower_2
+          (2,0) -10.0   ; state_lower_3
+          (3,0) -6.283  ; state_lower_4 (-2pi)
+          (4,0) -6.283  ; state_lower_5 (-2pi)
+          (5,0) -6.283  ; state_lower_6 (-2pi)
+          (6,0) -6.283  ; state_lower_7 (-2pi)
+          (7,0) -6.283  ; state_lower_8 (-2pi)
+          (8,0) -6.283  ; state_lower_9 (-2pi)
+          (9,0) -1.1    ; state_lower_10
+          (10,0) -1.1   ; state_lower_11
+          (11,0) -2.0   ; state_lower_12
+          (12,0) -2.0   ; state_lower_13
+          (13,0) -2.0   ; state_lower_14
+          (14,0) -3.0   ; state_lower_15
+          (15,0) -3.0   ; state_lower_16
+          (16,0) -3.0   ; state_lower_17
+          (17,0) -3.0   ; state_lower_18
+          (18,0) -2.5   ; state_lower_19
+          (19,0) -2.5   ; state_lower_20
+          (20,0) -1.0   ; state_lower_21
+          (21,0) -10.0  ; state_lower_22
+          (22,0) -10.0  ; state_lower_23
+          (23,0) -10.0  ; state_lower_24
+          (24,0) -10.0  ; state_lower_25
+        }
+
+        state_upper
+        {
+          scale 1e+0
+          (0,0) 10.0   ; state_upper_1
+          (1,0) 10.0   ; state_upper_2
+          (2,0) 10.0   ; state_upper_3
+          (3,0) 6.283  ; state_upper_4 (2pi)
+          (4,0) 6.283  ; state_upper_5 (2pi)
+          (5,0) 6.283  ; state_upper_6 (2pi)
+          (6,0) 6.283  ; state_upper_7 (2pi)
+          (7,0) 6.283  ; state_upper_8 (2pi)
+          (8,0) 6.283  ; state_upper_9 (2pi)
+          (9,0) 1.1    ; state_upper_10
+          (10,0) 1.1   ; state_upper_11
+          (11,0) 2.0   ; state_upper_12
+          (12,0) 2.0   ; state_upper_13
+          (13,0) 2.0   ; state_upper_14
+          (14,0) 3.0   ; state_upper_15
+          (15,0) 3.0   ; state_upper_16
+          (16,0) 3.0   ; state_upper_17
+          (17,0) 3.0   ; state_upper_18
+          (18,0) 2.5   ; state_upper_19
+          (19,0) 2.5   ; state_upper_20
+          (20,0) 1.0   ; state_upper_21
+          (21,0) 10.0  ; state_upper_22
+          (22,0) 10.0  ; state_upper_23
+          (23,0) 10.0  ; state_upper_24
+          (24,0) 10.0  ; state_upper_25
         }
     }
 
