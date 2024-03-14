@@ -50,4 +50,3 @@ MobileManipulatorInfo createMobileManipulatorInfo(const ocs2::PinocchioInterface
 ControllerSettings creatControllerSetting(const std::string& taskFile, const std::string& libraryFolder,const std::string& urdfFile, MobileManipulatorInfo robot_info);
 
 }  // namespace upright
-#include "implementation/FactoryFunctionsImpl.h"

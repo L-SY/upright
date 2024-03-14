@@ -1,5 +1,7 @@
-#include <ocs2_robotic_tools/common/RotationTransforms.h>
+#pragma once
 
+#include <ocs2_robotic_tools/common/RotationTransforms.h>
+#include <upright_control/common/AccessHelpFunctions.h>
 namespace upright{
 
 /******************************************************************************************************/

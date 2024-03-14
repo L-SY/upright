@@ -44,7 +44,7 @@
 #include <upright_control/dynamics/MobileManipulatorInfo.h>
 
 #include <upright_control/InertialAlignment.h>
-#include <upright_control/common/FactoryFunctions.h>
+#include <upright_control/common/implementation/FactoryFunctionsImpl.h>
 
 #include <pinocchio/algorithm/frames.hpp>
 #include <pinocchio/algorithm/kinematics.hpp>

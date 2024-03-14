@@ -16,10 +16,11 @@
 #include <ocs2_self_collision/PinocchioGeometryInterface.h>
 
 #include <upright_control/constraint/ObstacleConstraint.h>
-#include <upright_control/common/InterfaceSettings.h>
+#include <upright_control/common/implementation/SqpSettingsImpl.h>
 #include <upright_control/common/Types.h>
 #include <upright_control/dynamics/MobileManipulatorInfo.h>
-#include <upright_control/common/AccessHelpFunctions.h>
+#include <upright_control/common/implementation/AccessHelperFunctionsImpl.h>
+#include <upright_control/common/InterfaceSettings.h>
 
 namespace upright {
 
@@ -27,35 +28,40 @@ namespace upright {
     public:
         explicit ControllerInterface(const std::string& taskFile, const std::string& libraryFolder,const std::string& urdfFileconst, MobileManipulatorInfo model_info);
 
-        const ocs2::OptimalControlProblem& getOptimalControlProblem()
-        const override {
-            return problem_;
-        }
-
-        const ocs2::Initializer& getInitializer() const override {
-            return *initializer_ptr_;
-        }
-
-        std::shared_ptr<ocs2::ReferenceManagerInterface> getReferenceManagerPtr()
-        const override {
-            return reference_manager_ptr_;
-        }
-
         const VecXd& get_initial_state() { return initial_state_; }
+//        const ocs2::vector_t& getInitialState() { return initial_state_; }
+
+        ocs2::sqp::Settings& sqpSettings() { return sqpSettings_; }
+        ocs2::mpc::Settings& mpcSettings() { return mpcSettings_; }
+
+        const ocs2::OptimalControlProblem& getOptimalControlProblem()const override {return problem_;}
+
+        std::shared_ptr<ocs2::ReferenceManagerInterface> getReferenceManagerPtr()const override {return reference_manager_ptr_;}
+
+        const ocs2::RolloutBase& getRollout() const { return *rollout_ptr_; }
+        const ocs2::Initializer& getInitializer() const override {return *initializer_ptr_;}
+
 
         std::unique_ptr<ocs2::MPC_BASE> get_mpc();
 
-        const ocs2::RolloutBase& get_rollout() const { return *rollout_ptr_; }
 
-        const ocs2::PinocchioInterface& get_pinocchio_interface() const {
-            return *pinocchio_interface_ptr;
-        }
 
-        ocs2::PinocchioEndEffectorKinematicsCppAd& get_end_effector_kinematics() const {
-            return *end_effector_kinematics_ptr_;
-        }
+
+        const ocs2::PinocchioInterface& getPinocchioInterface() const {return *pinocchio_interface_ptr;}
+
+        ocs2::PinocchioEndEffectorKinematicsCppAd& get_end_effector_kinematics() const {return *end_effector_kinematics_ptr_;}
 
     private:
+        ocs2::sqp::Settings sqpSettings_;
+        ocs2::mpc::Settings mpcSettings_;
+        ControllerSettings settings_;
+        ocs2::OptimalControlProblem problem_;
+        std::unique_ptr<ocs2::RolloutBase> rollout_ptr_;
+        std::unique_ptr<ocs2::Initializer> initializer_ptr_;
+        std::shared_ptr<ocs2::ReferenceManager> reference_manager_ptr_;
+        std::unique_ptr<ocs2::PinocchioInterface> pinocchio_interface_ptr;
+        std::unique_ptr<ocs2::PinocchioEndEffectorKinematicsCppAd> end_effector_kinematics_ptr_;
+
         std::unique_ptr<ocs2::StateInputCost> get_quadratic_state_input_cost();
 
         // Hard static obstacle avoidance constraint.
@@ -73,12 +79,10 @@ namespace upright {
                 bool recompile_libraries);
 
         // Hard state and input limits.
-        std::unique_ptr<ocs2::StateInputConstraint>
-        get_joint_state_input_limit_constraint();
+        std::unique_ptr<ocs2::StateInputConstraint>get_joint_state_input_limit_constraint();
 
         // Soft state and input limits
-        std::unique_ptr<ocs2::StateInputCost>
-        get_soft_joint_state_input_limit_constraint();
+        std::unique_ptr<ocs2::StateInputCost>get_soft_joint_state_input_limit_constraint();
 
         // Hard balancing inequality constraints.
         std::unique_ptr<ocs2::StateInputConstraint> get_balancing_constraint(
@@ -112,14 +116,6 @@ namespace upright {
                 const ocs2::PinocchioEndEffectorKinematicsCppAd&
                 end_effector_kinematics,
                 bool recompileLibraries);
-
-        ControllerSettings settings_;
-        ocs2::OptimalControlProblem problem_;
-        std::unique_ptr<ocs2::RolloutBase> rollout_ptr_;
-        std::unique_ptr<ocs2::Initializer> initializer_ptr_;
-        std::shared_ptr<ocs2::ReferenceManager> reference_manager_ptr_;
-        std::unique_ptr<ocs2::PinocchioInterface> pinocchio_interface_ptr;
-        std::unique_ptr<ocs2::PinocchioEndEffectorKinematicsCppAd> end_effector_kinematics_ptr_;
 
         VecXd initial_state_;
     };

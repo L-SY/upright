@@ -19,7 +19,7 @@
 #include <ocs2_ros_interfaces/common/RosMsgHelpers.h>
 
 #include <upright_control/common/AccessHelpFunctions.h>
-#include <upright_control/common/FactoryFunctions.h>
+#include <upright_control/common/implementation/FactoryFunctionsImpl.h>
 #include <upright_control/dynamics/MobileManipulatorInfo.h>
 #include <upright_control/MobileManipulatorInterface.h>
 #include <upright_control_ros/MobileManipulatorVisualization.h>

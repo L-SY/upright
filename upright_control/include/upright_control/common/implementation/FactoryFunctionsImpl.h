@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "upright_control/common/FactoryFunctions.h"
 namespace upright{
 
 /******************************************************************************************************/
