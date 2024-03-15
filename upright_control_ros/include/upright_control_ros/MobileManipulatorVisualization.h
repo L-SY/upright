@@ -37,7 +37,6 @@ namespace ddt {
 
         ocs2::PinocchioInterface pinocchioInterface_;
         const upright::MobileManipulatorInfo modelInfo_;
-        std::vector<std::string> removeJointNames_;
 
         std::unique_ptr<robot_state_publisher::RobotStatePublisher> robotStatePublisherPtr_;
         tf::TransformBroadcaster tfBroadcaster_;

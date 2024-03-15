@@ -51,10 +51,8 @@ void MobileManipulatorDummyVisualization::launchVisualizerNode(ros::NodeHandle& 
     if (!kdl_parser::treeFromUrdfModel(model, tree)) {
         ROS_ERROR("Failed to extract kdl tree from xml robot description");
     }
-
     robotStatePublisherPtr_.reset(new robot_state_publisher::RobotStatePublisher(tree));
     robotStatePublisherPtr_->publishFixedTransforms(true);
-
     stateOptimizedPublisher_ = nodeHandle.advertise<visualization_msgs::MarkerArray>("/mobile_manipulator/optimizedStateTrajectory", 1);
     stateOptimizedPosePublisher_ = nodeHandle.advertise<geometry_msgs::PoseArray>("/mobile_manipulator/optimizedPoseTrajectory", 1);
     // Get ROS parameter
@@ -62,16 +60,14 @@ void MobileManipulatorDummyVisualization::launchVisualizerNode(ros::NodeHandle& 
     nodeHandle.getParam("/urdfFile", urdfFile);
     nodeHandle.getParam("/taskFile", taskFile);
     // read manipulator type
-    upright::RobotBaseType robotBaseType = upright::loadRobotBaseType(taskFile, "robot.base_type");
-    // read the joints to make fixed
-    ocs2::loadData::loadStdVector<std::string>(taskFile, "model_information.removeJoints", removeJointNames_, false);
+    upright::RobotBaseType robotBaseType = modelInfo_.robotBaseType;
     // read if self-collision checking active
     boost::property_tree::ptree pt;
     boost::property_tree::read_info(taskFile, pt);
     bool activateSelfCollision = true;
-    ocs2::loadData::loadPtreeValue(pt, activateSelfCollision, "selfCollision.activate", true);
+    ocs2::loadData::loadPtreeValue(pt, activateSelfCollision, "selfCollision.activate", false);
     // create pinocchio interface
-    ocs2::PinocchioInterface pinocchioInterface(upright::createPinocchioInterface(urdfFile, robotBaseType, removeJointNames_));
+    ocs2::PinocchioInterface pinocchioInterface(upright::createPinocchioInterface(urdfFile, robotBaseType));
     // activate markers for self-collision visualization
     if (activateSelfCollision) {
         std::vector<std::pair<size_t, size_t>> collisionObjectPairs;
@@ -112,9 +108,6 @@ void MobileManipulatorDummyVisualization::publishObservation(const ros::Time& ti
     std::map<std::string, ocs2::scalar_t> jointPositions;
     for (size_t i = 0; i < modelInfo_.dofNames.size(); i++) {
         jointPositions[modelInfo_.dofNames[i]] = j_arm(i);
-    }
-    for (const auto& name : removeJointNames_) {
-        jointPositions[name] = 0.0;
     }
     robotStatePublisherPtr_->publishTransforms(jointPositions, timeStamp);
 }

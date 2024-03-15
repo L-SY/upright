@@ -30,12 +30,10 @@ int main(int argc, char** argv) {
     ros::NodeHandle nodeHandle;
 
     // Robot interface
-//    const std::string taskFile = ros::package::getPath("upright_control") + "/config/" + taskFileFolderName + "/task.info";
-    const std::string taskFile = ros::package::getPath("upright_control") + "/config" + "/task.info";
+    const std::string taskFile = ros::package::getPath("mobile_manipulator_assets") + "/config/task.info";
     const std::string libFolder = ros::package::getPath("mobile_manipulator_assets") + "/auto_generated";
     const std::string urdfFile = ros::package::getPath("mobile_manipulator_assets") + "/description/urdf/ridgeback_ur5.urdf";
     upright::ControllerInterface mobileManipulatorInetface(taskFile, libFolder, urdfFile);
-
     // ROS ReferenceManager
     auto rosReferenceManagerPtr =
             std::make_shared<ddt::RosReferenceManager>("/mobile_manipulator",mobileManipulatorInetface.getReferenceManagerPtr());
@@ -44,10 +42,6 @@ int main(int argc, char** argv) {
     // MPC
     std::unique_ptr<ocs2::MPC_BASE> mpc_ptr = mobileManipulatorInetface.get_mpc();
     mpc_ptr->getSolverPtr()->setReferenceManager(rosReferenceManagerPtr);
-
-    // Launch MPC ROS node
-    ocs2::MPC_ROS_Interface mpc_node(*mpc_ptr, robotName);
-    mpc_node.launchNodes(nodeHandle);
 
     // Launch MPC ROS node
     ocs2::MPC_ROS_Interface mpcNode(*mpc_ptr, robotName);

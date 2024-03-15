@@ -18,7 +18,6 @@ ocs2::PinocchioInterface createPinocchioInterface(const std::string& robotUrdfPa
             jointComposite.addJoint(pinocchio::JointModelPX());
             jointComposite.addJoint(pinocchio::JointModelRZ());
             return ocs2::getPinocchioInterfaceFromUrdfFile(robotUrdfPath, jointComposite);
-            return ocs2::getPinocchioInterfaceFromUrdfFile(robotUrdfPath);
         }
         case RobotBaseType::Omnidirectional: {
             // add XY-yaw joint for the wheel-base
@@ -57,7 +56,6 @@ ocs2::PinocchioInterface createPinocchioInterface(const std::string& robotUrdfPa
             jointComposite.addJoint(pinocchio::JointModelPX());
             jointComposite.addJoint(pinocchio::JointModelRZ());
             return ocs2::getPinocchioInterfaceFromUrdfFile(robotUrdfPath, jointComposite);
-            return ocs2::getPinocchioInterfaceFromUrdfFile(robotUrdfPath);
         }
         case RobotBaseType::Omnidirectional: {
             // add XY-yaw joint for the wheel-base
@@ -156,6 +154,7 @@ ControllerSettings creatControllerSetting(const std::string& taskFile, const std
     settings.sqp = ocs2::multiple_shooting::loadSettings(taskFile, "sqp");
     settings.rollout = ocs2::rollout::loadSettings(taskFile, "rollout");
     settings.lib_folder = libraryFolder;
+    settings.robot_urdf_path = urdfFile;
 
 //  Robot setting
 

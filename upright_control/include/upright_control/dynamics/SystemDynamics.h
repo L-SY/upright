@@ -40,6 +40,7 @@ namespace upright {
 
     template <typename Scalar>
     class NonholonomicDynamics {
+    public:
         NonholonomicDynamics(const RobotDimensions& dims) : dims_(dims) {}
 
         VecX<Scalar> flowmap(Scalar t, const VecX<Scalar>& x, const VecX<Scalar>& u,

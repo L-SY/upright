@@ -19,19 +19,19 @@
       <param name="libFolder"  value="$(arg libFolder)" />
 
       <group if="$(arg rviz)">
-            <include file="$(find ocs2_mobile_manipulator_ros)/launch/include/visualize.launch">
+            <include file="$(find mobile_manipulator_assets)/launch/include/visualize.launch">
                   <arg name="urdfFile" value="$(arg urdfFile)" />
             </include>
       </group>
 <!--  Is not finish this part -->
-<!--       <node if="$(arg debug)" pkg="ocs2_mobile_manipulator_ros" type="mobile_manipulator_mpc_node" name="mobile_manipulator_mpc_node" -->
-<!--             output="screen" launch-prefix="gnome-terminal -- gdb -ex run --args" /> -->
-<!--       <node unless="$(arg debug)" pkg="ocs2_mobile_manipulator_ros" type="mobile_manipulator_mpc_node" name="mobile_manipulator_mpc_node" -->
-<!--             output="screen" launch-prefix="" /> -->
+      <node if="$(arg debug)" pkg="upright_control_ros" type="mobile_manipulator_mpc" name="mobile_manipulator_mpc"
+            output="screen" launch-prefix="gnome-terminal -- gdb -ex run --args" />
+      <node unless="$(arg debug)" pkg="upright_control_ros" type="mobile_manipulator_mpc" name="mobile_manipulator_mpc"
+            output="screen" launch-prefix="" />
 
-<!--       <node pkg="ocs2_mobile_manipulator_ros" type="mobile_manipulator_dummy_mrt_node" name="mobile_manipulator_dummy_mrt_node" -->
-<!--             output="screen" launch-prefix="gnome-terminal --" /> -->
+      <node pkg="upright_control_ros" type="mobile_manipulator_dummy_node" name="mobile_manipulator_dummy_node"
+            output="screen" launch-prefix="gnome-terminal --" />
 
-<!--       <node if="$(arg rviz)" pkg="ocs2_mobile_manipulator_ros" type="mobile_manipulator_target" name="mobile_manipulator_target" -->
-<!--             output="screen" launch-prefix="" /> -->
+      <node if="$(arg rviz)" pkg="upright_control_ros" type="ddt_mobile_manipulator_target" name="ddt_mobile_manipulator_target"
+            output="screen" launch-prefix="" />
 </launch>

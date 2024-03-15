@@ -123,7 +123,7 @@ namespace upright {
         // NOTE: we don't have any branches here because every system we use
         // currently is an integrator
         std::unique_ptr<ocs2::SystemDynamicsBase> dynamics_ptr(
-                new SystemDynamics<TripleIntegratorDynamics<ocs2::ad_scalar_t>>(
+                new SystemDynamics<NonholonomicDynamics<ocs2::ad_scalar_t>>(
                         "system_dynamics", settings_.dims, settings_.lib_folder,
                         recompile_libraries, true));
 
@@ -138,12 +138,11 @@ namespace upright {
         problem_.dynamicsPtr = std::move(dynamics_ptr);
 
         // Regularization cost
+        // TODO 没有成本函数会无法求解，但是加入后有会报矩阵不对齐的问题
         problem_.costPtr->add("state_input_cost", get_quadratic_state_input_cost());
 
         // Build the end effector kinematics
-        SystemPinocchioMapping<TripleIntegratorPinocchioMapping<ocs2::ad_scalar_t>,
-                ocs2::ad_scalar_t>
-                mapping(settings_.dims);
+        SystemPinocchioMapping<TripleIntegratorPinocchioMapping<ocs2::ad_scalar_t>,ocs2::ad_scalar_t>mapping(settings_.dims);
 
         /* Constraints */
         if (settings_.limit_constraint_type == ConstraintType::Soft) {
@@ -178,92 +177,88 @@ namespace upright {
             std::cerr << "Hard state and input limits are enabled." << std::endl;
         }
 
-        // Collision avoidance
-        if (settings_.obstacle_settings.enabled) {
-            ocs2::PinocchioGeometryInterface geom_interface(
-                    *pinocchio_interface_ptr);
-
-            // Add obstacle collision objects to the geometry model, so we can check
-            // them against the robot.
-            std::string obs_urdf_path =
-                    settings_.obstacle_settings.obstacle_urdf_path;
-            if (obs_urdf_path.size() > 0) {
-                std::cout << "Obstacle URDF: " << obs_urdf_path << std::endl;
-                pinocchio::GeometryModel obs_geom_model =
-                        build_geometry_model(obs_urdf_path);
-                geom_interface.addGeometryObjects(obs_geom_model);
-            }
-
-            const auto& model = pinocchio_interface_ptr->getModel();
-            auto& geom_model = geom_interface.getGeometryModel();
-            add_ground_plane(model, geom_model);
-
-            // Add dynamic obstacles.
-            if (settings_.obstacle_settings.dynamic_obstacles.size() > 0) {
-                ocs2::PinocchioInterface::Model dyn_obs_model, new_model;
-                pinocchio::GeometryModel dyn_obs_geom_model, new_geom_model;
-
-                std::tie(dyn_obs_model, dyn_obs_geom_model) =
-                        build_dynamic_obstacle_model(
-                                settings_.obstacle_settings.dynamic_obstacles);
-
-                // Update models
-                pinocchio::appendModel(
-                        model, dyn_obs_model, geom_model, dyn_obs_geom_model, 0,
-                        pinocchio::SE3::Identity(), new_model, new_geom_model);
-
-                pinocchio_interface_ptr.reset(
-                        new ocs2::PinocchioInterface(new_model));
-                geom_interface = ocs2::PinocchioGeometryInterface(new_geom_model);
-            }
-
-            std::cout << *pinocchio_interface_ptr << std::endl;
-
-            if (settings_.obstacle_settings.constraint_type ==
-                ConstraintType::Soft) {
-                problem_.stateSoftConstraintPtr->add(
-                        "obstacle_avoidance",
-                        get_soft_obstacle_constraint(
-                                *pinocchio_interface_ptr, geom_interface,
-                                settings_.obstacle_settings, settings_.lib_folder,
-                                recompile_libraries));
-                std::cerr << "Soft obstacle avoidance constraints are enabled."
-                          << std::endl;
-            } else {
-                // Get the usual state constraint
-                std::unique_ptr<ocs2::StateConstraint> obstacle_constraint =
-                        get_obstacle_constraint(
-                                *pinocchio_interface_ptr, geom_interface,
-                                settings_.obstacle_settings, settings_.lib_folder,
-                                recompile_libraries);
-
-                // Map it to a state-input constraint so it works with the current
-                // implementation of the hard inequality constraints
-                problem_.inequalityConstraintPtr->add(
-                        "obstacle_avoidance",
-                        std::unique_ptr<ocs2::StateInputConstraint>(
-                                new StateToStateInputConstraint(*obstacle_constraint)));
-                std::cerr << "Hard obstacle avoidance constraints are enabled."
-                          << std::endl;
-            }
-        } else {
-            std::cerr << "Obstacle avoidance is disabled." << std::endl;
-        }
-
+//        // Collision avoidance
+//        if (settings_.obstacle_settings.enabled) {
+//            ocs2::PinocchioGeometryInterface geom_interface(
+//                    *pinocchio_interface_ptr);
+//
+//            // Add obstacle collision objects to the geometry model, so we can check
+//            // them against the robot.
+//            std::string obs_urdf_path =
+//                    settings_.obstacle_settings.obstacle_urdf_path;
+//            if (obs_urdf_path.size() > 0) {
+//                std::cout << "Obstacle URDF: " << obs_urdf_path << std::endl;
+//                pinocchio::GeometryModel obs_geom_model =
+//                        build_geometry_model(obs_urdf_path);
+//                geom_interface.addGeometryObjects(obs_geom_model);
+//            }
+//
+//            const auto& model = pinocchio_interface_ptr->getModel();
+//            auto& geom_model = geom_interface.getGeometryModel();
+//            add_ground_plane(model, geom_model);
+//
+//            // Add dynamic obstacles.
+//            if (settings_.obstacle_settings.dynamic_obstacles.size() > 0) {
+//                ocs2::PinocchioInterface::Model dyn_obs_model, new_model;
+//                pinocchio::GeometryModel dyn_obs_geom_model, new_geom_model;
+//
+//                std::tie(dyn_obs_model, dyn_obs_geom_model) =
+//                        build_dynamic_obstacle_model(
+//                                settings_.obstacle_settings.dynamic_obstacles);
+//
+//                // Update models
+//                pinocchio::appendModel(
+//                        model, dyn_obs_model, geom_model, dyn_obs_geom_model, 0,
+//                        pinocchio::SE3::Identity(), new_model, new_geom_model);
+//
+//                pinocchio_interface_ptr.reset(
+//                        new ocs2::PinocchioInterface(new_model));
+//                geom_interface = ocs2::PinocchioGeometryInterface(new_geom_model);
+//            }
+//
+//            std::cout << *pinocchio_interface_ptr << std::endl;
+//
+//            if (settings_.obstacle_settings.constraint_type ==
+//                ConstraintType::Soft) {
+//                problem_.stateSoftConstraintPtr->add(
+//                        "obstacle_avoidance",
+//                        get_soft_obstacle_constraint(
+//                                *pinocchio_interface_ptr, geom_interface,
+//                                settings_.obstacle_settings, settings_.lib_folder,
+//                                recompile_libraries));
+//                std::cerr << "Soft obstacle avoidance constraints are enabled."
+//                          << std::endl;
+//            } else {
+//                // Get the usual state constraint
+//                std::unique_ptr<ocs2::StateConstraint> obstacle_constraint =
+//                        get_obstacle_constraint(
+//                                *pinocchio_interface_ptr, geom_interface,
+//                                settings_.obstacle_settings, settings_.lib_folder,
+//                                recompile_libraries);
+//
+//                // Map it to a state-input constraint so it works with the current
+//                // implementation of the hard inequality constraints
+//                problem_.inequalityConstraintPtr->add(
+//                        "obstacle_avoidance",
+//                        std::unique_ptr<ocs2::StateInputConstraint>(
+//                                new StateToStateInputConstraint(*obstacle_constraint)));
+//                std::cerr << "Hard obstacle avoidance constraints are enabled."
+//                          << std::endl;
+//            }
+//        } else {
+//            std::cerr << "Obstacle avoidance is disabled." << std::endl;
+//        }
         ocs2::PinocchioEndEffectorKinematicsCppAd end_effector_kinematics(
                 *pinocchio_interface_ptr, mapping, {settings_.end_effector_link_name},
                 settings_.dims.x(), settings_.dims.u(), "end_effector_kinematics",
                 settings_.lib_folder, recompile_libraries, false);
-
         // Store for possible use by other callers.
         end_effector_kinematics_ptr_.reset(end_effector_kinematics.clone());
-
         // End effector pose cost
         std::unique_ptr<ocs2::StateCost> end_effector_cost(new EndEffectorCost(
                 settings_.end_effector_weight, end_effector_kinematics));
         problem_.stateCostPtr->add("end_effector_cost",
                                    std::move(end_effector_cost));
-
         // Alternative auto-diff version with full Hessian
         // std::unique_ptr<ocs2::StateCost> end_effector_cost(new
         // EndEffectorCostCppAd(
@@ -271,141 +266,144 @@ namespace upright {
         //     settings_.dims, recompile_libraries));
         // problem_.stateCostPtr->add("end_effector_cost",
         //                            std::move(end_effector_cost));
-
         // End effector position box constraint
-        if (settings_.end_effector_box_constraint_enabled) {
-            std::cout << "End effector box constraint is enabled." << std::endl;
-            std::unique_ptr<ocs2::StateConstraint> end_effector_box_constraint(
-                    new EndEffectorBoxConstraint(
-                            settings_.xyz_lower, settings_.xyz_upper,
-                            end_effector_kinematics, *reference_manager_ptr_));
-            problem_.inequalityConstraintPtr->add(
-                    "end_effector_box_constraint",
-                    std::unique_ptr<ocs2::StateInputConstraint>(
-                            new StateToStateInputConstraint(*end_effector_box_constraint)));
-        } else {
-            std::cout << "End effector box constraint is disabled." << std::endl;
-        }
+
+
+//        if (settings_.end_effector_box_constraint_enabled) {
+//            std::cout << "End effector box constraint is enabled." << std::endl;
+//            std::unique_ptr<ocs2::StateConstraint> end_effector_box_constraint(
+//                    new EndEffectorBoxConstraint(
+//                            settings_.xyz_lower, settings_.xyz_upper,
+//                            end_effector_kinematics, *reference_manager_ptr_));
+//            problem_.inequalityConstraintPtr->add(
+//                    "end_effector_box_constraint",
+//                    std::unique_ptr<ocs2::StateInputConstraint>(
+//                            new StateToStateInputConstraint(*end_effector_box_constraint)));
+//        } else {
+//            std::cout << "End effector box constraint is disabled." << std::endl;
+//        }
+
+
 
         // Experimental: projectile avoidance constraint
-        if (settings_.projectile_path_constraint_enabled) {
-            // TODO: hardcoded link name
-            ocs2::PinocchioEndEffectorKinematicsCppAd
-                    end_effector_collision_kinematics(
-                    *pinocchio_interface_ptr, mapping,
-                    settings_.projectile_path_collision_links, settings_.dims.x(),
-                    settings_.dims.u(), "end_effector_collision_kinematics",
-                    settings_.lib_folder, recompile_libraries, false);
+//        if (settings_.projectile_path_constraint_enabled) {
+//            // TODO: hardcoded link name
+//            ocs2::PinocchioEndEffectorKinematicsCppAd
+//                    end_effector_collision_kinematics(
+//                    *pinocchio_interface_ptr, mapping,
+//                    settings_.projectile_path_collision_links, settings_.dims.x(),
+//                    settings_.dims.u(), "end_effector_collision_kinematics",
+//                    settings_.lib_folder, recompile_libraries, false);
+//
+//            std::unique_ptr<ocs2::StateConstraint> projectile_constraint(
+//                    new ProjectilePathConstraint(end_effector_collision_kinematics,
+//                                                 *reference_manager_ptr_,
+//                                                 settings_.projectile_path_distances,
+//                                                 settings_.projectile_path_scale));
+//            // new ProjectilePlaneConstraint(end_effector_collision_kinematics,
+//            //                              *reference_manager_ptr_,
+//            //                              settings_.projectile_path_distance));
+//            problem_.inequalityConstraintPtr->add(
+//                    "projectile_constraint",
+//                    std::unique_ptr<ocs2::StateInputConstraint>(
+//                            new StateToStateInputConstraint(*projectile_constraint)));
+//        }
+//
+//        // Inertial alignment
+//        if (settings_.inertial_alignment_settings.cost_enabled) {
+//            std::unique_ptr<ocs2::StateInputCost> inertial_alignment_cost(
+//                    new InertialAlignmentCostGaussNewton(
+//                            end_effector_kinematics, settings_.inertial_alignment_settings,
+//                            settings_.gravity, settings_.dims, true));
+//            problem_.costPtr->add("inertial_alignment_cost",
+//                                  std::move(inertial_alignment_cost));
+//            std::cout << "Inertial alignment cost enabled." << std::endl;
+//        }
+//        if (settings_.inertial_alignment_settings.constraint_enabled) {
+//            std::unique_ptr<ocs2::StateInputConstraint>
+//                    inertial_alignment_constraint(new InertialAlignmentConstraint(
+//                    end_effector_kinematics, settings_.inertial_alignment_settings,
+//                    settings_.gravity, settings_.dims, recompile_libraries));
+//            problem_.inequalityConstraintPtr->add(
+//                    "inertial_alignment_constraint",
+//                    std::move(inertial_alignment_constraint));
+//            std::cout << "Inertial alignment constraint enabled." << std::endl;
+//        }
 
-            std::unique_ptr<ocs2::StateConstraint> projectile_constraint(
-                    new ProjectilePathConstraint(end_effector_collision_kinematics,
-                                                 *reference_manager_ptr_,
-                                                 settings_.projectile_path_distances,
-                                                 settings_.projectile_path_scale));
-            // new ProjectilePlaneConstraint(end_effector_collision_kinematics,
-            //                              *reference_manager_ptr_,
-            //                              settings_.projectile_path_distance));
-            problem_.inequalityConstraintPtr->add(
-                    "projectile_constraint",
-                    std::unique_ptr<ocs2::StateInputConstraint>(
-                            new StateToStateInputConstraint(*projectile_constraint)));
-        }
-
-        // Inertial alignment
-        if (settings_.inertial_alignment_settings.cost_enabled) {
-            std::unique_ptr<ocs2::StateInputCost> inertial_alignment_cost(
-                    new InertialAlignmentCostGaussNewton(
-                            end_effector_kinematics, settings_.inertial_alignment_settings,
-                            settings_.gravity, settings_.dims, true));
-            problem_.costPtr->add("inertial_alignment_cost",
-                                  std::move(inertial_alignment_cost));
-            std::cout << "Inertial alignment cost enabled." << std::endl;
-        }
-        if (settings_.inertial_alignment_settings.constraint_enabled) {
-            std::unique_ptr<ocs2::StateInputConstraint>
-                    inertial_alignment_constraint(new InertialAlignmentConstraint(
-                    end_effector_kinematics, settings_.inertial_alignment_settings,
-                    settings_.gravity, settings_.dims, recompile_libraries));
-            problem_.inequalityConstraintPtr->add(
-                    "inertial_alignment_constraint",
-                    std::move(inertial_alignment_constraint));
-            std::cout << "Inertial alignment constraint enabled." << std::endl;
-        }
-
-        // TODO we're getting too nested here
-        if (settings_.balancing_settings.enabled) {
-            if (settings_.balancing_settings.use_force_constraints) {
-                problem_.equalityConstraintPtr->add(
-                        "object_dynamics",
-                        get_object_dynamics_constraint(end_effector_kinematics,
-                                                       recompile_libraries));
-
-                // Inequalities for the friction cones
-                // NOTE: the hard inequality constraints appear to work much better
-                // (avoid phantom gradients and such)
-                if (settings_.balancing_settings.constraint_type ==
-                    ConstraintType::Soft) {
-                    std::cerr
-                            << "Soft contact force-based balancing constraints enabled."
-                            << std::endl;
-                    problem_.softConstraintPtr->add(
-                            "contact_forces",
-                            get_soft_contact_force_constraint(end_effector_kinematics,
-                                                              recompile_libraries));
-                } else {
-                    std::cerr
-                            << "Hard contact force-based balancing constraints enabled."
-                            << std::endl;
-                    const bool frictionless = (settings_.dims.nf == 1);
-                    if (frictionless) {
-                        // lower bounds are already zero, make the upper ones
-                        // arbitrary high values
-                        problem_.boundConstraintPtr->input_ub_
-                                .tail(settings_.dims.f())
-                                .setConstant(1e6);
-                        // indicate that all inputs are now box constrained (real
-                        // inputs and contact forces)
-                        problem_.boundConstraintPtr->setInputIndices(
-                                0, settings_.dims.u());
-
-                        std::cout
-                                << problem_.boundConstraintPtr->input_lb_.transpose()
-                                << std::endl;
-                        std::cout
-                                << problem_.boundConstraintPtr->input_ub_.transpose()
-                                << std::endl;
-                    } else {
-                        problem_.inequalityConstraintPtr->add(
-                                "contact_forces",
-                                get_contact_force_constraint(end_effector_kinematics,
-                                                             recompile_libraries));
-                    }
-                }
-            } else {
-                if (settings_.balancing_settings.constraint_type ==
-                    ConstraintType::Soft) {
-                    std::cerr << "Soft ZMP/limit surface-based balancing "
-                                 "constraints enabled."
-                              << std::endl;
-
-                    problem_.softConstraintPtr->add(
-                            "balancing",
-                            get_soft_balancing_constraint(end_effector_kinematics,
-                                                          recompile_libraries));
-
-                } else {
-                    std::cerr << "Hard ZMP/limit surface-based balancing "
-                                 "constraints enabled."
-                              << std::endl;
-                    problem_.inequalityConstraintPtr->add(
-                            "balancing",
-                            get_balancing_constraint(end_effector_kinematics,
-                                                     recompile_libraries));
-                }
-            }
-        } else {
-            std::cerr << "Balancing constraints disabled." << std::endl;
-        }
+//        // TODO we're getting too nested here
+//        if (settings_.balancing_settings.enabled) {
+//            if (settings_.balancing_settings.use_force_constraints) {
+//                problem_.equalityConstraintPtr->add(
+//                        "object_dynamics",
+//                        get_object_dynamics_constraint(end_effector_kinematics,
+//                                                       recompile_libraries));
+//
+//                // Inequalities for the friction cones
+//                // NOTE: the hard inequality constraints appear to work much better
+//                // (avoid phantom gradients and such)
+//                if (settings_.balancing_settings.constraint_type ==
+//                    ConstraintType::Soft) {
+//                    std::cerr
+//                            << "Soft contact force-based balancing constraints enabled."
+//                            << std::endl;
+//                    problem_.softConstraintPtr->add(
+//                            "contact_forces",
+//                            get_soft_contact_force_constraint(end_effector_kinematics,
+//                                                              recompile_libraries));
+//                } else {
+//                    std::cerr
+//                            << "Hard contact force-based balancing constraints enabled."
+//                            << std::endl;
+//                    const bool frictionless = (settings_.dims.nf == 1);
+//                    if (frictionless) {
+//                        // lower bounds are already zero, make the upper ones
+//                        // arbitrary high values
+//                        problem_.boundConstraintPtr->input_ub_
+//                                .tail(settings_.dims.f())
+//                                .setConstant(1e6);
+//                        // indicate that all inputs are now box constrained (real
+//                        // inputs and contact forces)
+//                        problem_.boundConstraintPtr->setInputIndices(
+//                                0, settings_.dims.u());
+//
+//                        std::cout
+//                                << problem_.boundConstraintPtr->input_lb_.transpose()
+//                                << std::endl;
+//                        std::cout
+//                                << problem_.boundConstraintPtr->input_ub_.transpose()
+//                                << std::endl;
+//                    } else {
+//                        problem_.inequalityConstraintPtr->add(
+//                                "contact_forces",
+//                                get_contact_force_constraint(end_effector_kinematics,
+//                                                             recompile_libraries));
+//                    }
+//                }
+//            } else {
+//                if (settings_.balancing_settings.constraint_type ==
+//                    ConstraintType::Soft) {
+//                    std::cerr << "Soft ZMP/limit surface-based balancing "
+//                                 "constraints enabled."
+//                              << std::endl;
+//
+//                    problem_.softConstraintPtr->add(
+//                            "balancing",
+//                            get_soft_balancing_constraint(end_effector_kinematics,
+//                                                          recompile_libraries));
+//
+//                } else {
+//                    std::cerr << "Hard ZMP/limit surface-based balancing "
+//                                 "constraints enabled."
+//                              << std::endl;
+//                    problem_.inequalityConstraintPtr->add(
+//                            "balancing",
+//                            get_balancing_constraint(end_effector_kinematics,
+//                                                     recompile_libraries));
+//                }
+//            }
+//        } else {
+//            std::cerr << "Balancing constraints disabled." << std::endl;
+//        }
 
         // Initialization state
         if (settings_.use_operating_points) {
@@ -437,22 +435,26 @@ namespace upright {
     std::unique_ptr<ocs2::StateInputCost>
     ControllerInterface::get_quadratic_state_input_cost() {
         // augment R with cost on the contact forces
-        MatXd input_weight =
-                settings_.balancing_settings.force_weight *
-                MatXd::Identity(settings_.dims.u(), settings_.dims.u());
-        input_weight.topLeftCorner(settings_.dims.robot.u, settings_.dims.robot.u) =
-                settings_.input_weight;
+//        MatXd input_weight =
+//                settings_.balancing_settings.force_weight *
+//                MatXd::Identity(settings_.dims.u(), settings_.dims.u());
+//        input_weight.topLeftCorner(settings_.dims.robot.u, settings_.dims.robot.u) =
+//                settings_.input_weight;
+        MatXd input_weight = settings_.input_weight;
 
         // TODO do I need weight on obstacle dynamics?
-        MatXd state_weight = MatXd::Zero(settings_.dims.x(), settings_.dims.x());
-        state_weight.topLeftCorner(settings_.dims.robot.x, settings_.dims.robot.x) =
-                settings_.state_weight;
+//        MatXd state_weight = MatXd::Zero(settings_.dims.x(), settings_.dims.x());
+//        state_weight.topLeftCorner(settings_.dims.robot.x, settings_.dims.robot.x) =
+//                settings_.state_weight;
+        MatXd state_weight = settings_.state_weight;;
 
         std::cout << "Q: " << state_weight << std::endl;
         std::cout << "R: " << input_weight << std::endl;
 
+//        return std::unique_ptr<ocs2::StateInputCost>(
+//                new QuadraticJointStateInputCost(state_weight, input_weight, settings_.xd));
         return std::unique_ptr<ocs2::StateInputCost>(
-                new QuadraticJointStateInputCost(state_weight, input_weight, settings_.xd));
+                new QuadraticJointStateInputCost(state_weight, input_weight));
     }
 
     std::unique_ptr<ocs2::StateInputConstraint>
