@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
     // Interface
     const std::string taskFile = ros::package::getPath("mobile_manipulator_assets") + "/config/task.info";
     const std::string libFolder = ros::package::getPath("mobile_manipulator_assets") + "/auto_generated";
-    const std::string urdfFile = ros::package::getPath("mobile_manipulator_assets") + "/description/urdf/ridgeback_ur5.urdf";
+    const std::string urdfFile = ros::package::getPath("mobile_manipulator_assets") + "/description/OCS2_mobile_manipulator/urdf/ridgeback_ur5.urdf";
     upright::ControllerInterface mobileManipulatorInetface(taskFile, libFolder, urdfFile);
 
     // MRT
@@ -52,7 +52,7 @@ int main(int argc, char** argv) {
     initObservation.time = 0.0;
 
     ocs2::vector_t initTarget(7);
-    initTarget.head(3) << 1, 0, 1;
+    initTarget.head(3) << 0, 0, 1;
     initTarget.tail(4) << Eigen::Quaternion<ocs2::scalar_t>(1, 0, 0, 0).coeffs();
 
     // initial command

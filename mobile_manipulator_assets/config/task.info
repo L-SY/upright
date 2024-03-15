@@ -15,11 +15,11 @@ robot
     (0,0) 0.0       ; initial state x0_1
     (1,0) 0.0        ; initial state x0_2
     (2,0) 0.0        ; initial state x0_3
-    (3,0) 2.5   ; initial state x0_4 (0.5pi)
-    (4,0) -1.0 ; initial state x0_5 (-0.25pi)
-    (5,0) 1.5   ; initial state x0_6 (0.5pi)
+    (3,0) 0   ; initial state x0_4 (0.5pi)
+    (4,0) 0 ; initial state x0_5 (-0.25pi)
+    (5,0) 0   ; initial state x0_6 (0.5pi)
     (6,0) 0.0 ; initial state x0_7 (-0.25pi)
-    (7,0) 1.0   ; initial state x0_8 (0.5pi)
+    (7,0) 0   ; initial state x0_8 (0.5pi)
     (8,0) 0.0 ; initial state x0_9 (0.417pi)
 
     ; init vel
@@ -43,7 +43,7 @@ robot
     (24,0) 0.0       ; initial state x0_25
   }
 
-  tool_link_name "ur_arm_wrist_3_link"  ; the name of the link representing the tool (i.e., the tray)
+  tool_link_name "ur_arm_tool0"  ; the name of the link representing the tool (i.e., the tray)
   base_link_name "base_link"
 
   arm_dim 6 ; the dof of arm
@@ -61,22 +61,25 @@ mobile_manipulator_interface
 ; Rollout settings
 rollout
 {
-  timeStep                      1e-2
-  maxNumStepsPerSecond          100000
-  checkNumericalStability       false
+  AbsTolODE                       1e-5
+  RelTolODE                       1e-3
+  timeStep                        1e-2
+  integratorType                  ODE45
+  maxNumStepsPerSecond            100000
+  checkNumericalStability         false
 }
 
 ; MPC settings
 mpc
 {
-  timeHorizon                    2.0   ; [s]
-  solutionTimeWindow             0.2   ; [s]
-  coldStart                      false
+  timeHorizon                     3.0  ; [s]
+  solutionTimeWindow              0.2   ; [s]
+  coldStart                       false
 
-  debugPrint                     false
+  debugPrint                      true
 
-  mpcDesiredFrequency            250   ; [Hz]
-  mrtDesiredFrequency            500   ; [Hz]
+  mpcDesiredFrequency             100   ; [Hz]
+  mrtDesiredFrequency             400   ; [Hz]
 }
 
 ; settings for the sequential quadratic programming solver
@@ -131,14 +134,14 @@ Cost
     (8,8) 0.0    ; M(8,8)
 
     ; the vel weight
-    (9,9) 10.0   ; M(9,9)
-    (10,10) 10.0 ; M(10,10)
-    (11,11) 10.0 ; M(11,11)
-    (12,12) 10.0 ; M(12,12)
-    (13,13) 10.0 ; M(13,13)
-    (14,14) 10.0 ; M(14,14)
-    (15,15) 10.0 ; M(15,15)
-    (16,16) 10.0 ; M(16,16)
+    (9,9) 0.0   ; M(9,9)
+    (10,10) 0.0 ; M(10,10)
+    (11,11) 0.0 ; M(11,11)
+    (12,12) 0.0 ; M(12,12)
+    (13,13) 0.0 ; M(13,13)
+    (14,14) 0.0 ; M(14,14)
+    (15,15) 0.0 ; M(15,15)
+    (16,16) 0.0 ; M(16,16)
 
     ; the acc weight
     (17,17) 1.0  ; M(17,17)
@@ -152,14 +155,14 @@ Cost
   }
   end_effector  ; EE pose weight
   {
-    scale 1e+3
+    scale 1e+5
     ; 3 position DOFs, 3 orientation DOFs
     (0,0) 1.0    ; M(0,0)
     (1,1) 1.0    ; M(1,1)
     (2,2) 1.0    ; M(2,2)
-    (3,3) 0.0    ; M(3,3)
-    (4,4) 0.0    ; M(4,4)
-    (5,5) 0.0    ; M(5,5)
+    (3,3) 10.0    ; M(3,3)
+    (4,4) 10.0    ; M(4,4)
+    (5,5) 10.0    ; M(5,5)
   }
 }
 
@@ -327,7 +330,7 @@ inertial_alignment
 ; the controller can be initialized around some operating points may not fully supported
 operating_points
 {
-  enabled bool  ; leave `false`
+  enabled false  ; leave `false`
 }
 
 ; estimation settings

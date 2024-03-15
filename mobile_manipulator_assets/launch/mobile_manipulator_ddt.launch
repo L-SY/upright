@@ -5,7 +5,7 @@
       <arg name="debug"       default="false" />
 
       <!-- The URDF model of the robot -->
-      <arg name="urdfFile"    value="$(find mobile_manipulator_assets)/description/urdf/ridgeback_ur5.urdf" />
+      <arg name="urdfFile"    value="$(find mobile_manipulator_assets)/description/OCS2_mobile_manipulator/urdf/ridgeback_ur5.urdf" />
       <!-- The task file for the mpc. -->
       <arg name="taskFile"    value="$(find mobile_manipulator_assets)/config/task.info" />
       <!-- The library folder to generate CppAD codegen into -->

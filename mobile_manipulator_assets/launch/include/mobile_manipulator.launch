@@ -23,7 +23,7 @@
                   <arg name="urdfFile" value="$(arg urdfFile)" />
             </include>
       </group>
-<!--  Is not finish this part -->
+
       <node if="$(arg debug)" pkg="upright_control_ros" type="mobile_manipulator_mpc" name="mobile_manipulator_mpc"
             output="screen" launch-prefix="gnome-terminal -- gdb -ex run --args" />
       <node unless="$(arg debug)" pkg="upright_control_ros" type="mobile_manipulator_mpc" name="mobile_manipulator_mpc"

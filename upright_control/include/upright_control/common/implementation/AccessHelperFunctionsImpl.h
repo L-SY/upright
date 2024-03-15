@@ -55,7 +55,7 @@ template <typename Derived>
 Eigen::Block<Derived, -1, 1> getArmJointAngles(Eigen::MatrixBase<Derived>& state, const MobileManipulatorInfo& info) {
     assert(state.rows() == info.OCPDim.robot.x);
     assert(state.cols() == 1);
-    const size_t startRow = info.OCPDim.robot.q - info.armDim;
+    const size_t startRow = 3;
     return Eigen::Block<Derived, -1, 1>(state.derived(), startRow, 0, info.armDim, 1);
 }
 
@@ -64,7 +64,7 @@ const Eigen::Block<const Derived, -1, 1> getArmJointAngles(const Eigen::MatrixBa
     assert(state.rows() == info.OCPDim.robot.x);
     assert(state.cols() == 1);
     // resolve for arm dof start index
-    const size_t startRow = info.OCPDim.robot.q - info.armDim;
+    const size_t startRow = 3;
     return Eigen::Block<const Derived, -1, 1>(state.derived(), startRow, 0, info.armDim, 1);
 }
 

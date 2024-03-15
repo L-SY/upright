@@ -8,11 +8,9 @@
 #include <tf/transform_broadcaster.h>
 
 #include <ocs2_ros_interfaces/mrt/DummyObserver.h>
-
-#include <ocs2_mobile_manipulator/ManipulatorModelInfo.h>
-#include <upright_control/MobileManipulatorInterface.h>
 #include <ocs2_self_collision_visualization/GeometryInterfaceVisualization.h>
 
+#include <upright_control/MobileManipulatorInterface.h>
 #include "upright_control/dynamics/MobileManipulatorInfo.h"
 
 namespace ddt {

@@ -18,10 +18,11 @@
 #include <ocs2_core/misc/LoadStdVectorOfPair.h>
 #include <ocs2_ros_interfaces/common/RosMsgHelpers.h>
 
-#include <upright_control/common/AccessHelpFunctions.h>
+#include <upright_control/common/implementation/AccessHelperFunctionsImpl.h>
 #include <upright_control/common/implementation/FactoryFunctionsImpl.h>
 #include <upright_control/dynamics/MobileManipulatorInfo.h>
 #include <upright_control/MobileManipulatorInterface.h>
+
 #include <upright_control_ros/MobileManipulatorVisualization.h>
 
 namespace ddt{
@@ -104,10 +105,11 @@ void MobileManipulatorDummyVisualization::publishObservation(const ros::Time& ti
     tfBroadcaster_.sendTransform(base_tf);
 
     // publish joints transforms
-    const auto j_arm = getArmJointAngles(observation.state, modelInfo_);
+    const auto j_arm = upright::getArmJointAngles(observation.state, modelInfo_);
     std::map<std::string, ocs2::scalar_t> jointPositions;
     for (size_t i = 0; i < modelInfo_.dofNames.size(); i++) {
         jointPositions[modelInfo_.dofNames[i]] = j_arm(i);
+//        ROS_INFO_STREAM(modelInfo_.dofNames[i] << ": " << j_arm(i));
     }
     robotStatePublisherPtr_->publishTransforms(jointPositions, timeStamp);
 }
@@ -132,7 +134,6 @@ void MobileManipulatorDummyVisualization::publishOptimizedTrajectory(const ros::
     const std::array<ocs2::scalar_t, 3> red{0.6350, 0.0780, 0.1840};
     const std::array<ocs2::scalar_t, 3> blue{0, 0.4470, 0.7410};
     const auto& mpcStateTrajectory = policy.stateTrajectory_;
-
     visualization_msgs::MarkerArray markerArray;
 
     // Base trajectory
@@ -144,7 +145,6 @@ void MobileManipulatorDummyVisualization::publishOptimizedTrajectory(const ros::
     // End effector trajectory
     const auto& model = pinocchioInterface_.getModel();
     auto& data = pinocchioInterface_.getData();
-
     std::vector<geometry_msgs::Point> endEffectorTrajectory;
     endEffectorTrajectory.reserve(mpcStateTrajectory.size());
     std::for_each(mpcStateTrajectory.begin(), mpcStateTrajectory.end(), [&](const Eigen::VectorXd& state) {
