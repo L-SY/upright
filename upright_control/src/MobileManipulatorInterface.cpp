@@ -138,11 +138,10 @@ namespace upright {
         problem_.dynamicsPtr = std::move(dynamics_ptr);
 
         // Regularization cost
-        // TODO 没有成本函数会无法求解，但是加入后有会报矩阵不对齐的问题
         problem_.costPtr->add("state_input_cost", get_quadratic_state_input_cost());
 
         // Build the end effector kinematics
-        SystemPinocchioMapping<TripleIntegratorPinocchioMapping<ocs2::ad_scalar_t>,ocs2::ad_scalar_t>mapping(settings_.dims);
+        NonholonomicPinocchioMapping<ocs2::ad_scalar_t>mapping(settings_.dims.robot);
 
         /* Constraints */
         if (settings_.limit_constraint_type == ConstraintType::Soft) {
@@ -248,10 +247,12 @@ namespace upright {
 //        } else {
 //            std::cerr << "Obstacle avoidance is disabled." << std::endl;
 //        }
+        std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+        std::cout << settings_.dims.x() << std::endl;
         ocs2::PinocchioEndEffectorKinematicsCppAd end_effector_kinematics(
                 *pinocchio_interface_ptr, mapping, {settings_.end_effector_link_name},
                 settings_.dims.x(), settings_.dims.u(), "end_effector_kinematics",
-                settings_.lib_folder, recompile_libraries, false);
+                settings_.lib_folder, true, false);
         // Store for possible use by other callers.
         end_effector_kinematics_ptr_.reset(end_effector_kinematics.clone());
         // End effector pose cost
@@ -269,19 +270,21 @@ namespace upright {
         // End effector position box constraint
 
 
-//        if (settings_.end_effector_box_constraint_enabled) {
-//            std::cout << "End effector box constraint is enabled." << std::endl;
-//            std::unique_ptr<ocs2::StateConstraint> end_effector_box_constraint(
-//                    new EndEffectorBoxConstraint(
-//                            settings_.xyz_lower, settings_.xyz_upper,
-//                            end_effector_kinematics, *reference_manager_ptr_));
-//            problem_.inequalityConstraintPtr->add(
-//                    "end_effector_box_constraint",
-//                    std::unique_ptr<ocs2::StateInputConstraint>(
-//                            new StateToStateInputConstraint(*end_effector_box_constraint)));
-//        } else {
-//            std::cout << "End effector box constraint is disabled." << std::endl;
-//        }
+        if (settings_.end_effector_box_constraint_enabled) {
+            std::cout << "End effector box constraint is enabled." << std::endl;
+            std::unique_ptr<ocs2::StateConstraint> end_effector_box_constraint(
+                    new EndEffectorBoxConstraint(
+                            settings_.xyz_lower, settings_.xyz_upper,
+                            end_effector_kinematics, *reference_manager_ptr_));
+            std::cout << "End effector box ." << std::endl;
+            problem_.inequalityConstraintPtr->add(
+                    "end_effector_box_constraint",
+                    std::unique_ptr<ocs2::StateInputConstraint>(
+                            new StateToStateInputConstraint(*end_effector_box_constraint)));
+            std::cout << "End effector box ." << std::endl;
+        } else {
+            std::cout << "End effector box constraint is disabled." << std::endl;
+        }
 
 
 
@@ -428,7 +431,7 @@ namespace upright {
         //         *initializer_ptr_));
         // } else {
         return std::unique_ptr<ocs2::MPC_BASE>(new ocs2::MultipleShootingMpc(
-                settings_.mpc, settings_.sqp, problem_, *initializer_ptr_));
+                settings_.mpc, settings_.sqp, problem_, getInitializer()));
         // }
     }
 

@@ -3,7 +3,13 @@
 //
 
 #pragma once
+#include <pinocchio/algorithm/model.hpp>
+#include <pinocchio/multibody/model.hpp>
+#include <pinocchio/parsers/urdf.hpp>
 
+#include <ocs2_pinocchio_interface/PinocchioInterface.h>
+#include <ocs2_pinocchio_interface/urdf.h>
+#include <urdf_parser/urdf_parser.h>
 #include "upright_control/common/FactoryFunctions.h"
 namespace upright{
 
@@ -16,6 +22,7 @@ ocs2::PinocchioInterface createPinocchioInterface(const std::string& robotUrdfPa
             // add X-yaw joint for the wheel-base
             pinocchio::JointModelComposite jointComposite(3);
             jointComposite.addJoint(pinocchio::JointModelPX());
+            jointComposite.addJoint(pinocchio::JointModelPY());
             jointComposite.addJoint(pinocchio::JointModelRZ());
             return ocs2::getPinocchioInterfaceFromUrdfFile(robotUrdfPath, jointComposite);
         }
@@ -54,6 +61,7 @@ ocs2::PinocchioInterface createPinocchioInterface(const std::string& robotUrdfPa
             // add X-yaw joint for the wheel-base
             pinocchio::JointModelComposite jointComposite(3);
             jointComposite.addJoint(pinocchio::JointModelPX());
+            jointComposite.addJoint(pinocchio::JointModelPY());
             jointComposite.addJoint(pinocchio::JointModelRZ());
             return ocs2::getPinocchioInterfaceFromUrdfFile(robotUrdfPath, jointComposite);
         }
@@ -94,14 +102,14 @@ MobileManipulatorInfo createMobileManipulatorInfo(const ocs2::PinocchioInterface
         case RobotBaseType::Nonholonomic: {
             info.OCPDim.robot.q = 9; // base: x,y,theta ; arm: q0,q1,q2,q3,q4,q5,q6
             info.OCPDim.robot.v = 8; // base: Vx, Vyaw ; arm: v0,v1,v2,v3,v4,v5,v6
-            info.OCPDim.robot.x = info.OCPDim.robot.q + info.OCPDim.robot.v + info.OCPDim.robot.v; // 8 + 9 +9
+            info.OCPDim.robot.x = 25; // 8 + 9 +9
             info.OCPDim.robot.u = 8; // // base: Jerk_x, Jerk_yaw ; arm: Jerk0,Jerk1,Jerk2,Jerk3,Jerk4,Jerk5,Jerk6
             break;
         }
         case RobotBaseType::Omnidirectional: {
             info.OCPDim.robot.q = 9; // base: x,y,theta ; arm: q0,q1,q2,q3,q4,q5,q6
             info.OCPDim.robot.v = 9; // base: Vx,Vy,Vyaw ; arm: v0,v1,v2,v3,v4,v5,v6
-            info.OCPDim.robot.x = info.OCPDim.robot.q + info.OCPDim.robot.v; info.OCPDim.robot.v; // 9 + 9 + 9
+            info.OCPDim.robot.x = 27; // 9 + 9 + 9
             info.OCPDim.robot.u = 9; // // base: Jerk_x,Jerk_y,Jerk_yaw ; arm: Jerk0,Jerk1,Jerk2,Jerk3,Jerk4,Jerk5,Jerk6
             break;
         }

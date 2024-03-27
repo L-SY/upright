@@ -39,7 +39,6 @@ namespace upright {
             VecXd err = VecXd::Zero(6);
             err.head<3>() =kinematics_ptr_->getPosition(state).front() - desired_pose.first;
             err.tail<3>() =kinematics_ptr_->getOrientationError(state, {desired_pose.second}).front();
-
             return 0.5 * err.transpose() * W_ * err;
         }
 

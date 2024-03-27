@@ -38,15 +38,13 @@ int main(int argc, char** argv) {
     auto rosReferenceManagerPtr =
             std::make_shared<ddt::RosReferenceManager>("/mobile_manipulator",mobileManipulatorInetface.getReferenceManagerPtr());
     rosReferenceManagerPtr->subscribe(nodeHandle);
-
     // MPC
     std::unique_ptr<ocs2::MPC_BASE> mpc_ptr = mobileManipulatorInetface.get_mpc();
     mpc_ptr->getSolverPtr()->setReferenceManager(rosReferenceManagerPtr);
-
     // Launch MPC ROS node
     ocs2::MPC_ROS_Interface mpcNode(*mpc_ptr, robotName);
     mpcNode.launchNodes(nodeHandle);
-
+    ROS_INFO_STREAM("MobileManipulatorMpcNode Start");
     // Successful exit
     return 0;
 }

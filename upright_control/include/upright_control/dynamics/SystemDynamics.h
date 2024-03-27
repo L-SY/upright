@@ -89,19 +89,19 @@ namespace upright {
                              const VecXad& parameters) const override {
             VecXad dxdt(dims_.x());
 
-            // Robot dynamics
-            VecXad x_robot = state.head(dims_.robot.x);
-            VecXad u_robot = input.head(dims_.robot.u);
-            dxdt.head(dims_.robot.x) =
-                    robot_dynamics_.flowmap(time, x_robot, u_robot, parameters);
-
-            // Obstacle dynamics
-            for (int i = 0; i < dims_.o; ++i) {
-                VecXad x_obs = state.segment(dims_.robot.x + i * 9, 9);
-                dxdt.segment(dims_.robot.x + i * 9, 9) =
-                        obstacle_dynamics_.flowmap(time, x_obs, parameters);
-            }
-            return dxdt;
+//            // Robot dynamics
+//            VecXad x_robot = state.head(dims_.robot.x);
+//            VecXad u_robot = input.head(dims_.robot.u);
+//            dxdt.head(dims_.robot.x) =
+//                    robot_dynamics_.flowmap(time, x_robot, u_robot, parameters);
+//
+//            // Obstacle dynamics
+//            for (int i = 0; i < dims_.o; ++i) {
+//                VecXad x_obs = state.segment(dims_.robot.x + i * 9, 9);
+//                dxdt.segment(dims_.robot.x + i * 9, 9) =
+//                        obstacle_dynamics_.flowmap(time, x_obs, parameters);
+//            }
+            return robot_dynamics_.flowmap(time, state, input, parameters);;
 
             // // Object dynamics
             // // TODO need to cast things to the AD type

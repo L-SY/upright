@@ -51,6 +51,7 @@ namespace upright {
         ControllerSettings settings_;
         ocs2::OptimalControlProblem problem_;
         std::unique_ptr<ocs2::RolloutBase> rollout_ptr_;
+        VecXd initial_state_;
         std::unique_ptr<ocs2::Initializer> initializer_ptr_;
         std::unique_ptr<MobileManipulatorInfo> mobileManipulatorInfo_;
         std::shared_ptr<ocs2::ReferenceManager> reference_manager_ptr_;
@@ -111,8 +112,6 @@ namespace upright {
                 const ocs2::PinocchioEndEffectorKinematicsCppAd&
                 end_effector_kinematics,
                 bool recompileLibraries);
-
-        VecXd initial_state_;
     };
 
 }  // namespace upright

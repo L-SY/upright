@@ -68,7 +68,9 @@ void MobileManipulatorDummyVisualization::launchVisualizerNode(ros::NodeHandle& 
     bool activateSelfCollision = true;
     ocs2::loadData::loadPtreeValue(pt, activateSelfCollision, "selfCollision.activate", false);
     // create pinocchio interface
+    ROS_INFO_STREAM("VIS BEFORE");
     ocs2::PinocchioInterface pinocchioInterface(upright::createPinocchioInterface(urdfFile, robotBaseType));
+    ROS_INFO_STREAM("VIS AFTER");
     // activate markers for self-collision visualization
     if (activateSelfCollision) {
         std::vector<std::pair<size_t, size_t>> collisionObjectPairs;
@@ -109,7 +111,7 @@ void MobileManipulatorDummyVisualization::publishObservation(const ros::Time& ti
     std::map<std::string, ocs2::scalar_t> jointPositions;
     for (size_t i = 0; i < modelInfo_.dofNames.size(); i++) {
         jointPositions[modelInfo_.dofNames[i]] = j_arm(i);
-//        ROS_INFO_STREAM(modelInfo_.dofNames[i] << ": " << j_arm(i));
+        ROS_INFO_STREAM(modelInfo_.dofNames[i] << ": " << j_arm(i));
     }
     robotStatePublisherPtr_->publishTransforms(jointPositions, timeStamp);
 }
