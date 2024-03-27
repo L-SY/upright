@@ -72,20 +72,20 @@ rollout
 ; MPC settings
 mpc
 {
-  timeHorizon                     2.5  ; [s]
-  solutionTimeWindow              0.3   ; [s]
+  timeHorizon                     3  ; [s]
+  solutionTimeWindow              0.1   ; [s]
   coldStart                       false
 
   debugPrint                      false
 
-  mpcDesiredFrequency             100   ; [Hz]
+  mpcDesiredFrequency             300   ; [Hz]
   mrtDesiredFrequency             400   ; [Hz]
 }
 
 ; settings for the sequential quadratic programming solver
 sqp
 {
-   dt 0.1
+   dt 0.2
    sqp_iteration 1
    init_sqp_iteration 1
    delta_tol 1e-3
@@ -107,7 +107,7 @@ Cost
 {
   input  ; input weight
   {
-    scale 1e+0         ; scale coefficient for the whole weight matrix
+    scaling 1e-2         ; scaling coefficient for the whole weight matrix
     ; weight matrix diagonal
     (0,0) 1.0    ; M(0,0)
     (1,1) 1.0    ; M(1,1)
@@ -120,7 +120,7 @@ Cost
   }
   state  ; state weight
   {
-    scale 1e+0
+    scaling 1e+0
 
     ; the pos weight
     (0,0) 0.0    ; M(0,0)
@@ -134,8 +134,8 @@ Cost
     (8,8) 0.0    ; M(8,8)
 
     ; the vel weight
-    (9,9) 0.0   ; M(9,9)
-    (10,10) 0.0 ; M(10,10)
+    (9,9) 1.0   ; M(9,9)
+    (10,10) 1.0 ; M(10,10)
     (11,11) 0.0 ; M(11,11)
     (12,12) 0.0 ; M(12,12)
     (13,13) 0.0 ; M(13,13)
@@ -144,8 +144,8 @@ Cost
     (16,16) 0.0 ; M(16,16)
 
     ; the acc weight
-    (17,17) 0.0  ; M(17,17)
-    (18,18) 0.0  ; M(18,18)
+    (17,17) 1.0  ; M(17,17)
+    (18,18) 1.0  ; M(18,18)
     (19,19) 0.0  ; M(19,19)
     (20,20) 0.0  ; M(20,20)
     (21,21) 0.0  ; M(21,21)
@@ -155,7 +155,7 @@ Cost
   }
   end_effector  ; EE pose weight
   {
-    scale 1e+3
+    scaling 1e+0
     ; 3 position DOFs, 3 orientation DOFs
     (0,0) 1.0    ; M(0,0)
     (1,1) 1.0    ; M(1,1)
@@ -169,20 +169,33 @@ Cost
 ; robot move constraint
 Constraint
 {
+    ; use for the mode controller EE to a space point
+    endEffector
+    {
+        muPosition      20.0
+        muOrientation    10.0
+    }
+
+    finalEndEffector
+    {
+        muPosition      20.0
+        muOrientation    10.0
+    }
+
     ; for safety, the end effector can be restricted to lie inside of a box
     endEffectorBoxConstraint
     {
         enabled true
         xyz_lower
         {
-          scale 1e+1
+          scaling 1e+1
           (0,0) -10.0   ; xyz_lower_x
           (1,0) -10.0   ; xyz_lower_y
           (2,0) -5.0   ; xyz_lower_z
         }
         xyz_upper
         {
-          scale 1e+1
+          scaling 1e+1
           (0,0) 10.0    ; xyz_upper_x
           (1,0) 10.0    ; xyz_upper_y
           (2,0) 5.0    ; xyz_upper_z
@@ -194,7 +207,7 @@ Constraint
     {
         enabled false
         distances []
-        scale 1
+        scaling 1
         collision_links []
     }
 
@@ -204,9 +217,9 @@ Constraint
         constraint_type soft
         input_lower
         {
-          scale 1e+0
-          (0,0) -20.0  ; input_lower_1
-          (1,0) -20.0  ; input_lower_2
+          scaling 1e+0
+          (0,0) -2.0  ; input_lower_1
+          (1,0) -2.0  ; input_lower_2
           (2,0) -80.0  ; input_lower_3
           (3,0) -80.0  ; input_lower_4
           (4,0) -80.0  ; input_lower_5
@@ -217,9 +230,9 @@ Constraint
 
         input_upper
         {
-          scale 1e+0
-          (0,0) 20.0   ; input_upper_1
-          (1,0) 20.0   ; input_upper_2
+          scaling 1e+0
+          (0,0) 2.0   ; input_upper_1
+          (1,0) 2.0   ; input_upper_2
           (2,0) 80.0   ; input_upper_3
           (3,0) 80.0   ; input_upper_4
           (4,0) 80.0   ; input_upper_5
@@ -230,7 +243,7 @@ Constraint
 
         state_lower
         {
-          scale 1e+0
+          scaling 1e+0
 
           (0,0) -10.0   ; state_lower_1
           (1,0) -10.0   ; state_lower_2
@@ -261,7 +274,7 @@ Constraint
 
         state_upper
         {
-          scale 1e+0
+          scaling 1e+0
           (0,0) 10.0   ; state_upper_1
           (1,0) 10.0   ; state_upper_2
           (2,0) 10.0   ; state_upper_3
