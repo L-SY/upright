@@ -31,6 +31,7 @@
 #include <upright_control/constraint/EndEffectorBoxConstraint.h>
 #include <upright_control/constraint/JointStateInputLimits.h>
 #include <upright_control/constraint/ObstacleConstraint.h>
+#include <upright_control/constraint/EndEffectorConstraint.h>
 #include <upright_control/constraint/ProjectilePathConstraint.h>
 #include <upright_control/constraint/ProjectilePlaneConstraint.h>
 #include <upright_control/constraint/StateToStateInputConstraint.h>
@@ -270,6 +271,9 @@ namespace upright {
         // End effector position box constraint
 
 
+        problem_.stateSoftConstraintPtr->add("endEffector", getEndEffectorConstraint(taskFile, "Constraint.endEffector"));
+        problem_.finalSoftConstraintPtr->add("finalEndEffector", getEndEffectorConstraint(taskFile, "Constraint.finalEndEffector"));
+
         if (settings_.end_effector_box_constraint_enabled) {
             std::cout << "End effector box constraint is enabled." << std::endl;
             std::unique_ptr<ocs2::StateConstraint> end_effector_box_constraint(
@@ -458,6 +462,33 @@ namespace upright {
 //                new QuadraticJointStateInputCost(state_weight, input_weight, settings_.xd));
         return std::unique_ptr<ocs2::StateInputCost>(
                 new QuadraticJointStateInputCost(state_weight, input_weight));
+    }
+
+    std::unique_ptr<ocs2::StateCost> ControllerInterface::getEndEffectorConstraint(const std::string& taskFile, const std::string& prefix) {
+        ocs2::scalar_t muPosition = 1.0;
+        ocs2::scalar_t muOrientation = 1.0;
+        const std::string name = "WRIST_2";
+
+        boost::property_tree::ptree pt;
+        boost::property_tree::read_info(taskFile, pt);
+        std::cerr << "\n #### " << prefix << " Settings: ";
+        std::cerr << "\n #### =============================================================================\n";
+        ocs2::loadData::loadPtreeValue(pt, muPosition, prefix + ".muPosition", true);
+        ocs2::loadData::loadPtreeValue(pt, muOrientation, prefix + ".muOrientation", true);
+        std::cerr << " #### =============================================================================\n";
+
+        if (reference_manager_ptr_ == nullptr) {
+            throw std::runtime_error("[getEndEffectorConstraint] referenceManagerPtr_ should be set first!");
+        }
+
+        std::unique_ptr<ocs2::StateConstraint> constraint;
+        constraint.reset(new EndEffectorConstraint(get_end_effector_kinematics(), *reference_manager_ptr_));
+
+        std::vector<std::unique_ptr<ocs2::PenaltyBase>> penaltyArray(6);
+        std::generate_n(penaltyArray.begin(), 3, [&] { return std::make_unique<ocs2::QuadraticPenalty>(muPosition); });
+        std::generate_n(penaltyArray.begin() + 3, 3, [&] { return std::make_unique<ocs2::QuadraticPenalty>(muOrientation); });
+
+        return std::make_unique<ocs2::StateSoftConstraint>(std::move(constraint), std::move(penaltyArray));
     }
 
     std::unique_ptr<ocs2::StateInputConstraint>

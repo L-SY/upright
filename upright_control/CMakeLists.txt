@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.10.2)
 project(upright_control)
 
-add_compile_options(-std=c++14)
 
 # Generate compile_commands.json for clang tools
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -69,7 +68,7 @@ set(FLAGS ${OCS2_CXX_FLAGS} ${pinocchio_CFLAGS_OTHER} -Wno-invalid-partial-speci
 # add_compile_options(-std=c++14). It is included here to force the use of
 # C++14 over C++11 enforced in the same way by OCS2. We need C++14 to compile
 # CGAL.
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include_directories(
@@ -90,6 +89,7 @@ add_library(${PROJECT_NAME} SHARED
         src/InertialAlignment.cpp
         src/MobileManipulatorInterface.cpp
         src/constraint/BoundedBalancingConstraints.cpp
+        src/constraint/EndEffectorConstraint.cpp
 )
 add_dependencies(${PROJECT_NAME}
         ${catkin_EXPORTED_TARGETS}

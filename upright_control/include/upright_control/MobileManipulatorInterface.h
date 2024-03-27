@@ -60,6 +60,8 @@ namespace upright {
 
         std::unique_ptr<ocs2::StateInputCost> get_quadratic_state_input_cost();
 
+        std::unique_ptr<ocs2::StateCost> getEndEffectorConstraint(const std::string& taskFile, const std::string& prefix);
+
         // Hard static obstacle avoidance constraint.
         std::unique_ptr<ocs2::StateConstraint> get_obstacle_constraint(
                 ocs2::PinocchioInterface& pinocchio_interface,
