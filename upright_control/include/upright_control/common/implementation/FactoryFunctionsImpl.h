@@ -222,7 +222,34 @@ ControllerSettings creatControllerSetting(const std::string& taskFile, const std
     settings.state_limit_upper = stateUpper;
     std::cout << "Finish Get Basic Info" << std::endl;
 
-//  TODO:  Add The last config after basic function is done
+//  TODO:  Add The last config afterbasic function is done
+//  Inertial alignment
+    ocs2::loadData::loadCppDataType(taskFile,"inertial_alignment.cost_enabled",settings.inertial_alignment_settings.cost_enabled);
+    ocs2::loadData::loadCppDataType(taskFile,"inertial_alignment.constraint_enabled",settings.inertial_alignment_settings.constraint_enabled);
+    ocs2::loadData::loadCppDataType(taskFile,"inertial_alignment.use_angular_acceleration",settings.inertial_alignment_settings.use_angular_acceleration);
+    ocs2::loadData::loadCppDataType(taskFile,"inertial_alignment.cost_weight",settings.inertial_alignment_settings.cost_weight);
+    ocs2::matrix_t contact_plane_normal(3,1), com(3,1);
+    ocs2::loadData::loadEigenMatrix(taskFile,"inertial_alignment.contact_plane_normal",contact_plane_normal);
+    ocs2::loadData::loadEigenMatrix(taskFile,"inertial_alignment.com",settings.inertial_alignment_settings.com);
+    settings.inertial_alignment_settings.contact_plane_normal = contact_plane_normal;
+    settings.inertial_alignment_settings.com = com;
+    std::cout << "Finish Get Inertial alignment Info" << std::endl;
+
+//    Balance
+
+    ocs2::loadData::loadCppDataType(taskFile,"Constraint.balancing.enabled",settings.balancing_settings.enabled);
+    std::string constraintTypeStr;
+    ocs2::loadData::loadCppDataType(taskFile, "Constraint.balancing.constraint_type", constraintTypeStr);
+    settings.balancing_settings.constraint_type = constraint_type_from_string(constraintTypeStr);
+    ocs2::loadData::loadCppDataType(taskFile,"Constraint.balancing.arrangement",settings.balancing_settings.arrangement_name);
+    ocs2::loadData::loadCppDataType(taskFile,"Constraint.balancing.use_force_constraints",settings.balancing_settings.use_force_constraints);
+    ocs2::loadData::loadCppDataType(taskFile,"Constraint.balancing.enable_normal_constraint",settings.balancing_settings.constraints_enabled.normal);
+    ocs2::loadData::loadCppDataType(taskFile,"Constraint.balancing.enable_friction_constraint",settings.balancing_settings.constraints_enabled.friction);
+    ocs2::loadData::loadCppDataType(taskFile,"Constraint.balancing.enable_zmp_constraint",settings.balancing_settings.constraints_enabled.zmp);
+    ocs2::loadData::loadCppDataType(taskFile,"Constraint.balancing.force_weight",settings.balancing_settings.force_weight);
+    ocs2::loadData::loadCppDataType(taskFile,"Constraint.balancing.mu",settings.balancing_settings.mu);
+    ocs2::loadData::loadCppDataType(taskFile,"Constraint.balancing.delta",settings.balancing_settings.delta);
+    std::cout << "Finish Get Balance Info" << std::endl;
 
 //    EstimationSettings estimationSettings;
 //    TrackingSettings trackingSettings;

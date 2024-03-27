@@ -317,25 +317,25 @@ namespace upright {
 //        }
 //
 //        // Inertial alignment
-//        if (settings_.inertial_alignment_settings.cost_enabled) {
-//            std::unique_ptr<ocs2::StateInputCost> inertial_alignment_cost(
-//                    new InertialAlignmentCostGaussNewton(
-//                            end_effector_kinematics, settings_.inertial_alignment_settings,
-//                            settings_.gravity, settings_.dims, true));
-//            problem_.costPtr->add("inertial_alignment_cost",
-//                                  std::move(inertial_alignment_cost));
-//            std::cout << "Inertial alignment cost enabled." << std::endl;
-//        }
-//        if (settings_.inertial_alignment_settings.constraint_enabled) {
-//            std::unique_ptr<ocs2::StateInputConstraint>
-//                    inertial_alignment_constraint(new InertialAlignmentConstraint(
-//                    end_effector_kinematics, settings_.inertial_alignment_settings,
-//                    settings_.gravity, settings_.dims, recompile_libraries));
-//            problem_.inequalityConstraintPtr->add(
-//                    "inertial_alignment_constraint",
-//                    std::move(inertial_alignment_constraint));
-//            std::cout << "Inertial alignment constraint enabled." << std::endl;
-//        }
+        if (settings_.inertial_alignment_settings.cost_enabled) {
+            std::unique_ptr<ocs2::StateInputCost> inertial_alignment_cost(
+                    new InertialAlignmentCostGaussNewton(
+                            end_effector_kinematics, settings_.inertial_alignment_settings,
+                            settings_.gravity, settings_.dims, true));
+            problem_.costPtr->add("inertial_alignment_cost",
+                                  std::move(inertial_alignment_cost));
+            std::cout << "Inertial alignment cost enabled." << std::endl;
+        }
+        if (settings_.inertial_alignment_settings.constraint_enabled) {
+            std::unique_ptr<ocs2::StateInputConstraint>
+                    inertial_alignment_constraint(new InertialAlignmentConstraint(
+                    end_effector_kinematics, settings_.inertial_alignment_settings,
+                    settings_.gravity, settings_.dims, recompile_libraries));
+            problem_.inequalityConstraintPtr->add(
+                    "inertial_alignment_constraint",
+                    std::move(inertial_alignment_constraint));
+            std::cout << "Inertial alignment constraint enabled." << std::endl;
+        }
 
 //        // TODO we're getting too nested here
 //        if (settings_.balancing_settings.enabled) {

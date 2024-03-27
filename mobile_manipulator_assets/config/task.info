@@ -155,7 +155,7 @@ Cost
   }
   end_effector  ; EE pose weight
   {
-    scaling 1e+0
+    scaling 1e+2
     ; 3 position DOFs, 3 orientation DOFs
     (0,0) 1.0    ; M(0,0)
     (1,1) 1.0    ; M(1,1)
@@ -172,14 +172,14 @@ Constraint
     ; use for the mode controller EE to a space point
     endEffector
     {
-        muPosition      20.0
-        muOrientation    10.0
+        muPosition      0.0
+        muOrientation    0.0
     }
 
     finalEndEffector
     {
-        muPosition      20.0
-        muOrientation    10.0
+        muPosition      0.0
+        muOrientation    0.0
     }
 
     ; for safety, the end effector can be restricted to lie inside of a box
@@ -329,15 +329,27 @@ Constraint
 
 inertial_alignment
 {
-inertial_alignment
   cost_enabled false
   constraint_enabled false
   ; take angular acceleration into account (only has an affect if com has non-zero height)
   use_angular_acceleration false
   align_with_fixed_vector false  ; set to true to align with the contact_plane_normal
   cost_weight 1
-  contact_plane_normal [0, 0, 1]
-  com [0, 0, 0]  ; set CoM offset
+  contact_plane_normal
+  {
+   scaling 1e+0
+   (0,0) 0   ; x
+   (1,0) 0   ; y
+   (2,0) 1   ; z
+  }
+  ; set CoM offset
+  com
+  {
+   scaling 1e+0
+   (0,0) 0   ; x
+   (1,0) 0   ; y
+   (2,0) 0   ; z
+  }
 }
 
 ; the controller can be initialized around some operating points may not fully supported
