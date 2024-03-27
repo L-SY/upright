@@ -50,6 +50,13 @@ robot
   base_type "nonholonomic" ; type of mobile base
 }
 
+gravity
+{
+    (0,0) 0.0       ; x
+    (1,0) 0.0       ; y
+    (2,0) -0.98     ; z
+}
+
 ; mobile_manipulator_interface settings
 mobile_manipulator_interface
 {

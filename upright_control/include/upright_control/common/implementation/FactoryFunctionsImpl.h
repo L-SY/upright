@@ -181,6 +181,10 @@ ControllerSettings creatControllerSetting(const std::string& taskFile, const std
     ocs2::loadData::loadEigenMatrix(taskFile,"robot.x0",initState);
     settings.initial_state = initState;
 //    settings.gravity
+    ocs2::matrix_t gravity_vec(3,1);
+    ocs2::loadData::loadEigenMatrix(taskFile,"gravity",gravity_vec);
+    settings.gravity = gravity_vec;
+
     ocs2::loadData::loadCppDataType(taskFile, "mobile_manipulator_interface.recompileLibraries", settings.recompile_libraries);
     ocs2::loadData::loadCppDataType(taskFile, "mobile_manipulator_interface.debug", settings.debug);
 
