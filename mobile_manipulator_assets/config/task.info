@@ -15,12 +15,12 @@ robot
     (0,0) 0.0       ; initial state x0_1
     (1,0) 0.0        ; initial state x0_2
     (2,0) 0.0        ; initial state x0_3
-    (3,0) 0   ; initial state x0_4 (0.5pi)
-    (4,0) 0 ; initial state x0_5 (-0.25pi)
-    (5,0) 0   ; initial state x0_6 (0.5pi)
-    (6,0) 0.0 ; initial state x0_7 (-0.25pi)
-    (7,0) 0   ; initial state x0_8 (0.5pi)
-    (8,0) 0.0 ; initial state x0_9 (0.417pi)
+    (3,0) 1.57  ; initial state x0_4 (0.5pi)
+    (4,0) -0.785 ; initial state x0_5 (-0.25pi)
+    (5,0) 1.57   ; initial state x0_6 (0.5pi)
+    (6,0) -0.785 ; initial state x0_7 (-0.25pi)
+    (7,0) 1.57  ; initial state x0_8 (0.5pi)
+    (8,0) 1.31 ; initial state x0_9 (0.417pi)
 
     ; init vel
     (9,0) 0.0        ; initial state x0_10
@@ -72,20 +72,20 @@ rollout
 ; MPC settings
 mpc
 {
-  timeHorizon                     3  ; [s]
+  timeHorizon                     1 ; [s]
   solutionTimeWindow              0.1   ; [s]
   coldStart                       false
 
   debugPrint                      false
 
-  mpcDesiredFrequency             300   ; [Hz]
-  mrtDesiredFrequency             400   ; [Hz]
+  mpcDesiredFrequency             500   ; [Hz]
+  mrtDesiredFrequency             800   ; [Hz]
 }
 
 ; settings for the sequential quadratic programming solver
 sqp
 {
-   dt 0.2
+   dt 0.3
    sqp_iteration 1
    init_sqp_iteration 1
    delta_tol 1e-3
@@ -107,7 +107,7 @@ Cost
 {
   input  ; input weight
   {
-    scaling 1e-2         ; scaling coefficient for the whole weight matrix
+    scaling 1e-3         ; scaling coefficient for the whole weight matrix
     ; weight matrix diagonal
     (0,0) 1.0    ; M(0,0)
     (1,1) 1.0    ; M(1,1)
@@ -188,17 +188,17 @@ Constraint
         enabled true
         xyz_lower
         {
-          scaling 1e+1
-          (0,0) -10.0   ; xyz_lower_x
-          (1,0) -10.0   ; xyz_lower_y
-          (2,0) -5.0   ; xyz_lower_z
+          scaling 1e+0
+          (0,0) -4.0   ; xyz_lower_x
+          (1,0) -4.0   ; xyz_lower_y
+          (2,0) -1.5   ; xyz_lower_z
         }
         xyz_upper
         {
-          scaling 1e+1
-          (0,0) 10.0    ; xyz_upper_x
-          (1,0) 10.0    ; xyz_upper_y
-          (2,0) 5.0    ; xyz_upper_z
+          scaling 1e+0
+          (0,0) 4.0    ; xyz_upper_x
+          (1,0) 4.0    ; xyz_upper_y
+          (2,0) 1.5    ; xyz_upper_z
         }
     }
 
