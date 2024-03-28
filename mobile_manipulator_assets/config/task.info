@@ -54,7 +54,7 @@ gravity
 {
     (0,0) 0.0       ; x
     (1,0) 0.0       ; y
-    (2,0) -0.98     ; z
+    (2,0) -9.81     ; z
 }
 
 ; mobile_manipulator_interface settings
@@ -116,8 +116,8 @@ Cost
   {
     scaling 1e-3         ; scaling coefficient for the whole weight matrix
     ; weight matrix diagonal
-    (0,0) 1.0    ; M(0,0)
-    (1,1) 1.0    ; M(1,1)
+    (0,0) 0.1    ; M(0,0)
+    (1,1) 0.1    ; M(1,1)
     (2,2) 1.0    ; M(2,2)
     (3,3) 1.0    ; M(3,3)
     (4,4) 1.0    ; M(4,4)
@@ -167,9 +167,9 @@ Cost
     (0,0) 1.0    ; M(0,0)
     (1,1) 1.0    ; M(1,1)
     (2,2) 1.0    ; M(2,2)
-    (3,3) 1.0    ; M(3,3)
-    (4,4) 1.0    ; M(4,4)
-    (5,5) 1.0    ; M(5,5)
+    (3,3) 0.0    ; M(3,3)
+    (4,4) 0.0    ; M(4,4)
+    (5,5) 0.0    ; M(5,5)
   }
 }
 
@@ -336,12 +336,12 @@ Constraint
 
 inertial_alignment
 {
-  cost_enabled false
+  cost_enabled true
   constraint_enabled false
   ; take angular acceleration into account (only has an affect if com has non-zero height)
-  use_angular_acceleration false
+  use_angular_acceleration true
   align_with_fixed_vector false  ; set to true to align with the contact_plane_normal
-  cost_weight 1
+  cost_weight 100
   contact_plane_normal
   {
    scaling 1e+0
@@ -355,7 +355,7 @@ inertial_alignment
    scaling 1e+0
    (0,0) 0   ; x
    (1,0) 0   ; y
-   (2,0) 0   ; z
+   (2,0) 0.5   ; z
   }
 }
 

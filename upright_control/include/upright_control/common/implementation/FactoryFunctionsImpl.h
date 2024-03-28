@@ -165,7 +165,6 @@ ControllerSettings creatControllerSetting(const std::string& taskFile, const std
     settings.robot_urdf_path = urdfFile;
 
 //  Robot setting
-
     ocs2::loadData::loadCppDataType(taskFile, "robot.dims.q", settings.dims.robot.q);
     ocs2::loadData::loadCppDataType(taskFile, "robot.dims.v", settings.dims.robot.v);
     ocs2::loadData::loadCppDataType(taskFile, "robot.dims.x", settings.dims.robot.x);
@@ -176,10 +175,10 @@ ControllerSettings creatControllerSetting(const std::string& taskFile, const std
     std::string baseTypeStr;
     ocs2::loadData::loadCppDataType(taskFile, "robot.base_type", baseTypeStr);
     settings.robot_base_type = robot_base_type_from_string(baseTypeStr);
-
     ocs2::matrix_t initState(settings.dims.robot.x,1);
     ocs2::loadData::loadEigenMatrix(taskFile,"robot.x0",initState);
     settings.initial_state = initState;
+
 //    settings.gravity
     ocs2::matrix_t gravity_vec(3,1);
     ocs2::loadData::loadEigenMatrix(taskFile,"gravity",gravity_vec);
@@ -199,8 +198,6 @@ ControllerSettings creatControllerSetting(const std::string& taskFile, const std
     settings.state_weight = stateMatrix;
     settings.end_effector_weight = EEMatrix;
 
-
-
 // Constraint
 // EE box constraint
     ocs2::matrix_t xyzLower(3,1), xyzUpper(3,1);
@@ -210,7 +207,7 @@ ControllerSettings creatControllerSetting(const std::string& taskFile, const std
     ocs2::loadData::loadEigenMatrix(taskFile,"Constraint.endEffectorBoxConstraint.xyz_upper",xyzUpper);
     settings.xyz_lower = xyzLower;
     settings.xyz_upper = xyzUpper;
-//    Limit constraint
+// Limit constraint
     std::string limit_constraint_type;
     ocs2::loadData::loadCppDataType(taskFile,"Constraint.limits.constraint_type",limit_constraint_type);
     settings.limit_constraint_type = constraint_type_from_string(limit_constraint_type);
@@ -240,7 +237,6 @@ ControllerSettings creatControllerSetting(const std::string& taskFile, const std
     std::cout << "Finish Get Inertial alignment Info" << std::endl;
 
 //    Balance
-
     ocs2::loadData::loadCppDataType(taskFile,"Constraint.balancing.enabled",settings.balancing_settings.enabled);
     std::string constraintTypeStr;
     ocs2::loadData::loadCppDataType(taskFile, "Constraint.balancing.constraint_type", constraintTypeStr);
