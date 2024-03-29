@@ -18,7 +18,7 @@
 #include <ocs2_core/automatic_differentiation/Types.h>
 #include <ocs2_pinocchio_interface/PinocchioInterface.h>
 #include <ocs2_pinocchio_interface/urdf.h>
-
+#include <yaml-cpp/yaml.h>
 #include "upright_control/dynamics/MobileManipulatorInfo.h"
 #include "upright_control/common/InterfaceSettings.h"
 
@@ -43,9 +43,13 @@ ocs2::PinocchioInterface createPinocchioInterface(const std::string& robotUrdfPa
 /** Load ManipulatorModelType for a config file */
 RobotBaseType loadRobotBaseType(const std::string& configFilePath, const std::string& fieldName);
 
-
 MobileManipulatorInfo createMobileManipulatorInfo(const ocs2::PinocchioInterface& interface, const ControllerSettings& controllerSettings);
 
 ControllerSettings creatControllerSetting(const std::string& taskFile, const std::string& libraryFolder,const std::string& urdfFile);
 
+template <typename Scalar>
+std::map<std::string, BalancedObject<Scalar>> loadObjects(const YAML::Node& node);
+
+template <typename Scalar>
+std::vector<ContactPoint<Scalar>> loadContact(const YAML::Node& node);
 }  // namespace upright

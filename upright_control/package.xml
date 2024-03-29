@@ -14,6 +14,7 @@
   <depend>tf</depend>
   <depend>urdf</depend>
   <depend>kdl_parser</depend>
+  <depend>yaml_cpp</depend>
   <depend>robot_state_publisher</depend>
   <depend>visualization_msgs</depend>
   <depend>geometry_msgs</depend>

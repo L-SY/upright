@@ -16,10 +16,7 @@
 #include <upright_control/constraint/ObstacleConstraint.h>
 
 namespace upright {
-
-
     struct  TrackingSettings{
-
         // Frequency for tracking controller [Hz].
         ocs2::scalar_t rate = 125;
 

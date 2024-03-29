@@ -10,6 +10,9 @@
 #include <ocs2_pinocchio_interface/PinocchioInterface.h>
 #include <ocs2_pinocchio_interface/urdf.h>
 #include <urdf_parser/urdf_parser.h>
+#include <yaml-cpp/yaml.h>
+
+#include "upright_core/Nominal.h"
 #include "upright_control/common/FactoryFunctions.h"
 namespace upright{
 
@@ -127,6 +130,83 @@ MobileManipulatorInfo createMobileManipulatorInfo(const ocs2::PinocchioInterface
 
     return info;
 }
+/******************************************************************************************************/
+/******************************************************************************************************/
+/******************************************************************************************************/
+template <typename Scalar>
+std::map<std::string, BalancedObject<Scalar>> loadObjects(const YAML::Node& node)
+{
+    // TODO: make it clear
+    std::map<std::string, BalancedObject<Scalar>> objects;
+    for (const auto& object : node) {
+        std::string name = object.first.as<std::string>();
+        std::string shape = object.second["shape"].as<std::string>();
+        Scalar mass = object.second["mass"].as<Scalar>();
+        Scalar com_height, r_tau, mu;
+        std::vector<Scalar> yamlComOffset;
+        Vec3<Scalar> comOffset, com;
+        Mat3<Scalar> inertia;
+        const YAML::Node &comOffsetNode = object.second["com_offset"];
+        for (const auto &length: comOffsetNode)
+            comOffset << length.as<Scalar>();
+        if (shape == "cuboid" || shape == "wedge") {
+            const YAML::Node &sideLengthsNode = object.second["side_lengths"];
+            Vec3<Scalar> sideLengths;
+            for (const auto &length: sideLengthsNode)
+                sideLengths << length.as<Scalar>();
+            if (shape == "cuboid")
+            {
+                inertia = cuboid_inertia_matrix(mass, sideLengths);
+                com << 0., sideLengths(1)/2, 0.;
+                com_height = com(1);
+                r_tau = rectangle_r_tau(sideLengths(0), sideLengths(1));
+            }
+
+        } else if (shape == "cylinder") {
+            Scalar radius = object.second["radius"].as<Scalar>();
+            Scalar height = object.second["height"].as<Scalar>();
+            inertia = cylinder_inertia_matrix(mass, radius, height);
+            com << 0., height / 2, 0.;
+            com_height = com(1);
+            r_tau = circle_r_tau(radius);
+        }
+        RigidBody<Scalar> rigidBody(mass, inertia, com);
+        BalancedObject<Scalar> balancedObject(rigidBody, com_height, r_tau, mu);
+        objects.push_back(std::make_pair(name,balancedObject));
+    }
+    return objects;
+}
+
+
+
+
+/******************************************************************************************************/
+/******************************************************************************************************/
+/******************************************************************************************************/
+template <typename Scalar>
+std::vector<ContactPoint<Scalar>> loadContact(const YAML::Node& node)
+{
+//    contacts:
+//    -
+//        first:
+//        second:
+//        mu:
+//        mu_margin:
+//        support_area_inset:
+    std::vector<ContactPoint<Scalar>> contactPoints;
+    for (const auto& contactPoint : node) {
+        ContactPoint<Scalar> ContactPoint;
+        ContactPoint.object1_name = contactPoint["first"].as<std::string>();
+        ContactPoint.object2_name = contactPoint["second"].as<std::string>();
+        Scalar mu, mu_margin, support_area_inset;
+        contactPoints.push_back(ContactPoint);
+    }
+
+    return contactPoints;
+}
+
+
+
 
 /******************************************************************************************************/
 /******************************************************************************************************/
@@ -249,6 +329,35 @@ ControllerSettings creatControllerSetting(const std::string& taskFile, const std
     ocs2::loadData::loadCppDataType(taskFile,"Constraint.balancing.force_weight",settings.balancing_settings.force_weight);
     ocs2::loadData::loadCppDataType(taskFile,"Constraint.balancing.mu",settings.balancing_settings.mu);
     ocs2::loadData::loadCppDataType(taskFile,"Constraint.balancing.delta",settings.balancing_settings.delta);
+
+    ocs2::loadData::loadCppDataType(taskFile,"Constraint.balancing.arrangement_path",settings.balancing_settings.arrangement_path);
+
+    YAML::Node config = YAML::LoadFile(settings.balancing_settings.arrangement_path);
+    const YAML::Node& objectsNode = config["objects"];
+    for (const auto& object : objectsNode){
+        std::string name = object["name"].as<std::string>();
+        std::string shape = object.second["shape"].as<std::string>();
+        double mass = object.second["mass"].as<double>();
+        std::vector<double> comOffset,position;
+        const YAML::Node& comOffsetNode = object.second["com_offset"];
+        const YAML::Node& positionNode = object.second["position"];
+        for (const auto& length : comOffsetNode)
+            comOffset.push_back(length.as<double>());
+        for (const auto& pos : positionNode)
+            position.push_back(pos.as<double>());
+        if (shape == "cuboid")
+        {
+            const YAML::Node& sideLengthsNode = object.second["side_lengths"];
+            std::vector<double> sideLengths;
+            for (const auto& length : sideLengthsNode)
+                sideLengths.push_back(length.as<double>());
+        } else if (shape == "cylinder")
+        {
+            double radius = object.second["radius"].as<double>();
+            double height = object.second["height"].as<double>();
+        }
+    }
+
     std::cout << "Finish Get Balance Info" << std::endl;
 
 //    EstimationSettings estimationSettings;

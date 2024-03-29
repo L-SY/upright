@@ -15,7 +15,7 @@ namespace upright {
 
     struct BalancingSettings {
         bool enabled = false;
-
+        std::string arrangement_path;
         // Name of the arrangement is used to produce different CppAD libraries,
         // which can then be re-used later to save startup time
         std::string arrangement_name;

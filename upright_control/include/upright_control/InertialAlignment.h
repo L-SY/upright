@@ -18,9 +18,12 @@ namespace upright {
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
         InertialAlignmentSettings() {
-            contact_plane_normal = Vec3d::UnitZ();
-            contact_plane_span << 1, 0, 0, 0, 1, 0;
-            com = Vec3d::Zero();
+        contact_plane_normal = Vec3d::UnitZ();
+        contact_plane_span << 1, 0, 0, 0, 1, 0;
+//      test fot x-y to y-z
+//      contact_plane_span << 0, 1, 0, 0, 0, 1;
+        com = Vec3d::Zero();
+
         }
 
         // True to enable the alignment cost

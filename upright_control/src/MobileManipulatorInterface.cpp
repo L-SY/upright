@@ -337,81 +337,83 @@ namespace upright {
             std::cout << "Inertial alignment constraint enabled." << std::endl;
         }
 
-//        // TODO we're getting too nested here
-//        if (settings_.balancing_settings.enabled) {
-//            if (settings_.balancing_settings.use_force_constraints) {
-//                problem_.equalityConstraintPtr->add(
-//                        "object_dynamics",
-//                        get_object_dynamics_constraint(end_effector_kinematics,
-//                                                       recompile_libraries));
-//
-//                // Inequalities for the friction cones
-//                // NOTE: the hard inequality constraints appear to work much better
-//                // (avoid phantom gradients and such)
-//                if (settings_.balancing_settings.constraint_type ==
-//                    ConstraintType::Soft) {
-//                    std::cerr
-//                            << "Soft contact force-based balancing constraints enabled."
-//                            << std::endl;
-//                    problem_.softConstraintPtr->add(
-//                            "contact_forces",
-//                            get_soft_contact_force_constraint(end_effector_kinematics,
-//                                                              recompile_libraries));
-//                } else {
-//                    std::cerr
-//                            << "Hard contact force-based balancing constraints enabled."
-//                            << std::endl;
-//                    const bool frictionless = (settings_.dims.nf == 1);
-//                    if (frictionless) {
-//                        // lower bounds are already zero, make the upper ones
-//                        // arbitrary high values
-//                        problem_.boundConstraintPtr->input_ub_
-//                                .tail(settings_.dims.f())
-//                                .setConstant(1e6);
-//                        // indicate that all inputs are now box constrained (real
-//                        // inputs and contact forces)
-//                        problem_.boundConstraintPtr->setInputIndices(
-//                                0, settings_.dims.u());
-//
-//                        std::cout
-//                                << problem_.boundConstraintPtr->input_lb_.transpose()
-//                                << std::endl;
-//                        std::cout
-//                                << problem_.boundConstraintPtr->input_ub_.transpose()
-//                                << std::endl;
-//                    } else {
-//                        problem_.inequalityConstraintPtr->add(
-//                                "contact_forces",
-//                                get_contact_force_constraint(end_effector_kinematics,
-//                                                             recompile_libraries));
-//                    }
-//                }
-//            } else {
-//                if (settings_.balancing_settings.constraint_type ==
-//                    ConstraintType::Soft) {
-//                    std::cerr << "Soft ZMP/limit surface-based balancing "
-//                                 "constraints enabled."
-//                              << std::endl;
-//
-//                    problem_.softConstraintPtr->add(
-//                            "balancing",
-//                            get_soft_balancing_constraint(end_effector_kinematics,
-//                                                          recompile_libraries));
-//
-//                } else {
-//                    std::cerr << "Hard ZMP/limit surface-based balancing "
-//                                 "constraints enabled."
-//                              << std::endl;
-//                    problem_.inequalityConstraintPtr->add(
-//                            "balancing",
-//                            get_balancing_constraint(end_effector_kinematics,
-//                                                     recompile_libraries));
-//                }
-//            }
-//        } else {
-//            std::cerr << "Balancing constraints disabled." << std::endl;
-//        }
+        // TODO we're getting too nested here
+        if (settings_.balancing_settings.enabled) {
+            if (settings_.balancing_settings.use_force_constraints) {
+                problem_.equalityConstraintPtr->add(
+                        "object_dynamics",
+                        get_object_dynamics_constraint(end_effector_kinematics,
+                                                       recompile_libraries));
 
+                // Inequalities for the friction cones
+                // NOTE: the hard inequality constraints appear to work much better
+                // (avoid phantom gradients and such)
+                if (settings_.balancing_settings.constraint_type ==
+                    ConstraintType::Soft) {
+                    std::cerr
+                            << "Soft contact force-based balancing constraints enabled."
+                            << std::endl;
+                    problem_.softConstraintPtr->add(
+                            "contact_forces",
+                            get_soft_contact_force_constraint(end_effector_kinematics,
+                                                              recompile_libraries));
+                } else {
+                    std::cerr
+                            << "Hard contact force-based balancing constraints enabled."
+                            << std::endl;
+                    const bool frictionless = (settings_.dims.nf == 1);
+                    if (frictionless) {
+                        // lower bounds are already zero, make the upper ones
+                        // arbitrary high values
+                        problem_.boundConstraintPtr->input_ub_
+                                .tail(settings_.dims.f())
+                                .setConstant(1e6);
+                        // indicate that all inputs are now box constrained (real
+                        // inputs and contact forces)
+                        problem_.boundConstraintPtr->setInputIndices(
+                                0, settings_.dims.u());
+
+                        std::cout
+                                << problem_.boundConstraintPtr->input_lb_.transpose()
+                                << std::endl;
+                        std::cout
+                                << problem_.boundConstraintPtr->input_ub_.transpose()
+                                << std::endl;
+                    } else {
+                        problem_.inequalityConstraintPtr->add(
+                                "contact_forces",
+                                get_contact_force_constraint(end_effector_kinematics,
+                                                             recompile_libraries));
+                    }
+                }
+            } else {
+                if (settings_.balancing_settings.constraint_type ==
+                    ConstraintType::Soft) {
+                    std::cerr << "Soft ZMP/limit surface-based balancing "
+                                 "constraints enabled."
+                              << std::endl;
+
+                    problem_.softConstraintPtr->add(
+                            "balancing",
+                            get_soft_balancing_constraint(end_effector_kinematics,
+                                                          recompile_libraries));
+
+                } else {
+                    std::cerr << "Hard ZMP/limit surface-based balancing "
+                                 "constraints enabled."
+                              << std::endl;
+                    problem_.inequalityConstraintPtr->add(
+                            "balancing",
+                            get_balancing_constraint(end_effector_kinematics,
+                                                     recompile_libraries));
+                }
+            }
+        } else {
+            std::cerr << "Balancing constraints disabled." << std::endl;
+        }
+
+
+        std::cout << " Balancing init finish " << std::endl;
         // Initialization state
         if (settings_.use_operating_points) {
             initializer_ptr_.reset(new ocs2::OperatingPoints(

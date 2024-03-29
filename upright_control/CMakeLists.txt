@@ -44,7 +44,7 @@ find_package(Boost REQUIRED COMPONENTS
 find_package(PkgConfig REQUIRED)
 find_package(pinocchio REQUIRED)
 find_package(hpp-fcl REQUIRED)
-
+find_package(yaml-cpp REQUIRED)
 find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
 ###################################
@@ -78,6 +78,7 @@ include_directories(
         ${Boost_INCLUDE_DIRS}
         ${pinocchio_INCLUDE_DIRS}
         ${hpp-fcl_INCLUDE_DIRS}
+        ${YAML_CPP_INCLUDE_DIR}
 )
 
 link_directories(
@@ -98,6 +99,7 @@ target_link_libraries(${PROJECT_NAME}
         ${Boost_LIBRARIES}
         ${catkin_LIBRARIES}
         ${pinocchio_LIBRARIES}
+        ${YAML_CPP_LIBRARIES}
 )
 target_compile_options(${PROJECT_NAME} PUBLIC ${FLAGS})
 
