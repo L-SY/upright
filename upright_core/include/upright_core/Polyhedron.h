@@ -9,6 +9,7 @@
 #include <cmath>
 #include <algorithm>
 #include <cassert>
+#include <Eigen/Dense>
 
 namespace upright {
 
@@ -50,69 +51,71 @@ namespace upright {
             const std::vector<std::vector<Scalar>> &V2,
             Scalar tol);
 
-    template<typename Scalar>
-    std::vector<Scalar> PlaneSpan(const std::vector<Scalar> &normal);
+    Eigen::MatrixXd
+    ProjectVerticesOnAxes(const Eigen::MatrixXd &vertices, const Eigen::VectorXd &point, const Eigen::MatrixXd &axes);
 
-    template<typename Scalar>
-    std::vector<std::vector<Scalar>>
-    ProjectVerticesOnAxes(const std::vector<std::vector<Scalar>> &vertices, const std::vector<Scalar> &point,
-                          const std::vector<Scalar> &axes);
+    std::pair<Eigen::MatrixXd, std::vector<int>> WindPolygonVertices(const Eigen::MatrixXd &V);
 
-    template<typename Scalar>
-    std::vector<std::vector<Scalar>> WindPolygonVertices(const std::vector<std::vector<Scalar>> &V);
 
-    template<typename Scalar>
     class ConvexPolyhedron {
     public:
-        ConvexPolyhedron(const std::vector<std::vector<Scalar>> &vertices,
-                         const std::vector<std::vector<Scalar>> &normals,
-                         const std::vector<Scalar> &position = {0, 0, 0},
-                         const std::vector<Scalar> &rotation = {1, 0, 0, 0},
-                         const std::vector<std::vector<bool>> &incidence = {});
+        ConvexPolyhedron(const Eigen::MatrixXd &vertices, const Eigen::MatrixXd &normals,
+                         const Eigen::Vector3d &position = Eigen::Vector3d::Zero(),
+                         const Eigen::Matrix3d &rotation = Eigen::Matrix3d::Identity(),
+                         const Eigen::MatrixXi &incidence = Eigen::MatrixXi());
 
-        static ConvexPolyhedron
-        Box(const std::vector<Scalar> &half_extents, const std::vector<Scalar> &position = {0, 0, 0},
-            const std::vector<Scalar> &rotation = {1, 0, 0, 0});
+        ConvexPolyhedron();
 
-        static ConvexPolyhedron
-        Wedge(const std::vector<Scalar> &half_extents, const std::vector<Scalar> &position = {0, 0, 0},
-              const std::vector<Scalar> &rotation = {1, 0, 0, 0});
+        static ConvexPolyhedron Box(const Eigen::Vector3d &half_extents,
+                                    const Eigen::Vector3d &position = Eigen::Vector3d::Zero(),
+                                    const Eigen::Matrix3d &rotation = Eigen::Matrix3d::Identity());
 
-        ConvexPolyhedron Transform(const std::vector<Scalar> &translation = {0, 0, 0},
-                                   const std::vector<Scalar> &rotation = {1, 0, 0, 0}) const;
+        static ConvexPolyhedron Wedge(const Eigen::Vector3d &half_extents,
+                                      const Eigen::Vector3d &position = Eigen::Vector3d::Zero(),
+                                      const Eigen::Matrix3d &rotation = Eigen::Matrix3d::Identity());
 
-        std::array<Scalar, 2> LimitsAlongAxis(const std::vector<Scalar> &axis) const;
+        ConvexPolyhedron Transform(const Eigen::Vector3d &translation = Eigen::Vector3d::Zero(),
+                                   const Eigen::Matrix3d &rotation = Eigen::Matrix3d::Identity()) const;
 
-        Scalar LengthAlongAxis(const std::vector<Scalar> &axis) const;
+        Eigen::Vector2d LimitsAlongAxis(const Eigen::MatrixXd &vertices, const Eigen::Vector3d &axis) const;
 
-        Scalar Height() const;
+        double LengthAlongAxis(const Eigen::MatrixXd &vertices, const Eigen::Vector3d &axis) const;
 
-        std::vector<Scalar> MaxVertexAlongAxis(const std::vector<Scalar> &axis) const;
+        double Height(const Eigen::MatrixXd &vertices) const;
 
-        std::vector<std::vector<Scalar>>
-        GetVerticesInPlane(const std::vector<Scalar> &point, const std::vector<Scalar> &normal,
-                           Scalar tol = DEFAULT_TOLERANCE<Scalar>) const;
+        Eigen::Vector3d MaxVertexAlongAxis(const Eigen::MatrixXd &vertices, const Eigen::Vector3d &axis) const;
 
-        std::vector<std::vector<Scalar>>
-        GetPolygonInPlane(const std::vector<Scalar> &point, const std::vector<Scalar> &plane_normal,
-                          const std::vector<Scalar> &plane_span, Scalar tol = DEFAULT_TOLERANCE<Scalar>) const;
+        Eigen::MatrixXd
+        GetVerticesInPlane(const Eigen::MatrixXd &vertices, const Eigen::Vector3d &point, const Eigen::Vector3d &normal,
+                           double tol) const;
 
-        Scalar
-        DistanceFromCentroidToBoundary(const std::vector<Scalar> &axis, const std::vector<Scalar> &offset = {0, 0, 0},
-                                       Scalar tol = DEFAULT_TOLERANCE<Scalar>) const;
-        // std::vector<std::vector<Scalar>> ClipWithHalfSpace(const std::vector<std::vector<Scalar>>& V, const std::vector<Scalar>& point, const std::vector<Scalar>& normal, Scalar tol = DEFAULT_TOLERANCE<Scalar>) const;
+        Eigen::MatrixXd
+        GetPolygonInPlane(const Eigen::MatrixXd &vertices, const Eigen::Vector3d &point,
+                          const Eigen::Vector3d &plane_normal,
+                          const Eigen::Matrix<double, 3, 2> &plane_span,
+                          double tol) const;
+
+        double DistanceFromCentroidToBoundary(const Eigen::MatrixXd &vertices,
+                                              const Eigen::Vector3d &axis,
+                                              const Eigen::Vector3d &offset = Eigen::Vector3d::Zero(),
+                                              double tol = 1e-6) const;
+
+        Eigen::MatrixXd clipWithHalfSpace(const Eigen::MatrixXd &V, const Eigen::Vector3d &point,
+                                          const Eigen::Vector3d &normal, double tol);
 
     private:
-        std::vector<std::vector<Scalar>> vertices_;
-        std::vector<std::vector<Scalar>> normals_;
-        std::vector<Scalar> position_;
-        std::vector<Scalar> rotation_;
-        std::vector<std::vector<bool>> incidence_;
-        size_t nv_; // number of vertices
-        size_t nf_; // number of faces
-        size_t ne_; // number of edges
+        int nv;  // number of vertices
+        int nf;  // number of faces
+        int ne;  // number of edges
+        Eigen::MatrixXd vertices;
+        Eigen::MatrixXd normals;
+        Eigen::Vector3d position;
+        Eigen::Matrix3d rotation;
+        Eigen::MatrixXi incidence;
 
-        std::vector<std::vector<bool>> ComputeIncidenceMatrix(Scalar tol = DEFAULT_TOLERANCE<Scalar>) const;
+        Eigen::MatrixXi ComputeIncidenceMatrix(double tol);
+
+        void ComputeFaces();
     };
 
 }  // namespace upright
