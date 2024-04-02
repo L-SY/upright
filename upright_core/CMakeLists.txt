@@ -35,6 +35,12 @@ target_link_libraries(${PROJECT_NAME}
         ${catkin_LIBRARIES}
 )
 
+
+add_executable(test_clip
+    test/TestClipPolygonWithPolygon.cpp)
+
+target_link_libraries(test_clip ${PROJECT_NAME} ${catkin_LIBRARIES})
+
 #########################
 ###   CLANG TOOLING   ###
 #########################

@@ -11,3 +11,4 @@
 #include "upright_core/ContactConstraints.h"
 #include "upright_core/Bounded.h"
 #include "upright_core/BoundedConstraints.h"
+#include "upright_core/Polyhedron.h"
