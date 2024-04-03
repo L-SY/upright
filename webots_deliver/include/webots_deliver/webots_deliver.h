@@ -19,8 +19,8 @@ namespace webots_deliver {
     public:
         RosWebotsDeliver(ros::NodeHandle nh) {
             XmlRpc::XmlRpcValue motorsNameList, posSensorNameList;
-            if (nh.getParam("/webots_deliver/ridgeback_ur5/motors_name", motorsNameList) &&
-                nh.getParam("/webots_deliver/ridgeback_ur5/pos_sensor_name", posSensorNameList)) {
+            if (nh.getParam("/robot_def/ridgeback_ur5/motors_name", motorsNameList) &&
+                nh.getParam("/robot_def/ridgeback_ur5/pos_sensor_name", posSensorNameList)) {
                 if (motorsNameList.getType() == XmlRpc::XmlRpcValue::TypeArray) {
                     for (int i = 0; i < motorsNameList.size(); ++i) {
                         if (motorsNameList[i].getType() == XmlRpc::XmlRpcValue::TypeString) {
@@ -43,8 +43,8 @@ namespace webots_deliver {
         ~RosWebotsDeliver() = default;
 
         void initVelocityMode(webots::Robot *robot) {
-//            rosMotorCmd_.resize(motorNum_);
-            rosMotorCmd_ = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+            rosMotorCmd_.resize(motorNum_);
+//            rosMotorCmd_ = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
             enablePositionSensor(robot, 100);
             setAllVelocityMode(robot);
         }

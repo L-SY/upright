@@ -1,6 +1,6 @@
 <launch>
 
-    <rosparam file="$(find webots_deliver)/config/robot_def.yaml" command="load" ns="webots_deliver"/>
+    <rosparam file="$(find webots_deliver)/config/robot_def.yaml" command="load" ns="robot_def"/>
     <node name="webots_deliver" pkg="webots_deliver" type="webots_deliver" respawn="false"
           clear_params="false"/>
 
