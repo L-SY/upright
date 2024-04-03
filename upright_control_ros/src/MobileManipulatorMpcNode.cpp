@@ -14,7 +14,7 @@
 
 #include <upright_control/MobileManipulatorInterface.h>
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
     const std::string robotName = "mobile_manipulator";
 
     // task file
@@ -30,13 +30,17 @@ int main(int argc, char** argv) {
     ros::NodeHandle nodeHandle;
 
     // Robot interface
-    const std::string taskFile = ros::package::getPath("mobile_manipulator_assets") + "/config/task.info";
-    const std::string libFolder = ros::package::getPath("mobile_manipulator_assets") + "/auto_generated";
-    const std::string urdfFile = ros::package::getPath("mobile_manipulator_assets") + "/description/OCS2_mobile_manipulator/urdf/ridgeback_ur5.urdf";
+    const std::string taskFile =
+            ros::package::getPath("mobile_manipulator_assets") + "/config/OCS2_mobile_manipulator/task.info";
+    const std::string libFolder =
+            ros::package::getPath("mobile_manipulator_assets") + "/auto_generated" + "/OCS2_mobile_manipulator";
+    const std::string urdfFile = ros::package::getPath("mobile_manipulator_assets") +
+                                 "/description/OCS2_mobile_manipulator/urdf/ridgeback_ur5.urdf";
     upright::ControllerInterface mobileManipulatorInetface(taskFile, libFolder, urdfFile);
     // ROS ReferenceManager
     auto rosReferenceManagerPtr =
-            std::make_shared<ddt::RosReferenceManager>("/mobile_manipulator",mobileManipulatorInetface.getReferenceManagerPtr());
+            std::make_shared<ddt::RosReferenceManager>("/mobile_manipulator",
+                                                       mobileManipulatorInetface.getReferenceManagerPtr());
     rosReferenceManagerPtr->subscribe(nodeHandle);
     // MPC
     std::unique_ptr<ocs2::MPC_BASE> mpc_ptr = mobileManipulatorInetface.get_mpc();

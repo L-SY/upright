@@ -13,9 +13,9 @@ robot
   {
     ; init pos
     (0,0) 0.0       ; initial state x0_1
-    (1,0) 0.0        ; initial state x0_2
-    (2,0) 0.0        ; initial state x0_3
-    (3,0) 1.57  ; initial state x0_4 (0.5pi)
+    (1,0) -1.0        ; initial state x0_2
+    (2,0) -1.57        ; initial state x0_3
+    (3,0) 3.14  ; initial state x0_4 (0.5pi)
     (4,0) -0.785 ; initial state x0_5 (-0.25pi)
     (5,0) 1.57   ; initial state x0_6 (0.5pi)
     (6,0) -0.785 ; initial state x0_7 (-0.25pi)
@@ -118,8 +118,8 @@ Cost
     ; weight matrix diagonal
     (0,0) 0.1    ; M(0,0)
     (1,1) 0.1    ; M(1,1)
-    (2,2) 1.0    ; M(2,2)
-    (3,3) 1.0    ; M(3,3)
+    (2,2) 0.1    ; M(2,2)
+    (3,3) 10.0    ; M(3,3)
     (4,4) 1.0    ; M(4,4)
     (5,5) 1.0    ; M(5,5)
     (6,6) 1.0    ; M(6,6)
@@ -141,18 +141,18 @@ Cost
     (8,8) 0.0    ; M(8,8)
 
     ; the vel weight
-    (9,9) 1.0   ; M(9,9)
-    (10,10) 1.0 ; M(10,10)
-    (11,11) 0.0 ; M(11,11)
-    (12,12) 0.0 ; M(12,12)
-    (13,13) 0.0 ; M(13,13)
-    (14,14) 0.0 ; M(14,14)
-    (15,15) 0.0 ; M(15,15)
-    (16,16) 0.0 ; M(16,16)
+    (9,9) 0.0   ; M(9,9)
+    (10,10) 0.0 ; M(10,10)
+    (11,11) 1.0 ; M(11,11)
+    (12,12) 1.0 ; M(12,12)
+    (13,13) 1.0 ; M(13,13)
+    (14,14) 1.0 ; M(14,14)
+    (15,15) 1.0 ; M(15,15)
+    (16,16) 1.0 ; M(16,16)
 
     ; the acc weight
-    (17,17) 1.0  ; M(17,17)
-    (18,18) 1.0  ; M(18,18)
+    (17,17) 0.0  ; M(17,17)
+    (18,18) 0.0  ; M(18,18)
     (19,19) 0.0  ; M(19,19)
     (20,20) 0.0  ; M(20,20)
     (21,21) 0.0  ; M(21,21)
@@ -313,11 +313,11 @@ Constraint
     ; settings for the balancing constraints
     balancing
     {
-          enabled true
+          enabled false
           arrangement nothing
           arrangement_path /home/lsy/upright_ws/src/mobile_manipulator_assets/config/balance.yaml
           constraint_type hard
-          use_force_constraints true
+          use_force_constraints false
           force_weight 0.001
 
           mu 1e-3
@@ -337,7 +337,7 @@ Constraint
 
 inertial_alignment
 {
-  cost_enabled false
+  cost_enabled true
   constraint_enabled false
   ; take angular acceleration into account (only has an affect if com has non-zero height)
   use_angular_acceleration true
@@ -349,6 +349,17 @@ inertial_alignment
    (0,0) 0   ; x
    (1,0) 0   ; y
    (2,0) 1   ; z
+  }
+  ; the span for tray
+  contact_plane_span
+  {
+    scaling 1e+0
+    (0,0) 1   ;
+    (0,1) 0   ;
+    (0,2) 0   ;
+    (1,0) 0   ;
+    (1,2) 1   ;
+    (1,3) 0   ;
   }
   ; set CoM offset
   com
