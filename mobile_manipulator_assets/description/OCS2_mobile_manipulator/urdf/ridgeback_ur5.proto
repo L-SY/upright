@@ -192,54 +192,84 @@ PROTO ridgeback_ur5 [
                       }
                     ]
                   }
-                  Solid {
-                    translation 0.000000 0.275500 0.000000
-                    children [
-                      Pose {
-                        rotation 1.000000 0.000000 0.000000 1.570796
-                        children [
-                          Shape {
-                            appearance USE black
-                            geometry DEF wheel Mesh {
-                              url "/home/lsy/upright_ws/src/mobile_manipulator_assets/description/OCS2_mobile_manipulator/meshes/base/wheel.stl"
-                            }
-                          }
-                        ]
+                  HingeJoint {
+                    jointParameters HingeJointParameters {
+                      axis 0.000000 1.000000 0.000000
+                      anchor 0.000000 0.275500 0.000000
+                    }
+                    device [
+                      RotationalMotor {
+                        name "front_left_wheel"
+                        maxTorque 10000
+                      }
+                      PositionSensor {
+                        name "front_left_wheel_sensor"
                       }
                     ]
-                    name "front_left_wheel_link"
-                    physics Physics {
-                      density -1
-                      mass 2.300000
-                      centerOfMass [ 0.000000 0.000000 0.000000 ]
-                      inertiaMatrix [
-                        3.321200e-03 6.642400e-03 3.321200e-03
-                        0.000000e+00 0.000000e+00 0.000000e+00
+                    endPoint Solid {
+                      translation 0.000000 0.275500 0.000000
+                      children [
+                        Pose {
+                          rotation 1.000000 0.000000 0.000000 1.570796
+                          children [
+                            Shape {
+                              appearance USE black
+                              geometry DEF wheel Mesh {
+                                url "/home/lsy/upright_ws/src/mobile_manipulator_assets/description/OCS2_mobile_manipulator/meshes/base/wheel.stl"
+                              }
+                            }
+                          ]
+                        }
                       ]
+                      name "front_left_wheel_link"
+                      physics Physics {
+                        density -1
+                        mass 2.300000
+                        centerOfMass [ 0.000000 0.000000 0.000000 ]
+                        inertiaMatrix [
+                          3.321200e-03 6.642400e-03 3.321200e-03
+                          0.000000e+00 0.000000e+00 0.000000e+00
+                        ]
+                      }
                     }
                   }
-                  Solid {
-                    translation 0.000000 -0.275500 0.000000
-                    children [
-                      Pose {
-                        rotation 1.000000 0.000000 0.000000 1.570796
-                        children [
-                          Shape {
-                            appearance USE black
-                            geometry USE wheel
-                          }
-                        ]
+                  HingeJoint {
+                    jointParameters HingeJointParameters {
+                      axis 0.000000 1.000000 0.000000
+                      anchor 0.000000 -0.275500 0.000000
+                    }
+                    device [
+                      RotationalMotor {
+                        name "front_right_wheel"
+                        maxTorque 10000
+                      }
+                      PositionSensor {
+                        name "front_right_wheel_sensor"
                       }
                     ]
-                    name "front_right_wheel_link"
-                    physics Physics {
-                      density -1
-                      mass 2.300000
-                      centerOfMass [ 0.000000 0.000000 0.000000 ]
-                      inertiaMatrix [
-                        3.321200e-03 6.642400e-03 3.321200e-03
-                        0.000000e+00 0.000000e+00 0.000000e+00
+                    endPoint Solid {
+                      translation 0.000000 -0.275500 0.000000
+                      children [
+                        Pose {
+                          rotation 1.000000 0.000000 0.000000 1.570796
+                          children [
+                            Shape {
+                              appearance USE black
+                              geometry USE wheel
+                            }
+                          ]
+                        }
                       ]
+                      name "front_right_wheel_link"
+                      physics Physics {
+                        density -1
+                        mass 2.300000
+                        centerOfMass [ 0.000000 0.000000 0.000000 ]
+                        inertiaMatrix [
+                          3.321200e-03 6.642400e-03 3.321200e-03
+                          0.000000e+00 0.000000e+00 0.000000e+00
+                        ]
+                      }
                     }
                   }
                 ]
@@ -266,52 +296,82 @@ PROTO ridgeback_ur5 [
                       }
                     ]
                   }
-                  Solid {
-                    translation 0.000000 0.275500 0.000000
-                    children [
-                      Pose {
-                        rotation 1.000000 0.000000 0.000000 1.570796
-                        children [
-                          Shape {
-                            appearance USE black
-                            geometry USE wheel
-                          }
-                        ]
+                  HingeJoint {
+                    jointParameters HingeJointParameters {
+                      axis 0.000000 1.000000 0.000000
+                      anchor 0.000000 0.275500 0.000000
+                    }
+                    device [
+                      RotationalMotor {
+                        name "rear_left_wheel"
+                        maxTorque 10000
+                      }
+                      PositionSensor {
+                        name "rear_left_wheel_sensor"
                       }
                     ]
-                    name "rear_left_wheel_link"
-                    physics Physics {
-                      density -1
-                      mass 2.300000
-                      centerOfMass [ 0.000000 0.000000 0.000000 ]
-                      inertiaMatrix [
-                        3.321200e-03 6.642400e-03 3.321200e-03
-                        0.000000e+00 0.000000e+00 0.000000e+00
+                    endPoint Solid {
+                      translation 0.000000 0.275500 0.000000
+                      children [
+                        Pose {
+                          rotation 1.000000 0.000000 0.000000 1.570796
+                          children [
+                            Shape {
+                              appearance USE black
+                              geometry USE wheel
+                            }
+                          ]
+                        }
                       ]
+                      name "rear_left_wheel_link"
+                      physics Physics {
+                        density -1
+                        mass 2.300000
+                        centerOfMass [ 0.000000 0.000000 0.000000 ]
+                        inertiaMatrix [
+                          3.321200e-03 6.642400e-03 3.321200e-03
+                          0.000000e+00 0.000000e+00 0.000000e+00
+                        ]
+                      }
                     }
                   }
-                  Solid {
-                    translation 0.000000 -0.275500 0.000000
-                    children [
-                      Pose {
-                        rotation 1.000000 0.000000 0.000000 1.570796
-                        children [
-                          Shape {
-                            appearance USE black
-                            geometry USE wheel
-                          }
-                        ]
+                  HingeJoint {
+                    jointParameters HingeJointParameters {
+                      axis 0.000000 1.000000 0.000000
+                      anchor 0.000000 -0.275500 0.000000
+                    }
+                    device [
+                      RotationalMotor {
+                        name "rear_right_wheel"
+                        maxTorque 10000
+                      }
+                      PositionSensor {
+                        name "rear_right_wheel_sensor"
                       }
                     ]
-                    name "rear_right_wheel_link"
-                    physics Physics {
-                      density -1
-                      mass 2.300000
-                      centerOfMass [ 0.000000 0.000000 0.000000 ]
-                      inertiaMatrix [
-                        3.321200e-03 6.642400e-03 3.321200e-03
-                        0.000000e+00 0.000000e+00 0.000000e+00
+                    endPoint Solid {
+                      translation 0.000000 -0.275500 0.000000
+                      children [
+                        Pose {
+                          rotation 1.000000 0.000000 0.000000 1.570796
+                          children [
+                            Shape {
+                              appearance USE black
+                              geometry USE wheel
+                            }
+                          ]
+                        }
                       ]
+                      name "rear_right_wheel_link"
+                      physics Physics {
+                        density -1
+                        mass 2.300000
+                        centerOfMass [ 0.000000 0.000000 0.000000 ]
+                        inertiaMatrix [
+                          3.321200e-03 6.642400e-03 3.321200e-03
+                          0.000000e+00 0.000000e+00 0.000000e+00
+                        ]
+                      }
                     }
                   }
                 ]
