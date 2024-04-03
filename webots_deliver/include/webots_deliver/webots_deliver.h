@@ -5,7 +5,7 @@
 
 #include <webots/Robot.hpp>
 #include <webots/Node.hpp>
-#include <webots_deliver/ur5_def.h>
+#include "webots_deliver/def/ur5_def.h"
 #include <ros/ros.h>
 #include <ocs2_msgs/mpc_flattened_controller.h>
 #include <unordered_map>
@@ -21,16 +21,15 @@ namespace webots_deliver {
 
     void setVelocityMode(webots::Robot *robot) {
         for (int i = 0; i < MOTOR_NUM; ++i) {
-            webots::Motor* motor = robot->getMotor(DEF::motors_name[i]);
+            webots::Motor *motor = robot->getMotor(DEF::motors_name[i]);
             motor->setPosition(INFINITY);
         }
     }
 
-    std::unordered_map<std::string, double> getMotorAllState(webots::Robot *robot, const std::string &motor_name)
-    {
+    std::unordered_map<std::string, double> getMotorAllState(webots::Robot *robot, const std::string &motor_name) {
         std::unordered_map<std::string, double> stateMap;
 
-        webots::Motor* motor = robot->getMotor(motor_name);
+        webots::Motor *motor = robot->getMotor(motor_name);
         if (motor != nullptr) {
             double vel = motor->getVelocity();
             double pos = motor->getPositionSensor()->getValue();
@@ -92,27 +91,30 @@ namespace webots_deliver {
         }
         return true;
     }
+
     class RosWebotsDeliver {
     public:
-        RosWebotsDeliver(ros::NodeHandle nh){
+        RosWebotsDeliver(ros::NodeHandle nh) {
             initDeliver(nh);
         };
 
         ~RosWebotsDeliver() = default;
 
-        void initDeliver(ros::NodeHandle nh)
-        {
-            observation_ = nh.subscribe<ocs2_msgs::mpc_flattened_controller>("/mobile_manipulator_mpc_policy",10, &RosWebotsDeliver::MPCPolicyCallback,this);
-            rosMotorCmdSub_ = nh.subscribe<std_msgs::Float64MultiArray>("/ros_motor_cmd",10, &RosWebotsDeliver::rosMotorCmdCallback,this);
-            webotsMotorPosPub_ = nh.advertise<std_msgs::Float64MultiArray>("/webots_motor_pos",1);
-            webotsMotorVelPub_ = nh.advertise<std_msgs::Float64MultiArray>("/webots_motor_vel",1);
-            webotsMotorTorPub_ = nh.advertise<std_msgs::Float64MultiArray>("/webots_motor_tor",1);
+        void initDeliver(ros::NodeHandle nh) {
+            observation_ = nh.subscribe<ocs2_msgs::mpc_flattened_controller>("/mobile_manipulator_mpc_policy", 10,
+                                                                             &RosWebotsDeliver::MPCPolicyCallback,
+                                                                             this);
+            rosMotorCmdSub_ = nh.subscribe<std_msgs::Float64MultiArray>("/ros_motor_cmd", 10,
+                                                                        &RosWebotsDeliver::rosMotorCmdCallback, this);
+            webotsMotorPosPub_ = nh.advertise<std_msgs::Float64MultiArray>("/webots_motor_pos", 1);
+            webotsMotorVelPub_ = nh.advertise<std_msgs::Float64MultiArray>("/webots_motor_vel", 1);
+            webotsMotorTorPub_ = nh.advertise<std_msgs::Float64MultiArray>("/webots_motor_tor", 1);
             mpc_policy_.inputTrajectory.clear();
             for (int i = 0; i < INPUT_DIM; ++i)
                 rosMotorCmd_.push_back(0.);
         }
-        void pubWebotsMotorState(webots::Robot *robot)
-        {
+
+        void pubWebotsMotorState(webots::Robot *robot) {
             std_msgs::Float64MultiArray posInfo, velInfo, torInfo;
             for (int i = 0; i < MOTOR_NUM; ++i) {
                 auto motorAllState = getMotorAllState(robot, DEF::motors_name[i]);
@@ -124,30 +126,29 @@ namespace webots_deliver {
             webotsMotorVelPub_.publish(velInfo);
             webotsMotorTorPub_.publish(torInfo);
         }
-        void rosMotorCmdCallback(const std_msgs::Float64MultiArray ::ConstPtr& data)
-        {
+
+        void rosMotorCmdCallback(const std_msgs::Float64MultiArray::ConstPtr &data) {
             for (int i = 0; i < INPUT_DIM; ++i)
-                rosMotorCmd_[i] = (double)data->data[i];
+                rosMotorCmd_[i] = (double) data->data[i];
         }
-        void MPCPolicyCallback(const ocs2_msgs::mpc_flattened_controller ::ConstPtr& data)
-        {
-            if (mpc_policy_.inputTrajectory.empty())
-            {
+
+        void MPCPolicyCallback(const ocs2_msgs::mpc_flattened_controller::ConstPtr &data) {
+            if (mpc_policy_.inputTrajectory.empty()) {
                 ocs2_msgs::mpc_input zero_input;
                 for (int i = 0; i < INPUT_DIM; ++i)
                     zero_input.value.push_back(0.);
                 mpc_policy_.inputTrajectory.push_back(zero_input);
-            }
-            else
+            } else
                 mpc_policy_.inputTrajectory.begin()->value = data->inputTrajectory.begin()->value;
         }
+
     public:
         int INPUT_DIM = 6;
         ros::Subscriber observation_;
         ocs2_msgs::mpc_flattened_controller mpc_policy_;
         std::vector<double> rosMotorCmd_{};
         ros::Subscriber rosMotorCmdSub_;
-        ros::Publisher webotsMotorVelPub_,webotsMotorPosPub_,webotsMotorTorPub_;
+        ros::Publisher webotsMotorVelPub_, webotsMotorPosPub_, webotsMotorTorPub_;
 
     };
 }
