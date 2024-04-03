@@ -1,0 +1,625 @@
+#VRML_SIM R2023b utf8
+# license: Apache License 2.0
+# license url: http://www.apache.org/licenses/LICENSE-2.0
+# This is a proto file for Webots for the ridgeback_ur5
+# Extracted from: /home/lsy/upright_ws/src/mobile_manipulator_assets/description/OCS2_mobile_manipulator/urdf/ridgeback_ur5.urdf
+
+PROTO ridgeback_ur5 [
+  field  SFVec3f     translation     0 0 0
+  field  SFRotation  rotation        0 0 1 0
+  field  SFString    name            "ridgeback_ur5"  # Is `Robot.name`.
+  field  SFString    controller      "void"           # Is `Robot.controller`.
+  field  MFString    controllerArgs  []               # Is `Robot.controllerArgs`.
+  field  SFString    customData      ""               # Is `Robot.customData`.
+  field  SFBool      supervisor      FALSE            # Is `Robot.supervisor`.
+  field  SFBool      synchronization TRUE             # Is `Robot.synchronization`.
+  field  SFBool      selfCollision   FALSE            # Is `Robot.selfCollision`.
+]
+{
+  Robot {
+    translation IS translation
+    rotation IS rotation
+    controller IS controller
+    controllerArgs IS controllerArgs
+    customData IS customData
+    supervisor IS supervisor
+    synchronization IS synchronization
+    selfCollision IS selfCollision
+    children [
+      Solid {
+        children [
+          Shape {
+            appearance DEF black PBRAppearance {
+              baseColor 0.500000 0.500000 0.500000
+              roughness 1.000000
+              metalness 0
+            }
+            geometry DEF body Mesh {
+              url "/home/lsy/upright_ws/src/mobile_manipulator_assets/description/OCS2_mobile_manipulator/meshes/base/body.stl"
+            }
+          }
+          Solid {
+            children [
+              Shape {
+                appearance DEF yellow PBRAppearance {
+                  baseColor 0.500000 0.500000 0.500000
+                  roughness 1.000000
+                  metalness 0
+                }
+                geometry DEF side-cover Mesh {
+                  url "/home/lsy/upright_ws/src/mobile_manipulator_assets/description/OCS2_mobile_manipulator/meshes/base/side-cover.stl"
+                }
+              }
+            ]
+            name "right_side_cover_link"
+            physics Physics {
+              density -1
+              mass 0.100000
+            }
+          }
+          Solid {
+            children [
+              Pose {
+                rotation 0.000000 0.000000 1.000000 3.141593
+                children [
+                  Shape {
+                    appearance USE yellow
+                    geometry USE side-cover
+                  }
+                ]
+              }
+            ]
+            name "left_side_cover_link"
+            physics Physics {
+              density -1
+              mass 0.100000
+            }
+          }
+          Solid {
+            children [
+              Shape {
+                appearance USE black
+                geometry DEF end-cover Mesh {
+                  url "/home/lsy/upright_ws/src/mobile_manipulator_assets/description/OCS2_mobile_manipulator/meshes/base/end-cover.stl"
+                }
+              }
+            ]
+            name "front_cover_link"
+            physics Physics {
+              density -1
+              mass 0.100000
+            }
+          }
+          Solid {
+            children [
+              Pose {
+                rotation 0.000000 0.000000 1.000000 3.141593
+                children [
+                  Shape {
+                    appearance USE black
+                    geometry USE end-cover
+                  }
+                ]
+              }
+            ]
+            name "rear_cover_link"
+            physics Physics {
+              density -1
+              mass 0.100000
+            }
+          }
+          Solid {
+            children [
+              Shape {
+                appearance DEF white PBRAppearance {
+                  baseColor 0.500000 0.500000 0.500000
+                  roughness 1.000000
+                  metalness 0
+                }
+                geometry DEF lights Mesh {
+                  url "/home/lsy/upright_ws/src/mobile_manipulator_assets/description/OCS2_mobile_manipulator/meshes/base/lights.stl"
+                }
+              }
+            ]
+            name "front_lights_link"
+            physics Physics {
+              density -1
+              mass 0.100000
+            }
+          }
+          Solid {
+            children [
+              Pose {
+                rotation 0.000000 0.000000 1.000000 3.141593
+                children [
+                  Shape {
+                    appearance DEF red PBRAppearance {
+                      baseColor 0.500000 0.500000 0.500000
+                      roughness 1.000000
+                      metalness 0
+                    }
+                    geometry USE lights
+                  }
+                ]
+              }
+            ]
+            name "rear_lights_link"
+            physics Physics {
+              density -1
+              mass 0.100000
+            }
+          }
+          Solid {
+            children [
+              Shape {
+                appearance USE black
+                geometry DEF top Mesh {
+                  url "/home/lsy/upright_ws/src/mobile_manipulator_assets/description/OCS2_mobile_manipulator/meshes/base/top.stl"
+                }
+              }
+            ]
+            name "top_link"
+            physics Physics {
+              density -1
+              mass 0.100000
+            }
+          }
+          Solid {
+            translation 0.000000 0.000000 0.050000
+            children [
+              Pose {
+                rotation 0.000000 1.000000 0.000000 1.570796
+                children [
+                  Shape {
+                    appearance USE black
+                    geometry DEF axle Mesh {
+                      url "/home/lsy/upright_ws/src/mobile_manipulator_assets/description/OCS2_mobile_manipulator/meshes/base/axle.stl"
+                    }
+                  }
+                ]
+              }
+              Solid {
+                translation 0.319000 0.000000 0.000000
+                children [
+                  Pose {
+                    rotation 0.577350 0.577350 0.577350 2.094395
+                    children [
+                      Shape {
+                        appearance USE black
+                        geometry DEF rocker Mesh {
+                          url "/home/lsy/upright_ws/src/mobile_manipulator_assets/description/OCS2_mobile_manipulator/meshes/base/rocker.stl"
+                        }
+                      }
+                    ]
+                  }
+                  Solid {
+                    translation 0.000000 0.275500 0.000000
+                    children [
+                      Pose {
+                        rotation 1.000000 0.000000 0.000000 1.570796
+                        children [
+                          Shape {
+                            appearance USE black
+                            geometry DEF wheel Mesh {
+                              url "/home/lsy/upright_ws/src/mobile_manipulator_assets/description/OCS2_mobile_manipulator/meshes/base/wheel.stl"
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                    name "front_left_wheel_link"
+                    physics Physics {
+                      density -1
+                      mass 2.300000
+                      centerOfMass [ 0.000000 0.000000 0.000000 ]
+                      inertiaMatrix [
+                        3.321200e-03 6.642400e-03 3.321200e-03
+                        0.000000e+00 0.000000e+00 0.000000e+00
+                      ]
+                    }
+                  }
+                  Solid {
+                    translation 0.000000 -0.275500 0.000000
+                    children [
+                      Pose {
+                        rotation 1.000000 0.000000 0.000000 1.570796
+                        children [
+                          Shape {
+                            appearance USE black
+                            geometry USE wheel
+                          }
+                        ]
+                      }
+                    ]
+                    name "front_right_wheel_link"
+                    physics Physics {
+                      density -1
+                      mass 2.300000
+                      centerOfMass [ 0.000000 0.000000 0.000000 ]
+                      inertiaMatrix [
+                        3.321200e-03 6.642400e-03 3.321200e-03
+                        0.000000e+00 0.000000e+00 0.000000e+00
+                      ]
+                    }
+                  }
+                ]
+                name "front_rocker_link"
+                physics Physics {
+                  density -1
+                  mass 10.267000
+                  centerOfMass [ 0.000000 0.000000 0.000000 ]
+                  inertiaMatrix [
+                    4.324000e-01 4.130000e-01 2.880000e-02
+                    1.894400e-03 2.204840e-06 -1.314500e-05
+                  ]
+                }
+              }
+              Solid {
+                translation -0.319000 0.000000 0.000000
+                children [
+                  Pose {
+                    rotation 0.577350 0.577350 0.577350 2.094395
+                    children [
+                      Shape {
+                        appearance USE black
+                        geometry USE rocker
+                      }
+                    ]
+                  }
+                  Solid {
+                    translation 0.000000 0.275500 0.000000
+                    children [
+                      Pose {
+                        rotation 1.000000 0.000000 0.000000 1.570796
+                        children [
+                          Shape {
+                            appearance USE black
+                            geometry USE wheel
+                          }
+                        ]
+                      }
+                    ]
+                    name "rear_left_wheel_link"
+                    physics Physics {
+                      density -1
+                      mass 2.300000
+                      centerOfMass [ 0.000000 0.000000 0.000000 ]
+                      inertiaMatrix [
+                        3.321200e-03 6.642400e-03 3.321200e-03
+                        0.000000e+00 0.000000e+00 0.000000e+00
+                      ]
+                    }
+                  }
+                  Solid {
+                    translation 0.000000 -0.275500 0.000000
+                    children [
+                      Pose {
+                        rotation 1.000000 0.000000 0.000000 1.570796
+                        children [
+                          Shape {
+                            appearance USE black
+                            geometry USE wheel
+                          }
+                        ]
+                      }
+                    ]
+                    name "rear_right_wheel_link"
+                    physics Physics {
+                      density -1
+                      mass 2.300000
+                      centerOfMass [ 0.000000 0.000000 0.000000 ]
+                      inertiaMatrix [
+                        3.321200e-03 6.642400e-03 3.321200e-03
+                        0.000000e+00 0.000000e+00 0.000000e+00
+                      ]
+                    }
+                  }
+                ]
+                name "rear_rocker_link"
+                physics Physics {
+                  density -1
+                  mass 10.267000
+                  centerOfMass [ 0.000000 0.000000 0.000000 ]
+                  inertiaMatrix [
+                    4.324000e-01 4.130000e-01 2.880000e-02
+                    1.894400e-03 2.204840e-06 -1.314500e-05
+                  ]
+                }
+              }
+            ]
+            name "axle_link"
+            physics Physics {
+              density -1
+              mass 0.100000
+            }
+          }
+        ]
+        name "chassis_link"
+        physics Physics {
+          density -1
+          mass 165.304000
+          centerOfMass [ 0.012000 0.002000 0.067000 ]
+          inertiaMatrix [
+            7.162400e+00 4.615500e+00 4.474400e+00
+            1.228000e-01 3.098000e-02 3.647000e-03
+          ]
+        }
+      }
+      Solid {
+        translation 0.000000 0.000000 0.280000
+        children [
+          Pose {
+            rotation 0.000000 0.000000 1.000000 3.141593
+            children [
+              DEF base_visual CadShape {
+                url "/home/lsy/upright_ws/src/mobile_manipulator_assets/description/OCS2_mobile_manipulator/meshes/ur5/visual/base.dae"
+              }
+            ]
+          }
+          HingeJoint {
+            jointParameters HingeJointParameters {
+              axis 0.000000 0.000000 1.000000
+              anchor 0.000000 0.000000 0.089159
+            }
+            device [
+              RotationalMotor {
+                name "ur_arm_shoulder_pan_joint"
+                maxVelocity 3.141592653589793
+                minPosition -6.283185307179586
+                maxPosition 6.283185307179586
+                maxTorque 150.0
+              }
+              PositionSensor {
+                name "ur_arm_shoulder_pan_joint_sensor"
+              }
+            ]
+            endPoint Solid {
+              translation 0.000000 0.000000 0.089159
+              children [
+                Pose {
+                  rotation 0.000000 0.000000 1.000000 3.141593
+                  children [
+                    DEF shoulder_visual CadShape {
+                      url "/home/lsy/upright_ws/src/mobile_manipulator_assets/description/OCS2_mobile_manipulator/meshes/ur5/visual/shoulder.dae"
+                    }
+                  ]
+                }
+                HingeJoint {
+                  jointParameters HingeJointParameters {
+                    axis 0.000000 -1.000000 -0.000000
+                  }
+                  device [
+                    RotationalMotor {
+                      name "ur_arm_shoulder_lift_joint"
+                      maxVelocity 3.141592653589793
+                      minPosition -6.283185307179586
+                      maxPosition 6.283185307179586
+                      maxTorque 150.0
+                    }
+                    PositionSensor {
+                      name "ur_arm_shoulder_lift_joint_sensor"
+                    }
+                  ]
+                  endPoint Solid {
+                    rotation 1.000000 0.000000 0.000000 1.570796
+                    children [
+                      Pose {
+                        translation 0.000000 0.000000 0.135850
+                        rotation 0.577350 -0.577350 -0.577350 2.094395
+                        children [
+                          DEF upperarm_visual CadShape {
+                            url "/home/lsy/upright_ws/src/mobile_manipulator_assets/description/OCS2_mobile_manipulator/meshes/ur5/visual/upperarm.dae"
+                          }
+                        ]
+                      }
+                      HingeJoint {
+                        jointParameters HingeJointParameters {
+                          axis 0.000000 0.000000 1.000000
+                          anchor -0.425000 0.000000 0.000000
+                        }
+                        device [
+                          RotationalMotor {
+                            name "ur_arm_elbow_joint"
+                            maxVelocity 3.141592653589793
+                            minPosition -3.141592653589793
+                            maxPosition 3.141592653589793
+                            maxTorque 150.0
+                          }
+                          PositionSensor {
+                            name "ur_arm_elbow_joint_sensor"
+                          }
+                        ]
+                        endPoint Solid {
+                          translation -0.425000 0.000000 0.000000
+                          children [
+                            Pose {
+                              translation 0.000000 0.000000 0.016500
+                              rotation 0.577350 -0.577350 -0.577350 2.094395
+                              children [
+                                DEF forearm_visual CadShape {
+                                  url "/home/lsy/upright_ws/src/mobile_manipulator_assets/description/OCS2_mobile_manipulator/meshes/ur5/visual/forearm.dae"
+                                }
+                              ]
+                            }
+                            HingeJoint {
+                              jointParameters HingeJointParameters {
+                                axis 0.000000 0.000000 1.000000
+                                anchor -0.392250 0.000000 0.109150
+                              }
+                              device [
+                                RotationalMotor {
+                                  name "ur_arm_wrist_1_joint"
+                                  maxVelocity 3.141592653589793
+                                  minPosition -6.283185307179586
+                                  maxPosition 6.283185307179586
+                                  maxTorque 28.0
+                                }
+                                PositionSensor {
+                                  name "ur_arm_wrist_1_joint_sensor"
+                                }
+                              ]
+                              endPoint Solid {
+                                translation -0.392250 0.000000 0.109150
+                                children [
+                                  Pose {
+                                    translation 0.000000 0.000000 -0.093000
+                                    rotation 1.000000 0.000000 0.000000 1.570796
+                                    children [
+                                      DEF wrist1_visual CadShape {
+                                        url "/home/lsy/upright_ws/src/mobile_manipulator_assets/description/OCS2_mobile_manipulator/meshes/ur5/visual/wrist1.dae"
+                                      }
+                                    ]
+                                  }
+                                  HingeJoint {
+                                    jointParameters HingeJointParameters {
+                                      axis 0.000000 -1.000000 -0.000000
+                                      anchor 0.000000 -0.094650 -0.000000
+                                    }
+                                    device [
+                                      RotationalMotor {
+                                        name "ur_arm_wrist_2_joint"
+                                        maxVelocity 3.141592653589793
+                                        minPosition -6.283185307179586
+                                        maxPosition 6.283185307179586
+                                        maxTorque 28.0
+                                      }
+                                      PositionSensor {
+                                        name "ur_arm_wrist_2_joint_sensor"
+                                      }
+                                    ]
+                                    endPoint Solid {
+                                      translation 0.000000 -0.094650 -0.000000
+                                      rotation 1.000000 0.000000 0.000000 1.570796
+                                      children [
+                                        Pose {
+                                          translation 0.000000 0.000000 -0.095000
+                                          children [
+                                            DEF wrist2_visual CadShape {
+                                              url "/home/lsy/upright_ws/src/mobile_manipulator_assets/description/OCS2_mobile_manipulator/meshes/ur5/visual/wrist2.dae"
+                                            }
+                                          ]
+                                        }
+                                        HingeJoint {
+                                          jointParameters HingeJointParameters {
+                                            axis 0.000000 1.000000 -0.000000
+                                            anchor 0.000000 0.082300 -0.000000
+                                          }
+                                          device [
+                                            RotationalMotor {
+                                              name "ur_arm_wrist_3_joint"
+                                              maxVelocity 3.141592653589793
+                                              minPosition -6.283185307179586
+                                              maxPosition 6.283185307179586
+                                              maxTorque 28.0
+                                            }
+                                            PositionSensor {
+                                              name "ur_arm_wrist_3_joint_sensor"
+                                            }
+                                          ]
+                                          endPoint Solid {
+                                            translation 0.000000 0.082300 -0.000000
+                                            rotation -1.000000 0.000000 0.000000 1.570796
+                                            children [
+                                              Pose {
+                                                translation 0.000000 0.000000 -0.081800
+                                                rotation 1.000000 0.000000 0.000000 1.570796
+                                                children [
+                                                  DEF wrist3_visual CadShape {
+                                                    url "/home/lsy/upright_ws/src/mobile_manipulator_assets/description/OCS2_mobile_manipulator/meshes/ur5/visual/wrist3.dae"
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                            name "ur_arm_wrist_3_link"
+                                            physics Physics {
+                                              density -1
+                                              mass 0.187900
+                                              centerOfMass [ 0.000000 0.000000 -0.015250 ]
+                                              inertiaMatrix [
+                                                8.062473e-05 8.062473e-05 1.321172e-04
+                                                0.000000e+00 0.000000e+00 0.000000e+00
+                                              ]
+                                            }
+                                          }
+                                        }
+                                      ]
+                                      name "ur_arm_wrist_2_link"
+                                      physics Physics {
+                                        density -1
+                                        mass 1.219000
+                                        centerOfMass [ 0.000000 0.000000 0.000000 ]
+                                        inertiaMatrix [
+                                          1.831039e-03 1.831039e-03 2.194200e-03
+                                          0.000000e+00 0.000000e+00 0.000000e+00
+                                        ]
+                                      }
+                                    }
+                                  }
+                                ]
+                                name "ur_arm_wrist_1_link"
+                                physics Physics {
+                                  density -1
+                                  mass 1.219000
+                                  centerOfMass [ 0.000000 0.000000 0.000000 ]
+                                  inertiaMatrix [
+                                    2.013889e-03 2.013889e-03 2.194200e-03
+                                    0.000000e+00 0.000000e+00 0.000000e+00
+                                  ]
+                                }
+                              }
+                            }
+                          ]
+                          name "ur_arm_forearm_link"
+                          physics Physics {
+                            density -1
+                            mass 2.275000
+                            centerOfMass [ -0.196125 0.000000 0.016500 ]
+                            inertiaMatrix [
+                              4.095000e-03 3.121679e-02 3.121679e-02
+                              0.000000e+00 1.660731e-18 0.000000e+00
+                            ]
+                          }
+                        }
+                      }
+                    ]
+                    name "ur_arm_upper_arm_link"
+                    physics Physics {
+                      density -1
+                      mass 8.393000
+                      centerOfMass [ -0.212500 0.000000 0.136000 ]
+                      inertiaMatrix [
+                        1.510740e-02 1.338858e-01 1.338858e-01
+                        0.000000e+00 7.273078e-18 0.000000e+00
+                      ]
+                    }
+                  }
+                }
+              ]
+              name "ur_arm_shoulder_link"
+              physics Physics {
+                density -1
+                mass 3.700000
+                centerOfMass [ 0.000000 0.000000 0.000000 ]
+                inertiaMatrix [
+                  1.497235e-02 1.497235e-02 1.040625e-02
+                  0.000000e+00 0.000000e+00 0.000000e+00
+                ]
+              }
+            }
+          }
+        ]
+        name "ur_arm_base_link"
+        physics Physics {
+          density -1
+          mass 4.000000
+          centerOfMass [ 0.000000 0.000000 0.000000 ]
+          inertiaMatrix [
+            4.433332e-03 4.433332e-03 7.200000e-03
+            0.000000e+00 0.000000e+00 0.000000e+00
+          ]
+        }
+      }
+    ]
+    name IS name
+  }
+}

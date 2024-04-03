@@ -139,7 +139,6 @@
     <child link="rear_right_wheel_link"/>
     <origin rpy="0 0 0" xyz="0 -0.27549999999999997 0"/>
   </joint>
-  link name="world"/>
   <link name="base_link"/>
   <joint name="base_link_joint" type="fixed">
     <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -178,6 +177,11 @@
       </geometry>
       <material name="yellow"/>
     </visual>
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0.1"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
   </link>
   <link name="right_side_cover_link">
     <visual>
@@ -187,6 +191,11 @@
       </geometry>
       <material name="yellow"/>
     </visual>
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0.1"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
   </link>
   <joint name="front_cover_link_joint" type="fixed">
     <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -201,6 +210,11 @@
       </geometry>
       <material name="black"/>
     </visual>
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0.1"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
   </link>
   <joint name="rear_cover_link_joint" type="fixed">
     <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -215,6 +229,11 @@
       </geometry>
       <material name="black"/>
     </visual>
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0.1"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
   </link>
   <joint name="front_lights_link_joint" type="fixed">
     <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -234,6 +253,11 @@
       </geometry>
       <material name="white"/>
     </visual>
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0.1"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
   </link>
   <link name="rear_lights_link">
     <visual>
@@ -243,6 +267,11 @@
       </geometry>
       <material name="red"/>
     </visual>
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0.1"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
   </link>
   <joint name="top_link_joint" type="fixed">
     <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -257,6 +286,11 @@
       </geometry>
       <material name="black"/>
     </visual>
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0.1"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+    </inertial>
   </link>
   <joint name="axle_joint" type="fixed">
     <origin rpy="0 0 0" xyz="0 0 0.05"/>
@@ -271,83 +305,20 @@
       </geometry>
       <material name="black"/>
     </visual>
-  </link>
-  <link name="imu_link">
     <inertial>
-      <mass value="0.001"/>
       <origin rpy="0 0 0" xyz="0 0 0"/>
-      <inertia ixx="1e-09" ixy="0.0" ixz="0.0" iyy="1e-09" iyz="0.0" izz="1e-09"/>
+      <mass value="0.1"/>
+      <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
     </inertial>
   </link>
-  <joint name="imu_joint" type="fixed">
-    <parent link="chassis_link"/>
-    <child link="imu_link"/>
-    <origin rpy="0 0 0" xyz="0.2085 -0.2902 0.1681"/>
-  </joint>
-  <link name="mid_mount"/>
-  <joint name="mid_mount_joint" type="fixed">
+
+  <joint name="arm_mount_joint" type="fixed">
     <parent link="base_link"/>
-    <child link="mid_mount"/>
+    <child link="ur_arm_base_link"/>
     <origin rpy="0 0 0" xyz="0 0 0.28"/>
   </joint>
-  <joint name="arm_mount_joint" type="fixed">
-    <parent link="mid_mount"/>
-    <child link="ur_arm_base_link"/>
-    <origin rpy="0 0 0" xyz="0 0 0"/>
-  </joint>
-  <!--
-    Base UR robot series xacro macro.
-
-    NOTE: this is NOT a URDF. It cannot directly be loaded by consumers
-    expecting a flattened '.urdf' file. See the top-level '.xacro' for that
-    (but note: that .xacro must still be processed by the xacro command).
-
-    For use in '.launch' files: use one of the 'load_urX.launch' convenience
-    launch files.
-
-    This file models the base kinematic chain of a UR robot, which then gets
-    parameterised by various configuration files to convert it into a UR3(e),
-    UR5(e), UR10(e) or UR16e.
-
-    NOTE: the default kinematic parameters (ie: link lengths, frame locations,
-    offets, etc) do not correspond to any particular robot. They are defaults
-    only. There WILL be non-zero offsets between the Forward Kinematics results
-    in TF (ie: robot_state_publisher) and the values reported by the Teach
-    Pendant.
-
-    For accurate (and robot-specific) transforms, the 'kinematics_parameters_file'
-    parameter MUST point to a .yaml file containing the appropriate values for
-    the targetted robot.
-
-    If using the UniversalRobots/Universal_Robots_ROS_Driver, follow the steps
-    described in the readme of that repository to extract the kinematic
-    calibration from the controller and generate the required .yaml file.
-
-    Main author of the migration to yaml configs: Ludovic Delval.
-
-    Contributors to previous versions (in no particular order):
-
-     - Felix Messmer
-     - Kelsey Hawkins
-     - Wim Meeussen
-     - Shaun Edwards
-     - Nadia Hammoudeh Garcia
-     - Dave Hershberger
-     - G. vd. Hoorn
-     - Philip Long
-     - Dave Coleman
-     - Miguel Prada
-     - Mathias Luedtke
-     - Marcel Schnirring
-     - Felix von Drigalski
-     - Felix Exner
-     - Jimmy Da Silva
-     - Ajit Krisshna N L
-     - Muhammad Asif Rana
-  -->
   <!-- links: main serial chain -->
-  <link name="ur_arm_base_link"/>
-  <link name="ur_arm_base_link_inertia">
+  <link name="ur_arm_base_link">
     <visual>
       <origin rpy="0 0 3.141592653589793" xyz="0 0 0"/>
       <geometry>
@@ -461,18 +432,8 @@
     </inertial>
   </link>
   <!-- joints: main serial chain -->
-  <joint name="ur_arm_base_link-base_link_inertia" type="fixed">
-    <parent link="ur_arm_base_link"/>
-    <child link="ur_arm_base_link_inertia"/>
-    <!-- 'base_link' is REP-103 aligned (so X+ forward), while the internal
-           frames of the robot/controller have X+ pointing backwards.
-           Use the joint between 'base_link' and 'base_link_inertia' (a dummy
-           link/frame) to introduce the necessary rotation over Z (of pi rad).
-      -->
-    <origin rpy="0 0 3.141592653589793" xyz="0 0 0"/>
-  </joint>
   <joint name="ur_arm_shoulder_pan_joint" type="revolute">
-    <parent link="ur_arm_base_link_inertia"/>
+    <parent link="ur_arm_base_link"/>
     <child link="ur_arm_shoulder_link"/>
     <origin rpy="0 0 0" xyz="0 0 0.089159"/>
     <axis xyz="0 0 1"/>

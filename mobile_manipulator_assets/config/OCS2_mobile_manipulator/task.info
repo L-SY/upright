@@ -15,12 +15,12 @@ robot
     (0,0) 0.0       ; initial state x0_1
     (1,0) -1.0        ; initial state x0_2
     (2,0) -1.57        ; initial state x0_3
-    (3,0) 3.14  ; initial state x0_4 (0.5pi)
+    (3,0) 0.0  ; initial state x0_4 (0.5pi)
     (4,0) -0.785 ; initial state x0_5 (-0.25pi)
     (5,0) 1.57   ; initial state x0_6 (0.5pi)
     (6,0) -0.785 ; initial state x0_7 (-0.25pi)
     (7,0) 1.57  ; initial state x0_8 (0.5pi)
-    (8,0) 1.31 ; initial state x0_9 (0.417pi)
+    (8,0) 0.0 ; initial state x0_9 (0.417pi)
 
     ; init vel
     (9,0) 0.0        ; initial state x0_10
