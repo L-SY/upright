@@ -305,6 +305,7 @@ namespace upright {
         settings.input_limit_upper = inputUpper;
         settings.state_limit_lower = stateLower;
         settings.state_limit_upper = stateUpper;
+
         std::cout << "Finish Get Basic Info" << std::endl;
 
 //  TODO:  Add The last config afterbasic function is done
@@ -348,7 +349,6 @@ namespace upright {
 
         ocs2::loadData::loadCppDataType(taskFile, "Constraint.balancing.arrangement_path",
                                         settings.balancing_settings.arrangement_path);
-
 //    YAML::Node config = YAML::LoadFile(settings.balancing_settings.arrangement_path);
 //    const YAML::Node& objectsNode = config["objects"];
 //    for (const auto& object : objectsNode){

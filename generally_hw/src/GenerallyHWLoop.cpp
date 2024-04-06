@@ -5,7 +5,7 @@
 #include "generally_hw/GenerallyHWLoop.h"
 
 namespace generally {
-    GenerallyHWLoop::GenerallyHWLoop(ros::NodeHandle& nh, std::shared_ptr<GenerallyHW> hardware_interface)
+    GenerallyHWLoop::GenerallyHWLoop(ros::NodeHandle &nh, std::shared_ptr<GenerallyHW> hardware_interface)
             : nh_(nh), hardwareInterface_(std::move(hardware_interface)), loopRunning_(true) {
         // Create the controller manager
         controllerManager_.reset(new controller_manager::ControllerManager(hardwareInterface_.get(), nh_));
@@ -54,9 +54,10 @@ namespace generally {
         // Check cycle time for excess delay
         const double cycle_time_error = (elapsedTime_ - ros::Duration(desiredDuration.count())).toSec();
         if (cycle_time_error > cycleTimeErrorThreshold_) {
-            ROS_WARN_STREAM("Cycle time exceeded error threshold by: " << cycle_time_error - cycleTimeErrorThreshold_ << "s, "
-                                                                       << "cycle time: " << elapsedTime_ << "s, "
-                                                                       << "threshold: " << cycleTimeErrorThreshold_ << "s");
+            ROS_WARN_STREAM(
+                    "Cycle time exceeded error threshold by: " << cycle_time_error - cycleTimeErrorThreshold_ << "s, "
+                                                               << "cycle time: " << elapsedTime_ << "s, "
+                                                               << "threshold: " << cycleTimeErrorThreshold_ << "s");
         }
 
         // Input

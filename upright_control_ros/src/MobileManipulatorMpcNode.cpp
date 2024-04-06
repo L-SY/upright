@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
     const std::string taskFile =
             ros::package::getPath("mobile_manipulator_assets") + "/config/OCS2_mobile_manipulator/task.info";
     const std::string libFolder =
-            ros::package::getPath("mobile_manipulator_assets") + "/auto_generated" + "/OCS2_mobile_manipulator";
+            ros::package::getPath("mobile_manipulator_assets") + "/auto_generated/OCS2_mobile_manipulator";
     const std::string urdfFile = ros::package::getPath("mobile_manipulator_assets") +
                                  "/description/OCS2_mobile_manipulator/urdf/ridgeback_ur5.urdf";
     upright::ControllerInterface mobileManipulatorInetface(taskFile, libFolder, urdfFile);
