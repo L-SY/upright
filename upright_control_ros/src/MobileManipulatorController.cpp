@@ -11,11 +11,10 @@
 #include <pluginlib/class_list_macros.h>
 
 
-
-namespace ddt{
+namespace ddt {
 
     bool MobileManipulatorController::init(hardware_interface::RobotHW *robot_hw, ros::NodeHandle &root_nh,
-                             ros::NodeHandle &controller_nh) {
+                                           ros::NodeHandle &controller_nh) {
         // Initialize OCS2
         std::string taskFile;
         std::string libFolder;
@@ -23,27 +22,30 @@ namespace ddt{
         controller_nh.getParam("/taskFile", taskFile);
         controller_nh.getParam("/libFolder", libFolder);
         controller_nh.getParam("/urdfFile", urdfFile);
-
-        mobileManipulatorInterface_ = std::make_shared<ocs2::mobile_manipulator::MobileManipulatorInterface>(taskFile, libFolder, urdfFile);
+        mobileManipulatorInterface_ = std::make_shared<upright::ControllerInterface>(taskFile, libFolder, urdfFile);
         setupMpc(controller_nh);
         setupMrt();
-//    // Visualization
-//    ros::NodeHandle nh;
-//    visualizer_ = std::make_shared<ocs2::mobile_manipulator::MobileManipulatorDummyVisualization>(nh, *mobileManipulatorInterface_);
+
+        // Visualization
+        ros::NodeHandle nh;
+        visualizer_ = std::make_shared<ddt::MobileManipulatorDummyVisualization>(nh, *mobileManipulatorInterface_);
 
         currentObservation_.time = 0.0;
         currentObservation_.state.setZero(STATE_DIM);
         currentObservation_.input.setZero(INPUT_DIM);
 
         // Hardware interface
-        auto* effortJointInterface = robot_hw->get<hardware_interface::EffortJointInterface>();
+        auto *effortJointInterface = robot_hw->get<hardware_interface::EffortJointInterface>();
+        jointHandles_.push_back(effortJointInterface->getHandle("front_left_wheel"));
+        jointHandles_.push_back(effortJointInterface->getHandle("front_right_wheel"));
+        jointHandles_.push_back(effortJointInterface->getHandle("rear_left_wheel"));
+        jointHandles_.push_back(effortJointInterface->getHandle("rear_right_wheel"));
         jointHandles_.push_back(effortJointInterface->getHandle("ur_arm_shoulder_pan_joint"));
         jointHandles_.push_back(effortJointInterface->getHandle("ur_arm_shoulder_lift_joint"));
         jointHandles_.push_back(effortJointInterface->getHandle("ur_arm_elbow_joint"));
         jointHandles_.push_back(effortJointInterface->getHandle("ur_arm_wrist_1_joint"));
         jointHandles_.push_back(effortJointInterface->getHandle("ur_arm_wrist_2_joint"));
         jointHandles_.push_back(effortJointInterface->getHandle("ur_arm_wrist_3_joint"));
-
         return true;
     }
 
@@ -68,13 +70,13 @@ namespace ddt{
         }
 
         // Visualization
-//    visualizer_->update(currentObservation_, mpcMrtInterface_->getPolicy(), mpcMrtInterface_->getCommand());
+        visualizer_->update(currentObservation_, mpcMrtInterface_->getPolicy(), mpcMrtInterface_->getCommand());
 
         // Publish the observation. Only needed for the command interface
         observationPublisher_.publish(ocs2::ros_msg_conversions::createObservationMsg(currentObservation_));
     }
 
-    void MobileManipulatorController::updateStateEstimation(const ros::Time& time, const ros::Duration& period){
+    void MobileManipulatorController::updateStateEstimation(const ros::Time &time, const ros::Duration &period) {
         ocs2::vector_t jointPos(CONTROL_DIM), jointVel(CONTROL_DIM);
         for (size_t i = 0; i < CONTROL_DIM; ++i) {
             jointPos(i) = jointHandles_[i].getPosition();
@@ -84,15 +86,16 @@ namespace ddt{
 
         currentObservation_.time += period.toSec();
     }
+
     void MobileManipulatorController::starting(const ros::Time &time) {
-        updateStateEstimation(time,ros::Duration(0.001));
+        updateStateEstimation(time, ros::Duration(0.001));
         currentObservation_.input.setZero(INPUT_DIM);
-        ocs2::vector_t initDesiredState;
-        initDesiredState.setZero(7);
-        initDesiredState(0) = 0.25;
-        initDesiredState(2) = 0.3;
-        initDesiredState(6) = 1;
-        ocs2::TargetTrajectories targetTrajectories({currentObservation_.time}, {initDesiredState}, {currentObservation_.input});
+        ocs2::vector_t initDesiredState(7);
+
+        initDesiredState.head(3) << 0, 0, 1;
+        initDesiredState.tail(4) << Eigen::Quaternion<ocs2::scalar_t>(1, 0, 0, 0).coeffs();
+        ocs2::TargetTrajectories targetTrajectories({currentObservation_.time}, {initDesiredState},
+                                                    {currentObservation_.input});
 
         // Set the first observation and command and wait for optimization to finish
         mpcMrtInterface_->setCurrentObservation(currentObservation_);
@@ -118,17 +121,15 @@ namespace ddt{
     }
 
     void MobileManipulatorController::setupMpc(ros::NodeHandle &nh) {
-        const std::string robotName = "ur5";
+        const std::string robotName = "ridgeback_ur5";
 
         // ROS ReferenceManager
-        auto rosReferenceManagerPtr = std::make_shared<ocs2::RosReferenceManager>("/mobile_manipulator",mobileManipulatorInterface_->getReferenceManagerPtr());
+        auto rosReferenceManagerPtr = std::make_shared<ddt::RosReferenceManager>("/mobile_manipulator",
+                                                                                 mobileManipulatorInterface_->getReferenceManagerPtr());
         rosReferenceManagerPtr->subscribe(nh);
-
         // MPC
-        mpc_ = std::make_shared<ocs2::GaussNewtonDDP_MPC>(mobileManipulatorInterface_->mpcSettings(), mobileManipulatorInterface_->ddpSettings(), mobileManipulatorInterface_->getRollout(),
-                                                          mobileManipulatorInterface_->getOptimalControlProblem(), mobileManipulatorInterface_->getInitializer());
+        mpc_ = mobileManipulatorInterface_->get_mpc();
         mpc_->getSolverPtr()->setReferenceManager(rosReferenceManagerPtr);
-
         observationPublisher_ = nh.advertise<ocs2_msgs::mpc_observation>("/mobile_manipulator_mpc_observation", 1);
     }
 
@@ -161,18 +162,19 @@ namespace ddt{
                                 }
                             },
                             mobileManipulatorInterface_->mpcSettings().mpcDesiredFrequency_);
-                } catch (const std::exception& e) {
+                } catch (const std::exception &e) {
                     controllerRunning_ = false;
                     ROS_ERROR_STREAM("[Ocs2 MPC thread] Error : " << e.what());
                     stopRequest(ros::Time());
                 }
             }
         });
-        ocs2::setThreadPriority(mobileManipulatorInterface_->ddpSettings().threadPriority_, mpcThread_);
+        // TODO : Add config in task.info
+        ocs2::setThreadPriority(50, mpcThread_);
     }
 
     void MobileManipulatorController::normal(const ros::Time &time, const ros::Duration &period) {
-        static ocs2::vector_t lastOptimizedState(7);
+        static ocs2::vector_t lastOptimizedState(25);
 
         // Load the latest MPC policy
         mpcMrtInterface_->updatePolicy();
@@ -180,16 +182,40 @@ namespace ddt{
         // Evaluate the current policy
         ocs2::vector_t optimizedState, optimizedInput;
         size_t plannedMode = 0;  // The mode that is active at the time the policy is evaluated at.
-        mpcMrtInterface_->evaluatePolicy(currentObservation_.time, currentObservation_.state, optimizedState, optimizedInput, plannedMode);
+        mpcMrtInterface_->evaluatePolicy(currentObservation_.time, currentObservation_.state, optimizedState,
+                                         optimizedInput, plannedMode);
 
         currentObservation_.input = optimizedInput;
         int index = 0;
-        for (auto joint:jointHandles_) {
+        for (auto joint: jointHandles_) {
             joint.setCommand(currentObservation_.input(index));
             index++;
         }
 
         lastOptimizedState = optimizedState;
     }
+
+    void MobileManipulatorController::upright(const ros::Time &time, const ros::Duration &period) {
+        static ocs2::vector_t lastOptimizedState(25);
+
+        // Load the latest MPC policy
+        mpcMrtInterface_->updatePolicy();
+
+        // Evaluate the current policy
+        ocs2::vector_t optimizedState, optimizedInput;
+        size_t plannedMode = 0;  // The mode that is active at the time the policy is evaluated at.
+        mpcMrtInterface_->evaluatePolicy(currentObservation_.time, currentObservation_.state, optimizedState,
+                                         optimizedInput, plannedMode);
+
+        currentObservation_.input = optimizedInput;
+        int index = 0;
+        for (auto joint: jointHandles_) {
+            joint.setCommand(currentObservation_.input(index + 7));
+            index++;
+        }
+
+        lastOptimizedState = optimizedState;
+    }
+
 }// namespace ddt
 PLUGINLIB_EXPORT_CLASS(ddt::MobileManipulatorController, controller_interface::ControllerBase)

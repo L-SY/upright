@@ -1,0 +1,15 @@
+<launch>
+    <arg name="robot_type" default="ridged_ur5"/>
+
+    <param name="robot_description"
+           command="$(find xacro)/xacro $(find mobile_manipulator_assets)/description/OCS2_mobile_manipulator/urdf/ridgeback_ur5.urdf"/>
+
+    <rosparam file="$(find mobile_manipulator_assets)/config/OCS2_mobile_manipulator/robot_def.yaml" command="load"
+              ns="robot_def"/>
+
+    <rosparam file="$(find mobile_manipulator_assets)/config/OCS2_mobile_manipulator/hw.yaml" command="load"/>
+
+    <param name="robot_type" value="$(arg robot_type)"/>
+    <node name="mobile_manipulator_hw" pkg="mobile_manipulator_hw" type="mobile_manipulator_hw" respawn="false"
+          clear_params="true"/>
+</launch>

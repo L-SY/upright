@@ -19,11 +19,14 @@
 #include <ocs2_ddp/GaussNewtonDDP_MPC.h>
 #include <ocs2_core/Types.h>
 #include <ocs2_mobile_manipulator/MobileManipulatorInterface.h>
-#include <ocs2_mobile_manipulator_ros/MobileManipulatorDummyVisualization.h>
+#include <upright_control/MobileManipulatorInterface.h>
+#include <ros/package.h>
+#include "upright_control_ros/synchronized_module/RosReferenceManager.h"
+#include "upright_control_ros/MobileManipulatorVisualization.h"
 
-namespace ddt{
+namespace ddt {
     class MobileManipulatorController
-            : public controller_interface::MultiInterfaceController<hardware_interface::EffortJointInterface>{
+            : public controller_interface::MultiInterfaceController<hardware_interface::EffortJointInterface> {
         enum ControllerState {
             NORMAL,         // Only try to achieve EE to reach a specified point in space
             UPRIGHT,        // On the basis of normal, increase the importance of keeping the objects on EE upright
@@ -33,25 +36,35 @@ namespace ddt{
 
     public:
         MobileManipulatorController() = default;
+
         ~MobileManipulatorController() override;
 
-        bool init(hardware_interface::RobotHW* robot_hw, ros::NodeHandle& root_nh, ros::NodeHandle& controller_nh) override;
-        void update(const ros::Time& time, const ros::Duration& period) override;
-        void starting(const ros::Time& time) override;
-        void stopping(const ros::Time& /*time*/) override { mpcRunning_ = false; }
+        bool
+        init(hardware_interface::RobotHW *robot_hw, ros::NodeHandle &root_nh, ros::NodeHandle &controller_nh) override;
+
+        void update(const ros::Time &time, const ros::Duration &period) override;
+
+        void starting(const ros::Time &time) override;
+
+        void stopping(const ros::Time & /*time*/) override { mpcRunning_ = false; }
 
     protected:
-        virtual void updateStateEstimation(const ros::Time& time, const ros::Duration& period);
-        void normal(const ros::Time& time, const ros::Duration& period);
-        void upright(const ros::Time& time, const ros::Duration& period);
-        void uprightAvoid(const ros::Time& time, const ros::Duration& period);
-        void EESpaceLock(const ros::Time& time, const ros::Duration& period);
+        virtual void updateStateEstimation(const ros::Time &time, const ros::Duration &period);
 
-        virtual void setupMpc(ros::NodeHandle& nh);
+        void normal(const ros::Time &time, const ros::Duration &period);
+
+        void upright(const ros::Time &time, const ros::Duration &period);
+
+        void uprightAvoid(const ros::Time &time, const ros::Duration &period);
+
+        void EESpaceLock(const ros::Time &time, const ros::Duration &period);
+
+        virtual void setupMpc(ros::NodeHandle &nh);
+
         virtual void setupMrt();
 
         // Interface
-        std::shared_ptr<ocs2::mobile_manipulator::MobileManipulatorInterface> mobileManipulatorInterface_;
+        std::shared_ptr<upright::ControllerInterface> mobileManipulatorInterface_;
         std::vector<hardware_interface::JointHandle> jointHandles_;
 //    hardware_interface::ImuSensorHandle imuSensorHandle_;
 
@@ -59,16 +72,16 @@ namespace ddt{
         ocs2::SystemObservation currentObservation_;
 
         // Nonlinear MPC
-        std::shared_ptr<ocs2::MPC_BASE> mpc_;
+        std::unique_ptr<ocs2::MultipleShootingMpc> mpc_;
         std::shared_ptr<ocs2::MPC_MRT_Interface> mpcMrtInterface_;
 //    LeggedBalanceParameters params_;
 
         // Visualization
-//    std::shared_ptr<ocs2::mobile_manipulator::MobileManipulatorDummyVisualization> visualizer_;
+        std::shared_ptr<ddt::MobileManipulatorDummyVisualization> visualizer_;
         ros::Publisher observationPublisher_;
 
     private:
-        int controlState_ = NORMAL;
+        int controlState_ = UPRIGHT;
         std::thread mpcThread_;
         std::atomic_bool controllerRunning_{}, mpcRunning_{};
         ocs2::benchmark::RepeatedTimer mpcTimer_;

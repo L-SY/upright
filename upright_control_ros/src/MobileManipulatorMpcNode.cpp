@@ -11,7 +11,6 @@
 #include <ros/package.h>
 
 #include <ocs2_ros_interfaces/mpc/MPC_ROS_Interface.h>
-
 #include <upright_control/MobileManipulatorInterface.h>
 
 int main(int argc, char **argv) {
