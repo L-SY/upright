@@ -1,0 +1,86 @@
+cmake_minimum_required(VERSION 3.10)
+project(upright_common)
+
+## Use C++14
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+## By adding -Wall and -Werror, the compiler does not ignore warnings anymore,
+## enforcing cleaner code.
+add_definitions(-Wall -Werror -Wno-enum-compare)
+
+find_package(Eigen3 REQUIRED)
+
+find_package(catkin REQUIRED
+        COMPONENTS
+        roscpp
+        tf
+        geometry_msgs
+        control_msgs
+        controller_manager_msgs
+        dynamic_reconfigure
+        imu_complementary_filter
+        imu_filter_madgwick
+        realtime_tools
+)
+
+catkin_package(
+        INCLUDE_DIRS
+        include
+        ${EIGEN3_INCLUDE_DIR}
+        CATKIN_DEPENDS
+        tf
+        geometry_msgs
+        control_msgs
+        controller_manager_msgs
+        imu_complementary_filter
+        imu_filter_madgwick
+        roscpp
+        dynamic_reconfigure
+        DEPENDS
+        LIBRARIES
+        upright_common
+)
+
+include_directories(
+        include
+        ${catkin_INCLUDE_DIRS}
+        ${EIGEN3_INCLUDE_DIR}
+)
+
+file(GLOB_RECURSE sources "src/*.cpp")
+
+add_library(upright_common SHARED ${sources})
+
+target_link_libraries(upright_common ${catkin_LIBRARIES})
+
+#############
+## Install ##
+#############
+
+# Mark executables and/or libraries for installation
+install(
+        TARGETS ${PROJECT_NAME}
+        ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+# Mark cpp header files for installation
+install(
+        DIRECTORY include/${PROJECT_NAME}/
+        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+        FILES_MATCHING PATTERN "*.h"
+)
+
+# Mark other files for installation
+#install(
+#        DIRECTORY doc
+#        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+#)
+
+#############
+## Testing ##
+#############
+
+
