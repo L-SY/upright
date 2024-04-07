@@ -435,13 +435,13 @@ namespace upright {
         std::cerr << "Initial State:   " << initial_state_.transpose() << std::endl;
     }
 
-    std::unique_ptr<ocs2::MPC_BASE> ControllerInterface::get_mpc() {
+    std::unique_ptr<ocs2::MultipleShootingMpc> ControllerInterface::get_mpc() {
         // if (settings_.solver_method == ControllerSettings::SolverMethod::DDP) {
         //     return std::unique_ptr<ocs2::MPC_BASE>(new ocs2::GaussNewtonDDP_MPC(
         //         mpcSettings_, ddpSettings_, *rollout_ptr_, problem_,
         //         *initializer_ptr_));
         // } else {
-        return std::unique_ptr<ocs2::MPC_BASE>(new ocs2::MultipleShootingMpc(
+        return std::unique_ptr<ocs2::MultipleShootingMpc>(new ocs2::MultipleShootingMpc(
                 settings_.mpc, settings_.sqp, problem_, getInitializer()));
         // }
     }
