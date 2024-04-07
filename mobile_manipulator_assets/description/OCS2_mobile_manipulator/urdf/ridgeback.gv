@@ -11,16 +11,13 @@ node [shape=box];
 "rear_right_wheel_link" [label="rear_right_wheel_link"];
 "front_cover_link" [label="front_cover_link"];
 "front_lights_link" [label="front_lights_link"];
-"imu_link" [label="imu_link"];
 "left_side_cover_link" [label="left_side_cover_link"];
 "rear_cover_link" [label="rear_cover_link"];
 "rear_lights_link" [label="rear_lights_link"];
 "right_side_cover_link" [label="right_side_cover_link"];
 "top_link" [label="top_link"];
-"mid_mount" [label="mid_mount"];
 "ur_arm_base_link" [label="ur_arm_base_link"];
 "ur_arm_base" [label="ur_arm_base"];
-"ur_arm_base_link_inertia" [label="ur_arm_base_link_inertia"];
 "ur_arm_shoulder_link" [label="ur_arm_shoulder_link"];
 "ur_arm_upper_arm_link" [label="ur_arm_upper_arm_link"];
 "ur_arm_forearm_link" [label="ur_arm_forearm_link"];
@@ -50,8 +47,6 @@ node [shape=ellipse, color=blue, fontcolor=blue];
 "front_cover_link_joint" -> "front_cover_link"
 "chassis_link" -> "front_lights_link_joint" [label="xyz: 0 0 0 \nrpy: 0 -0 0"]
 "front_lights_link_joint" -> "front_lights_link"
-"chassis_link" -> "imu_joint" [label="xyz: 0.2085 -0.2902 0.1681 \nrpy: 0 -0 0"]
-"imu_joint" -> "imu_link"
 "chassis_link" -> "left_side_cover_link_joint" [label="xyz: 0 0 0 \nrpy: 0 -0 0"]
 "left_side_cover_link_joint" -> "left_side_cover_link"
 "chassis_link" -> "rear_cover_link_joint" [label="xyz: 0 0 0 \nrpy: 0 -0 0"]
@@ -62,15 +57,11 @@ node [shape=ellipse, color=blue, fontcolor=blue];
 "right_side_cover_link_joint" -> "right_side_cover_link"
 "chassis_link" -> "top_link_joint" [label="xyz: 0 0 0 \nrpy: 0 -0 0"]
 "top_link_joint" -> "top_link"
-"base_link" -> "mid_mount_joint" [label="xyz: 0 0 0.28 \nrpy: 0 -0 0"]
-"mid_mount_joint" -> "mid_mount"
-"mid_mount" -> "arm_mount_joint" [label="xyz: 0 0 0 \nrpy: 0 -0 0"]
+"top_link" -> "arm_mount_joint" [label="xyz: 0 0 0.28 \nrpy: 0 -0 0"]
 "arm_mount_joint" -> "ur_arm_base_link"
 "ur_arm_base_link" -> "ur_arm_base_link-base_fixed_joint" [label="xyz: 0 0 0 \nrpy: 0 -0 3.14159"]
 "ur_arm_base_link-base_fixed_joint" -> "ur_arm_base"
-"ur_arm_base_link" -> "ur_arm_base_link-base_link_inertia" [label="xyz: 0 0 0 \nrpy: 0 -0 3.14159"]
-"ur_arm_base_link-base_link_inertia" -> "ur_arm_base_link_inertia"
-"ur_arm_base_link_inertia" -> "ur_arm_shoulder_pan_joint" [label="xyz: 0 0 0.089159 \nrpy: 0 -0 0"]
+"ur_arm_base_link" -> "ur_arm_shoulder_pan_joint" [label="xyz: 0 0 0.089159 \nrpy: 0 -0 0"]
 "ur_arm_shoulder_pan_joint" -> "ur_arm_shoulder_link"
 "ur_arm_shoulder_link" -> "ur_arm_shoulder_lift_joint" [label="xyz: 0 0 0 \nrpy: 1.5708 -0 0"]
 "ur_arm_shoulder_lift_joint" -> "ur_arm_upper_arm_link"
