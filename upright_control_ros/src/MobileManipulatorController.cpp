@@ -46,6 +46,9 @@ namespace ddt {
         jointHandles_.push_back(effortJointInterface->getHandle("ur_arm_wrist_1_joint"));
         jointHandles_.push_back(effortJointInterface->getHandle("ur_arm_wrist_2_joint"));
         jointHandles_.push_back(effortJointInterface->getHandle("ur_arm_wrist_3_joint"));
+
+        controlState_ = UPRIGHT;
+
         return true;
     }
 
@@ -59,7 +62,7 @@ namespace ddt {
                 normal(time, period);
                 break;
             case ControllerState::UPRIGHT: //Add when normal is useful
-                update(time, period);
+                upright(time, period);
                 break;
             case ControllerState::UPRIGHT_AVOID: //Add when normal is useful
                 uprightAvoid(time, period);
@@ -200,20 +203,17 @@ namespace ddt {
 
         // Load the latest MPC policy
         mpcMrtInterface_->updatePolicy();
-
         // Evaluate the current policy
         ocs2::vector_t optimizedState, optimizedInput;
         size_t plannedMode = 0;  // The mode that is active at the time the policy is evaluated at.
         mpcMrtInterface_->evaluatePolicy(currentObservation_.time, currentObservation_.state, optimizedState,
                                          optimizedInput, plannedMode);
-
         currentObservation_.input = optimizedInput;
         int index = 0;
         for (auto joint: jointHandles_) {
-            joint.setCommand(currentObservation_.input(index + 7));
+            joint.setCommand(currentObservation_.state(index + 7));
             index++;
         }
-
         lastOptimizedState = optimizedState;
     }
 
