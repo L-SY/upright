@@ -39,13 +39,13 @@ public:
   void writeSim(ros::Time time, ros::Duration period) override;
 
 private:
-  void parseImu(XmlRpc::XmlRpcValue &imuDatas,
-                const gazebo::physics::ModelPtr &parentModel);
+  //  void parseImu(XmlRpc::XmlRpcValue &imuDatas,
+  //                const gazebo::physics::ModelPtr &parentModel);
 
-  hardware_interface::ImuSensorInterface imuSensorInterface_;
+  //  hardware_interface::ImuSensorInterface imuSensorInterface_;
 
   //  std::list<HybridJointData> hybridJointDatas_;
-  std::list<ImuData> imuDatas_;
+  //  std::list<ImuData> imuDatas_;
   //  std::unordered_map<std::string, std::deque<HybridJointCommand>>
   //  cmdBuffer_;
 

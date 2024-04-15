@@ -7,13 +7,14 @@ find_package(catkin REQUIRED COMPONENTS
         ocs2_mobile_manipulator_ros
         urdf
         rviz
+        upright_gazebo
 
 )
 
 catkin_package(
         INCLUDE_DIRS
         LIBRARIES
-        CATKIN_DEPENDS roscpp ocs2_mobile_manipulator ocs2_mobile_manipulator_ros urdf rviz
+        CATKIN_DEPENDS roscpp ocs2_mobile_manipulator ocs2_mobile_manipulator_ros urdf rviz upright_gazebo
         DEPENDS
 )
 

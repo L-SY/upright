@@ -1,0 +1,26 @@
+<launch>
+    <param name="robot_description"
+           command="$(find xacro)/xacro $(find mobile_manipulator_assets)/description/OCS2_mobile_manipulator/urdf/ridgeback_ur5_gazebo.urdf"/>
+
+    <param name="ridgeback_ur5"
+           command="$(find xacro)/xacro $(find mobile_manipulator_assets)/description/OCS2_mobile_manipulator/urdf/ridgeback_ur5_gazebo.urdf"/>
+
+    <rosparam file="$(find upright_gazebo)/config/default.yaml" command="load"/>
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(find upright_gazebo)/worlds/empty_world.world"/>
+        <arg name="paused" value="true"/>
+    </include>
+    <!-- push robot_description to factory and spawn robot in gazebo -->
+    <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" clear_params="true"
+          output="screen"
+          args="-param ridgeback_ur5 -urdf -model ridgeback_ur5
+        -z 0.5
+        -J ur_arm_shoulder_pan_joint 0.00
+        -J ur_arm_shoulder_lift_joint -0.785
+        -J ur_arm_elbow_joint 1.57
+        -J ur_arm_wrist_1_joint -0.785
+        -J ur_arm_wrist_2_joint 1.57
+        -J ur_arm_wrist_3_joint 0.0
+        "
+    />
+</launch>

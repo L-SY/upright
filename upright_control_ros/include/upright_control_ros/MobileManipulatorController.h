@@ -21,6 +21,9 @@
 #include <ocs2_mobile_manipulator/MobileManipulatorInterface.h>
 #include <upright_control/MobileManipulatorInterface.h>
 #include <ros/package.h>
+
+#include <upright_common/ori_tool.h>
+#include <upright_common/tf_rt_broadcaster.h>
 #include "upright_control_ros/synchronized_module/RosReferenceManager.h"
 #include "upright_control_ros/MobileManipulatorVisualization.h"
 
@@ -51,6 +54,8 @@ namespace ddt {
     protected:
         virtual void updateStateEstimation(const ros::Time &time, const ros::Duration &period);
 
+        void updateTfOdom(const ros::Time &time, const ros::Duration &period);
+
         void normal(const ros::Time &time, const ros::Duration &period);
 
         void upright(const ros::Time &time, const ros::Duration &period);
@@ -58,6 +63,8 @@ namespace ddt {
         void uprightAvoid(const ros::Time &time, const ros::Duration &period);
 
         void EESpaceLock(const ros::Time &time, const ros::Duration &period);
+
+        void worldV2BaseV();
 
         virtual void setupMpc(ros::NodeHandle &nh);
 
@@ -85,5 +92,14 @@ namespace ddt {
         std::thread mpcThread_;
         std::atomic_bool controllerRunning_{}, mpcRunning_{};
         ocs2::benchmark::RepeatedTimer mpcTimer_;
+
+        // Odom TF
+        upright::TfRtBroadcaster tfRtBroadcaster_;
+        geometry_msgs::TransformStamped odom2base_{};
+
+        ocs2::vector_t jointVelLast_{};
+        ros::Time lastTime_{};
+
+        double baseL_ = 0.683, baseW_ = 0.551, wheeelR = 0.15, baseD = 0.4215;
     };
 }
