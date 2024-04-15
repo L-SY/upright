@@ -12,6 +12,7 @@ set(CATKIN_PACKAGE_DEPENDENCIES
         effort_controllers
         pluginlib
 
+        upright_common
         upright_control
 )
 
