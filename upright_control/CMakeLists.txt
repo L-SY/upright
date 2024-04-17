@@ -27,7 +27,7 @@ set(CATKIN_PACKAGE_DEPENDENCIES
         ocs2_self_collision_visualization
         roscpp
 
-        mobile_manipulator_assets
+        mm_assets
         upright_core
 )
 

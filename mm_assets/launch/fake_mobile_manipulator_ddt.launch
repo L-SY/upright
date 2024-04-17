@@ -6,14 +6,14 @@
 
     <!-- The URDF model of the robot -->
     <arg name="urdfFile"
-         value="$(find mobile_manipulator_assets)/description/OCS2_mobile_manipulator/urdf/ridgeback_ur5.urdf"/>
+         value="$(find mm_assets)/description/OCS2_mobile_manipulator/urdf/ridgeback_ur5.urdf"/>
     <!-- The task file for the mpc. -->
-    <arg name="taskFile" value="$(find mobile_manipulator_assets)/config/OCS2_mobile_manipulator/task.info"/>
+    <arg name="taskFile" value="$(find mm_assets)/config/OCS2_mobile_manipulator/task.info"/>
     <!-- The library folder to generate CppAD codegen into -->
     <arg name="libFolder"
-         value="$(find mobile_manipulator_assets)/auto_generated/OCS2_mobile_manipulator/ridgeback_ur5"/>
+         value="$(find mm_assets)/auto_generated/OCS2_mobile_manipulator/ridgeback_ur5"/>
 
-    <include file="$(find mobile_manipulator_assets)/launch/include/mobile_manipulator.launch">
+    <include file="$(find mm_assets)/launch/include/mobile_manipulator.launch">
         <arg name="rviz" value="$(arg rviz)"/>
         <arg name="debug" value="$(arg debug)"/>
         <arg name="urdfFile" value="$(arg urdfFile)"/>

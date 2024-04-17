@@ -315,7 +315,7 @@ Constraint
     {
           enabled false
           arrangement nothing
-          arrangement_path /home/lsy/upright_ws/src/mobile_manipulator_assets/config/balance.yaml
+          arrangement_path /home/lsy/upright_ws/src/mm_assets/config/balance.yaml
           constraint_type hard
           use_force_constraints false
           force_weight 0.001

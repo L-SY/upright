@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(mobile_manipulator_assets)
+project(mm_assets)
 
 find_package(catkin REQUIRED COMPONENTS
         roscpp

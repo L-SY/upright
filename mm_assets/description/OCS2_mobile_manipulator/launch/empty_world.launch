@@ -1,9 +1,9 @@
 <launch>
     <!--    <param name="robot_description"-->
-    <!--           command="$(find xacro)/xacro $(find mobile_manipulator_assets)/description/OCS2_mobile_manipulator/urdf/ridgeback_ur5_gazebo.urdf"/>-->
+    <!--           command="$(find xacro)/xacro $(find mm_assets)/description/OCS2_mobile_manipulator/urdf/ridgeback_ur5_gazebo.urdf"/>-->
 
     <param name="ridgeback_ur5"
-           command="$(find xacro)/xacro $(find mobile_manipulator_assets)/description/OCS2_mobile_manipulator/urdf/ridgeback_ur5_gazebo.urdf"/>
+           command="$(find xacro)/xacro $(find mm_assets)/description/OCS2_mobile_manipulator/urdf/ridgeback_ur5_gazebo.urdf"/>
 
     <rosparam file="$(find upright_gazebo)/config/default.yaml" command="load"/>
     <include file="$(find gazebo_ros)/launch/empty_world.launch">

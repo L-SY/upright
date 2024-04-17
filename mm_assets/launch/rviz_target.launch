@@ -1,5 +1,5 @@
 <launch>
-    <arg name="rvizconfig" default="$(find mobile_manipulator_assets)/rviz/mobile_manipulator.rviz"/>
+    <arg name="rvizconfig" default="$(find mm_assets)/rviz/mobile_manipulator.rviz"/>
 
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" output="screen"/>
