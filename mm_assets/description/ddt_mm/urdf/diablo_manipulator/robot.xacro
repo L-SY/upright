@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="qm">
+
+    <xacro:arg name="robot_type" default="ddt"/>
+    <xacro:include filename="$(find mm_assets)/description/ddt_mm/urdf/diablo/robot.xacro"/>
+
+    <!-- manipulatior -->
+    <xacro:include filename="$(find mm_assets)/description/ddt_mm/urdf/manipulator/robot.xacro"/>
+
+    <joint name="manipulator_joint" type="fixed">
+        <parent link="diablo_base_link"/>
+        <child link="arm_base_link"/>
+        <origin xyz="0.0 0.0 0.1" rpy="0.0 0.0 0.0"/>
+    </joint>
+
+    <gazebo>
+        <plugin name="p3d_base_controller" filename="libgazebo_ros_p3d.so">
+            <alwaysOn>true</alwaysOn>
+            <updateRate>1000.0</updateRate>
+            <bodyName>diablo_base_link</bodyName>
+            <topicName>ground_truth/state</topicName>
+            <gaussianNoise>0</gaussianNoise>
+            <frameName>world</frameName>
+            <xyzOffsets>0 0 0</xyzOffsets>
+            <rpyOffsets>0 0 0</rpyOffsets>
+        </plugin>
+    </gazebo>
+    <!-- ros_control plugin -->
+    <!--    <gazebo>-->
+    <!--        <plugin name="gazebo_ros_control" filename="libqm_hw_sim.so">-->
+    <!--            <robotNamespace>/</robotNamespace>-->
+    <!--            <robotParam>mm_assets</robotParam>-->
+    <!--            <robotSimType>qm_gazebo/QMHWSim</robotSimType>-->
+    <!--        </plugin>-->
+    <!--    </gazebo>-->
+</robot>
