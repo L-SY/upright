@@ -46,9 +46,11 @@ public:
 
   void initVelocityMode(webots::Robot *robot) {
     rosMotorCmd_.resize(motorNum_);
-    //            rosMotorCmd_ = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+    //    rosMotorCmd_ = {1, 1, 0, 0, 0, 0, 0, 0};
     enablePositionSensor(robot, 100);
     setAllVelocityMode(robot);
+    setMotorCommands(robot, {0, 0, 0, 0, 0, 0, 0, 0},
+                     webots_deliver::RosWebotsDeliver::VELOCITY);
   }
 
   void initDeliver(ros::NodeHandle nh) {
