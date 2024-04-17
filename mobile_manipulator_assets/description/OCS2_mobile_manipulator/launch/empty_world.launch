@@ -1,6 +1,6 @@
 <launch>
-    <param name="robot_description"
-           command="$(find xacro)/xacro $(find mobile_manipulator_assets)/description/OCS2_mobile_manipulator/urdf/ridgeback_ur5_gazebo.urdf"/>
+    <!--    <param name="robot_description"-->
+    <!--           command="$(find xacro)/xacro $(find mobile_manipulator_assets)/description/OCS2_mobile_manipulator/urdf/ridgeback_ur5_gazebo.urdf"/>-->
 
     <param name="ridgeback_ur5"
            command="$(find xacro)/xacro $(find mobile_manipulator_assets)/description/OCS2_mobile_manipulator/urdf/ridgeback_ur5_gazebo.urdf"/>

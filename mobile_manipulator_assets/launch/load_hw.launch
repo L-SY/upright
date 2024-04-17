@@ -7,9 +7,8 @@
     <rosparam file="$(find mobile_manipulator_assets)/config/OCS2_mobile_manipulator/robot_def.yaml" command="load"
               ns="robot_def"/>
 
-    <rosparam file="$(find mobile_manipulator_assets)/config/OCS2_mobile_manipulator/hw.yaml" command="load"/>
-
     <param name="robot_type" value="$(arg robot_type)"/>
+    <rosparam file="$(find mobile_manipulator_assets)/config/OCS2_mobile_manipulator/hw.yaml" command="load"/>
     <node name="mobile_manipulator_hw" pkg="mobile_manipulator_hw" type="mobile_manipulator_hw" respawn="false"
           clear_params="true"/>
 </launch>
