@@ -2,18 +2,18 @@
 # license: Apache License 2.0
 # license url: http://www.apache.org/licenses/LICENSE-2.0
 # This is a proto file for Webots for the diablo_manipulator
-# Extracted from: /home/lsy/upright_ws/src/mm_assets/description/ddt_mm/urdf/diablo_manipulator/robot.urdf
+# Extracted from: /home/lsy/upright_ws/src/mm_assets/description/ddt_mm/urdf/diablo_manipulator/robot_webots.urdf
 
 PROTO diablo_manipulator [
   field  SFVec3f     translation     0 0 0
   field  SFRotation  rotation        0 0 1 0
   field  SFString    name            "diablo_manipulator"  # Is `Robot.name`.
-  field  SFString    controller      "void" # Is `Robot.controller`.
-  field  MFString    controllerArgs  []     # Is `Robot.controllerArgs`.
-  field  SFString    customData      ""     # Is `Robot.customData`.
-  field  SFBool      supervisor      FALSE  # Is `Robot.supervisor`.
-  field  SFBool      synchronization TRUE   # Is `Robot.synchronization`.
-  field  SFBool      selfCollision   FALSE  # Is `Robot.selfCollision`.
+  field  SFString    controller      "void"                # Is `Robot.controller`.
+  field  MFString    controllerArgs  []                    # Is `Robot.controllerArgs`.
+  field  SFString    customData      ""                    # Is `Robot.customData`.
+  field  SFBool      supervisor      FALSE                 # Is `Robot.supervisor`.
+  field  SFBool      synchronization TRUE                  # Is `Robot.synchronization`.
+  field  SFBool      selfCollision   FALSE                 # Is `Robot.selfCollision`.
 ]
 {
   Robot {
@@ -36,404 +36,283 @@ PROTO diablo_manipulator [
           url "/home/lsy/upright_ws/src/mm_assets/description/ddt_mm/meshes/diablo/base_link.STL"
         }
       }
-      InertialUnit {
-        name "ground_truth/state inertial"
-      }
-      Gyro {
-        name "ground_truth/state gyro"
-      }
       GPS {
         name "ground_truth/state gps"
       }
       InertialUnit {
         name "ground_truth/state inertial"
       }
-      HingeJoint {
-        jointParameters HingeJointParameters {
-          axis -0.000008 -1.000000 0.000004
-          anchor 0.000000 0.187550 0.000000
-        }
-        device [
-          RotationalMotor {
-            name "left_j4"
-            maxTorque 10000
-          }
-          PositionSensor {
-            name "left_j4_sensor"
-          }
-        ]
-        endPoint Solid {
-          translation 0.000000 0.187550 0.000000
-          rotation 0.047508 -0.706310 -0.706307 3.236548
-          children [
-            Shape {
-              appearance DEF silver PBRAppearance {
-                baseColor 0.500000 0.500000 0.500000
-                roughness 1.000000
-                metalness 0
-              }
-              geometry DEF left_motor Mesh {
-                url "/home/lsy/upright_ws/src/mm_assets/description/ddt_mm/meshes/diablo/left_motor.STL"
-              }
+      Gyro {
+        name "ground_truth/state gyro"
+      }
+      Solid {
+        translation 0.000000 0.187550 0.000000
+        rotation 0.047508 -0.706310 -0.706307 3.236548
+        children [
+          Shape {
+            appearance DEF silver PBRAppearance {
+              baseColor 0.500000 0.500000 0.500000
+              roughness 1.000000
+              metalness 0
             }
-            HingeJoint {
-              jointParameters HingeJointParameters {
-                axis 0.000000 0.000000 -1.000000
+            geometry DEF left_motor Mesh {
+              url "/home/lsy/upright_ws/src/mm_assets/description/ddt_mm/meshes/diablo/left_motor.STL"
+            }
+          }
+          Solid {
+            rotation 0.000000 0.000000 -1.000000 2.872900
+            children [
+              Shape {
+                appearance USE silver
+                geometry DEF left_leg1 Mesh {
+                  url "/home/lsy/upright_ws/src/mm_assets/description/ddt_mm/meshes/diablo/left_leg1.STL"
+                }
               }
-              device [
-                RotationalMotor {
-                  name "left_j1"
-                  maxTorque 10000
-                }
-                PositionSensor {
-                  name "left_j1_sensor"
-                }
-              ]
-              endPoint Solid {
-                rotation 0.000000 0.000000 -1.000000 2.872900
+              Solid {
+                translation 0.140000 0.000000 0.000000
+                rotation 0.000000 0.000000 1.000000 2.872900
                 children [
                   Shape {
                     appearance USE silver
-                    geometry DEF left_leg1 Mesh {
-                      url "/home/lsy/upright_ws/src/mm_assets/description/ddt_mm/meshes/diablo/left_leg1.STL"
+                    geometry DEF left_leg2 Mesh {
+                      url "/home/lsy/upright_ws/src/mm_assets/description/ddt_mm/meshes/diablo/left_leg2.STL"
                     }
                   }
                   HingeJoint {
                     jointParameters HingeJointParameters {
-                      axis 0.000000 0.000000 1.000000
-                      anchor 0.140000 0.000000 0.000000
+                      axis 0.000000 0.000000 -1.000000
+                      anchor 0.140000 0.000000 0.053700
                     }
                     device [
                       RotationalMotor {
-                        name "left_j2"
+                        name "left_j3"
                         maxTorque 10000
                       }
                       PositionSensor {
-                        name "left_j2_sensor"
+                        name "left_j3_sensor"
                       }
                     ]
                     endPoint Solid {
-                      translation 0.140000 0.000000 0.000000
-                      rotation 0.000000 0.000000 1.000000 2.872900
+                      translation 0.140000 0.000000 0.053700
+                      rotation 0.000000 0.000000 1.000000 0.134330
                       children [
                         Shape {
-                          appearance USE silver
-                          geometry DEF left_leg2 Mesh {
-                            url "/home/lsy/upright_ws/src/mm_assets/description/ddt_mm/meshes/diablo/left_leg2.STL"
+                          appearance DEF black PBRAppearance {
+                            baseColor 0.500000 0.500000 0.500000
+                            roughness 1.000000
+                            metalness 0
                           }
-                        }
-                        HingeJoint {
-                          jointParameters HingeJointParameters {
-                            axis 0.000000 0.000000 -1.000000
-                            anchor 0.140000 0.000000 0.053700
-                          }
-                          device [
-                            RotationalMotor {
-                              name "left_j3"
-                              maxTorque 10000
-                            }
-                            PositionSensor {
-                              name "left_j3_sensor"
-                            }
-                          ]
-                          endPoint Solid {
-                            translation 0.140000 0.000000 0.053700
-                            rotation 0.000000 0.000000 1.000000 0.134330
-                            children [
-                              Shape {
-                                appearance DEF black PBRAppearance {
-                                  baseColor 0.500000 0.500000 0.500000
-                                  roughness 1.000000
-                                  metalness 0
-                                }
-                                geometry DEF left_wheel Mesh {
-                                  url "/home/lsy/upright_ws/src/mm_assets/description/ddt_mm/meshes/diablo/left_wheel.STL"
-                                }
-                              }
-                            ]
-                            name "left_wheel"
-                            boundingObject USE left_wheel
-                            physics Physics {
-                              density -1
-                              mass 2.949400
-                              centerOfMass [ 0.000000 0.000000 0.000000 ]
-                              inertiaMatrix [
-                                6.933800e-03 6.934000e-03 1.256700e-02
-                                2.869300e-09 4.677900e-09 -5.044100e-11
-                              ]
-                            }
+                          geometry DEF left_wheel Mesh {
+                            url "/home/lsy/upright_ws/src/mm_assets/description/ddt_mm/meshes/diablo/left_wheel.STL"
                           }
                         }
                       ]
-                      name "left_leg2"
-                      boundingObject USE left_leg2
+                      name "left_wheel"
+                      boundingObject USE left_wheel
                       physics Physics {
                         density -1
-                        mass 0.182180
+                        mass 2.949400
                         centerOfMass [ 0.000000 0.000000 0.000000 ]
                         inertiaMatrix [
-                          4.137200e-05 4.821900e-04 5.044100e-04
-                          5.144500e-09 -7.365900e-06 2.552100e-11
+                          6.933800e-03 6.934000e-03 1.256700e-02
+                          2.869300e-09 4.677900e-09 -5.044100e-11
                         ]
                       }
                     }
                   }
                 ]
-                name "left_leg1"
-                boundingObject USE left_leg1
+                name "left_leg2"
+                boundingObject USE left_leg2
                 physics Physics {
                   density -1
-                  mass 0.103820
+                  mass 0.182180
                   centerOfMass [ 0.000000 0.000000 0.000000 ]
                   inertiaMatrix [
-                    3.697200e-05 2.927800e-04 3.253200e-04
-                    2.410600e-05 4.369900e-10 -4.124300e-11
+                    4.137200e-05 4.821900e-04 5.044100e-04
+                    5.144500e-09 -7.365900e-06 2.552100e-11
                   ]
                 }
               }
-            }
-            HingeJoint {
-              jointParameters HingeJointParameters {
-                axis 0.000000 -0.000000 1.000000
-                anchor 0.090000 0.000000 0.000000
-              }
-              device [
-                RotationalMotor {
-                  name "left_j5"
-                  maxTorque 10000
-                }
-                PositionSensor {
-                  name "left_j5_sensor"
-                }
-              ]
-              endPoint Solid {
-                translation 0.090000 0.000000 0.000000
-                rotation 0.000000 0.000000 -1.000000 2.872900
-                children [
-                  Shape {
-                    appearance DEF brown PBRAppearance {
-                      baseColor 0.500000 0.500000 0.500000
-                      roughness 1.000000
-                      metalness 0
-                    }
-                    geometry DEF left_leg3 Mesh {
-                      url "/home/lsy/upright_ws/src/mm_assets/description/ddt_mm/meshes/diablo/left_leg3.STL"
-                    }
-                  }
-                ]
-                name "left_leg3"
-                boundingObject USE left_leg3
-                physics Physics {
-                  density -1
-                  mass 0.071103
-                  centerOfMass [ 0.000000 0.000000 0.000000 ]
-                  inertiaMatrix [
-                    1.665700e-05 1.796600e-04 1.932800e-04
-                    -5.524600e-06 3.959800e-14 -6.549300e-15
-                  ]
-                }
-              }
-            }
-          ]
-          name "left_motor"
-          boundingObject USE left_motor
-          physics Physics {
-            density -1
-            mass 1.383700
-            centerOfMass [ 0.000000 0.000000 0.000000 ]
-            inertiaMatrix [
-              3.352000e-03 3.490800e-03 3.485600e-03
-              2.778500e-09 -6.591300e-05 4.504500e-10
             ]
+            name "left_leg1"
+            boundingObject USE left_leg1
+            physics Physics {
+              density -1
+              mass 0.103820
+              centerOfMass [ 0.000000 0.000000 0.000000 ]
+              inertiaMatrix [
+                3.697200e-05 2.927800e-04 3.253200e-04
+                2.410600e-05 4.369900e-10 -4.124300e-11
+              ]
+            }
           }
+          Solid {
+            translation 0.090000 0.000000 0.000000
+            rotation 0.000000 0.000000 -1.000000 2.872900
+            children [
+              Shape {
+                appearance DEF brown PBRAppearance {
+                  baseColor 0.500000 0.500000 0.500000
+                  roughness 1.000000
+                  metalness 0
+                }
+                geometry DEF left_leg3 Mesh {
+                  url "/home/lsy/upright_ws/src/mm_assets/description/ddt_mm/meshes/diablo/left_leg3.STL"
+                }
+              }
+            ]
+            name "left_leg3"
+            boundingObject USE left_leg3
+            physics Physics {
+              density -1
+              mass 0.071103
+              centerOfMass [ 0.000000 0.000000 0.000000 ]
+              inertiaMatrix [
+                1.665700e-05 1.796600e-04 1.932800e-04
+                -5.524600e-06 3.959800e-14 -6.549300e-15
+              ]
+            }
+          }
+        ]
+        name "left_motor"
+        boundingObject USE left_motor
+        physics Physics {
+          density -1
+          mass 1.383700
+          centerOfMass [ 0.000000 0.000000 0.000000 ]
+          inertiaMatrix [
+            3.352000e-03 3.490800e-03 3.485600e-03
+            2.778500e-09 -6.591300e-05 4.504500e-10
+          ]
         }
       }
-      HingeJoint {
-        jointParameters HingeJointParameters {
-          axis 0.000007 -1.000000 0.000004
-          anchor 0.000000 -0.187550 0.000000
-        }
-        device [
-          RotationalMotor {
-            name "right_j4"
-            maxTorque 10000
-          }
-          PositionSensor {
-            name "right_j4_sensor"
-          }
-        ]
-        endPoint Solid {
-          translation 0.000000 -0.187550 0.000000
-          rotation -0.047513 0.706309 0.706307 3.046648
-          children [
-            Shape {
-              appearance USE silver
-              geometry DEF right_motor Mesh {
-                url "/home/lsy/upright_ws/src/mm_assets/description/ddt_mm/meshes/diablo/right_motor.STL"
-              }
+      Solid {
+        translation 0.000000 -0.187550 0.000000
+        rotation -0.047513 0.706309 0.706307 3.046648
+        children [
+          Shape {
+            appearance USE silver
+            geometry DEF right_motor Mesh {
+              url "/home/lsy/upright_ws/src/mm_assets/description/ddt_mm/meshes/diablo/right_motor.STL"
             }
-            HingeJoint {
-              jointParameters HingeJointParameters {
-                axis 0.000000 0.000000 -1.000000
+          }
+          Solid {
+            rotation 0.000000 0.000000 -1.000000 2.872900
+            children [
+              Shape {
+                appearance USE silver
+                geometry DEF right_leg1 Mesh {
+                  url "/home/lsy/upright_ws/src/mm_assets/description/ddt_mm/meshes/diablo/right_leg1.STL"
+                }
               }
-              device [
-                RotationalMotor {
-                  name "right_j1"
-                  maxTorque 10000
-                }
-                PositionSensor {
-                  name "right_j1_sensor"
-                }
-              ]
-              endPoint Solid {
-                rotation 0.000000 0.000000 -1.000000 2.872900
+              Solid {
+                translation 0.140000 0.000000 0.000000
+                rotation 0.000000 0.000000 1.000000 2.872900
                 children [
                   Shape {
                     appearance USE silver
-                    geometry DEF right_leg1 Mesh {
-                      url "/home/lsy/upright_ws/src/mm_assets/description/ddt_mm/meshes/diablo/right_leg1.STL"
+                    geometry DEF right_leg2 Mesh {
+                      url "/home/lsy/upright_ws/src/mm_assets/description/ddt_mm/meshes/diablo/right_leg2.STL"
                     }
                   }
                   HingeJoint {
                     jointParameters HingeJointParameters {
-                      axis 0.000000 0.000000 1.000000
-                      anchor 0.140000 0.000000 0.000000
+                      axis 0.000000 0.000000 -1.000000
+                      anchor 0.140000 0.000000 -0.053700
                     }
                     device [
                       RotationalMotor {
-                        name "right_j2"
+                        name "right_j3"
                         maxTorque 10000
                       }
                       PositionSensor {
-                        name "right_j2_sensor"
+                        name "right_j3_sensor"
                       }
                     ]
                     endPoint Solid {
-                      translation 0.140000 0.000000 0.000000
-                      rotation 0.000000 0.000000 1.000000 2.872900
+                      translation 0.140000 0.000000 -0.053700
+                      rotation 0.000000 0.000000 -1.000000 3.007300
                       children [
                         Shape {
-                          appearance USE silver
-                          geometry DEF right_leg2 Mesh {
-                            url "/home/lsy/upright_ws/src/mm_assets/description/ddt_mm/meshes/diablo/right_leg2.STL"
-                          }
-                        }
-                        HingeJoint {
-                          jointParameters HingeJointParameters {
-                            axis 0.000000 0.000000 -1.000000
-                            anchor 0.140000 0.000000 -0.053700
-                          }
-                          device [
-                            RotationalMotor {
-                              name "right_j3"
-                              maxTorque 10000
-                            }
-                            PositionSensor {
-                              name "right_j3_sensor"
-                            }
-                          ]
-                          endPoint Solid {
-                            translation 0.140000 0.000000 -0.053700
-                            rotation 0.000000 0.000000 -1.000000 3.007300
-                            children [
-                              Shape {
-                                appearance USE black
-                                geometry DEF right_wheel Mesh {
-                                  url "/home/lsy/upright_ws/src/mm_assets/description/ddt_mm/meshes/diablo/right_wheel.STL"
-                                }
-                              }
-                            ]
-                            name "right_wheel"
-                            boundingObject USE right_wheel
-                            physics Physics {
-                              density -1
-                              mass 2.949400
-                              centerOfMass [ 0.000000 0.000000 0.000000 ]
-                              inertiaMatrix [
-                                6.933900e-03 6.933900e-03 1.256700e-02
-                                -1.314600e-07 -3.039200e-09 -3.575600e-09
-                              ]
-                            }
+                          appearance USE black
+                          geometry DEF right_wheel Mesh {
+                            url "/home/lsy/upright_ws/src/mm_assets/description/ddt_mm/meshes/diablo/right_wheel.STL"
                           }
                         }
                       ]
-                      name "right_leg2"
-                      boundingObject USE right_leg2
+                      name "right_wheel"
+                      boundingObject USE right_wheel
                       physics Physics {
                         density -1
-                        mass 0.182180
+                        mass 2.949400
                         centerOfMass [ 0.000000 0.000000 0.000000 ]
                         inertiaMatrix [
-                          4.137200e-05 4.821900e-04 5.044100e-04
-                          5.177700e-09 7.365900e-06 4.522500e-11
+                          6.933900e-03 6.933900e-03 1.256700e-02
+                          -1.314600e-07 -3.039200e-09 -3.575600e-09
                         ]
                       }
                     }
                   }
                 ]
-                name "right_leg1"
-                boundingObject USE right_leg1
+                name "right_leg2"
+                boundingObject USE right_leg2
                 physics Physics {
                   density -1
-                  mass 0.103820
+                  mass 0.182180
                   centerOfMass [ 0.000000 0.000000 0.000000 ]
                   inertiaMatrix [
-                    3.697200e-05 2.927800e-04 3.253200e-04
-                    2.410600e-05 -4.368600e-10 4.145900e-11
+                    4.137200e-05 4.821900e-04 5.044100e-04
+                    5.177700e-09 7.365900e-06 4.522500e-11
                   ]
                 }
               }
-            }
-            HingeJoint {
-              jointParameters HingeJointParameters {
-                axis 0.000000 -0.000000 1.000000
-                anchor 0.090000 0.000000 0.000000
-              }
-              device [
-                RotationalMotor {
-                  name "right_j5"
-                  maxTorque 10000
-                }
-                PositionSensor {
-                  name "right_j5_sensor"
-                }
-              ]
-              endPoint Solid {
-                translation 0.090000 0.000000 0.000000
-                rotation 0.000000 0.000000 -1.000000 2.872900
-                children [
-                  Shape {
-                    appearance USE brown
-                    geometry DEF right_leg3 Mesh {
-                      url "/home/lsy/upright_ws/src/mm_assets/description/ddt_mm/meshes/diablo/right_leg3.STL"
-                    }
-                  }
-                ]
-                name "right_leg3"
-                boundingObject USE right_leg3
-                physics Physics {
-                  density -1
-                  mass 0.071103
-                  centerOfMass [ 0.000000 0.000000 0.000000 ]
-                  inertiaMatrix [
-                    1.665700e-05 1.796600e-04 1.932800e-04
-                    -5.524600e-06 1.485200e-14 -6.519400e-14
-                  ]
-                }
-              }
-            }
-          ]
-          name "right_motor"
-          boundingObject USE right_motor
-          physics Physics {
-            density -1
-            mass 1.383800
-            centerOfMass [ 0.000000 0.000000 0.000000 ]
-            inertiaMatrix [
-              3.352000e-03 3.490800e-03 3.485600e-03
-              -2.652700e-09 6.591400e-05 -7.296800e-10
             ]
+            name "right_leg1"
+            boundingObject USE right_leg1
+            physics Physics {
+              density -1
+              mass 0.103820
+              centerOfMass [ 0.000000 0.000000 0.000000 ]
+              inertiaMatrix [
+                3.697200e-05 2.927800e-04 3.253200e-04
+                2.410600e-05 -4.368600e-10 4.145900e-11
+              ]
+            }
           }
+          Solid {
+            translation 0.090000 0.000000 0.000000
+            rotation 0.000000 0.000000 -1.000000 2.872900
+            children [
+              Shape {
+                appearance USE brown
+                geometry DEF right_leg3 Mesh {
+                  url "/home/lsy/upright_ws/src/mm_assets/description/ddt_mm/meshes/diablo/right_leg3.STL"
+                }
+              }
+            ]
+            name "right_leg3"
+            boundingObject USE right_leg3
+            physics Physics {
+              density -1
+              mass 0.071103
+              centerOfMass [ 0.000000 0.000000 0.000000 ]
+              inertiaMatrix [
+                1.665700e-05 1.796600e-04 1.932800e-04
+                -5.524600e-06 1.485200e-14 -6.519400e-14
+              ]
+            }
+          }
+        ]
+        name "right_motor"
+        boundingObject USE right_motor
+        physics Physics {
+          density -1
+          mass 1.383800
+          centerOfMass [ 0.000000 0.000000 0.000000 ]
+          inertiaMatrix [
+            3.352000e-03 3.490800e-03 3.485600e-03
+            -2.652700e-09 6.591400e-05 -7.296800e-10
+          ]
         }
       }
       Solid {
@@ -441,9 +320,7 @@ PROTO diablo_manipulator [
         children [
           Shape {
             appearance USE grey
-            geometry DEF left_motor Mesh {
-                            url "/home/lsy/upright_ws/src/mm_assets/description/ddt_mm/meshes/manipulator/base_link.STL"
-                          }
+            geometry USE base_link
           }
           HingeJoint {
             jointParameters HingeJointParameters {
@@ -453,10 +330,7 @@ PROTO diablo_manipulator [
             device [
               RotationalMotor {
                 name "joint1"
-                maxVelocity 110.0
-                minPosition -3.14
-                maxPosition 3.14
-                maxTorque 110.0
+                maxTorque 10000
               }
               PositionSensor {
                 name "joint1_sensor"
@@ -478,10 +352,7 @@ PROTO diablo_manipulator [
                   device [
                     RotationalMotor {
                       name "joint2"
-                      maxVelocity 110.0
-                      minPosition -2.96
-                      maxPosition 0.17
-                      maxTorque 110.0
+                      maxTorque 10000
                     }
                     PositionSensor {
                       name "joint2_sensor"
@@ -504,10 +375,7 @@ PROTO diablo_manipulator [
                         device [
                           RotationalMotor {
                             name "joint3"
-                            maxVelocity 110.0
-                            minPosition -0.087
-                            maxPosition 3.14
-                            maxTorque 110.0
+                            maxTorque 10000
                           }
                           PositionSensor {
                             name "joint3_sensor"
@@ -531,10 +399,7 @@ PROTO diablo_manipulator [
                               device [
                                 RotationalMotor {
                                   name "joint4"
-                                  maxVelocity 110.0
-                                  minPosition -2.96
-                                  maxPosition 2.96
-                                  maxTorque 110.0
+                                  maxTorque 10000
                                 }
                                 PositionSensor {
                                   name "joint4_sensor"
@@ -557,10 +422,7 @@ PROTO diablo_manipulator [
                                     device [
                                       RotationalMotor {
                                         name "joint5"
-                                        maxVelocity 110.0
-                                        minPosition -1.74
-                                        maxPosition 1.74
-                                        maxTorque 110.0
+                                        maxTorque 10000
                                       }
                                       PositionSensor {
                                         name "joint5_sensor"
@@ -583,10 +445,7 @@ PROTO diablo_manipulator [
                                           device [
                                             RotationalMotor {
                                               name "joint6"
-                                              maxVelocity 110.0
-                                              minPosition -3.14
-                                              maxPosition 3.14
-                                              maxTorque 110.0
+                                              maxTorque 10000
                                             }
                                             PositionSensor {
                                               name "joint6_sensor"
@@ -688,9 +547,7 @@ PROTO diablo_manipulator [
           }
         ]
         name "arm_base_link"
-        boundingObject DEF left_motor Mesh {
-                                    url "/home/lsy/upright_ws/src/mm_assets/description/ddt_mm/meshes/manipulator/base_link.STL"
-                                  }
+        boundingObject USE base_link
         physics Physics {
           density -1
           mass 0.775915
