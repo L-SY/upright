@@ -320,8 +320,10 @@ PROTO diablo_manipulator [
         children [
           Shape {
             appearance USE grey
-            geometry USE base_link
-          }
+            geometry DEF arm_base_link Mesh {
+                                        url "/home/lsy/upright_ws/src/mm_assets/description/ddt_mm/meshes/manipulator/base_link.STL"
+                                        }
+                                        }
           HingeJoint {
             jointParameters HingeJointParameters {
               axis 0.000000 0.000000 1.000000
@@ -547,7 +549,7 @@ PROTO diablo_manipulator [
           }
         ]
         name "arm_base_link"
-        boundingObject USE base_link
+        boundingObject USE arm_base_link
         physics Physics {
           density -1
           mass 0.775915
