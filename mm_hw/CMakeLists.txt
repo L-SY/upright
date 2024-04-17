@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(mobile_manipulator_hw)
+project(mm_hw)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -27,10 +27,10 @@ include_directories(
         ${catkin_INCLUDE_DIRS}
 )
 
-set(SOURCE src/mobile_manipulator_hw.cpp src/MobileManipulatorHW.cpp)
+set(SOURCE src/mm_hw.cpp src/MobileManipulatorHW.cpp)
 
 add_executable(${PROJECT_NAME}
-        src/mobile_manipulator_hw.cpp
+        src/mm_hw.cpp
         src/MobileManipulatorHW.cpp
 )
 

@@ -2,7 +2,7 @@
 # license: Apache License 2.0
 # license url: http://www.apache.org/licenses/LICENSE-2.0
 # This is a proto file for Webots for the Ridgeback
-# Extracted from: /home/lsy/upright_ws/src/mm_assets/description/OCS2_mobile_manipulator/urdf/ridgeback_ur5_for_webots.urdf
+# Extracted from: /home/lsy/upright_ws/src/mm_assets/description/ocs2_mm/urdf/ridgeback_ur5_for_webots.urdf
 
 PROTO Ridgeback [
   field  SFVec3f     translation     0 0 0
@@ -35,7 +35,7 @@ PROTO Ridgeback [
               metalness 0
             }
             geometry DEF body Mesh {
-              url "/home/lsy/upright_ws/src/mm_assets/description/OCS2_mobile_manipulator/meshes/base/body.stl"
+              url "/home/lsy/upright_ws/src/mm_assets/description/ocs2_mm/meshes/base/body.stl"
             }
           }
           Solid {
@@ -47,7 +47,7 @@ PROTO Ridgeback [
                   metalness 0
                 }
                 geometry DEF side-cover Mesh {
-                  url "/home/lsy/upright_ws/src/mm_assets/description/OCS2_mobile_manipulator/meshes/base/side-cover.stl"
+                  url "/home/lsy/upright_ws/src/mm_assets/description/ocs2_mm/meshes/base/side-cover.stl"
                 }
               }
             ]
@@ -80,7 +80,7 @@ PROTO Ridgeback [
               Shape {
                 appearance USE black
                 geometry DEF end-cover Mesh {
-                  url "/home/lsy/upright_ws/src/mm_assets/description/OCS2_mobile_manipulator/meshes/base/end-cover.stl"
+                  url "/home/lsy/upright_ws/src/mm_assets/description/ocs2_mm/meshes/base/end-cover.stl"
                 }
               }
             ]
@@ -117,7 +117,7 @@ PROTO Ridgeback [
                   metalness 0
                 }
                 geometry DEF lights Mesh {
-                  url "/home/lsy/upright_ws/src/mm_assets/description/OCS2_mobile_manipulator/meshes/base/lights.stl"
+                  url "/home/lsy/upright_ws/src/mm_assets/description/ocs2_mm/meshes/base/lights.stl"
                 }
               }
             ]
@@ -154,7 +154,7 @@ PROTO Ridgeback [
               Shape {
                 appearance USE black
                 geometry DEF top Mesh {
-                  url "/home/lsy/upright_ws/src/mm_assets/description/OCS2_mobile_manipulator/meshes/base/top.stl"
+                  url "/home/lsy/upright_ws/src/mm_assets/description/ocs2_mm/meshes/base/top.stl"
                 }
               }
               Solid {
@@ -164,7 +164,7 @@ PROTO Ridgeback [
                     rotation 0.000000 0.000000 1.000000 3.141593
                     children [
                       DEF base_visual CadShape {
-                        url "/home/lsy/upright_ws/src/mm_assets/description/OCS2_mobile_manipulator/meshes/ur5/visual/base.dae"
+                        url "/home/lsy/upright_ws/src/mm_assets/description/ocs2_mm/meshes/ur5/visual/base.dae"
                       }
                     ]
                   }
@@ -192,7 +192,7 @@ PROTO Ridgeback [
                           rotation 0.000000 0.000000 1.000000 3.141593
                           children [
                             DEF shoulder_visual CadShape {
-                              url "/home/lsy/upright_ws/src/mm_assets/description/OCS2_mobile_manipulator/meshes/ur5/visual/shoulder.dae"
+                              url "/home/lsy/upright_ws/src/mm_assets/description/ocs2_mm/meshes/ur5/visual/shoulder.dae"
                             }
                           ]
                         }
@@ -220,7 +220,7 @@ PROTO Ridgeback [
                                 rotation 0.577350 -0.577350 -0.577350 2.094395
                                 children [
                                   DEF upperarm_visual CadShape {
-                                    url "/home/lsy/upright_ws/src/mm_assets/description/OCS2_mobile_manipulator/meshes/ur5/visual/upperarm.dae"
+                                    url "/home/lsy/upright_ws/src/mm_assets/description/ocs2_mm/meshes/ur5/visual/upperarm.dae"
                                   }
                                 ]
                               }
@@ -249,7 +249,7 @@ PROTO Ridgeback [
                                       rotation 0.577350 -0.577350 -0.577350 2.094395
                                       children [
                                         DEF forearm_visual CadShape {
-                                          url "/home/lsy/upright_ws/src/mm_assets/description/OCS2_mobile_manipulator/meshes/ur5/visual/forearm.dae"
+                                          url "/home/lsy/upright_ws/src/mm_assets/description/ocs2_mm/meshes/ur5/visual/forearm.dae"
                                         }
                                       ]
                                     }
@@ -278,7 +278,7 @@ PROTO Ridgeback [
                                             rotation 1.000000 0.000000 0.000000 1.570796
                                             children [
                                               DEF wrist1_visual CadShape {
-                                                url "/home/lsy/upright_ws/src/mm_assets/description/OCS2_mobile_manipulator/meshes/ur5/visual/wrist1.dae"
+                                                url "/home/lsy/upright_ws/src/mm_assets/description/ocs2_mm/meshes/ur5/visual/wrist1.dae"
                                               }
                                             ]
                                           }
@@ -307,7 +307,7 @@ PROTO Ridgeback [
                                                   translation 0.000000 0.000000 -0.095000
                                                   children [
                                                     DEF wrist2_visual CadShape {
-                                                      url "/home/lsy/upright_ws/src/mm_assets/description/OCS2_mobile_manipulator/meshes/ur5/visual/wrist2.dae"
+                                                      url "/home/lsy/upright_ws/src/mm_assets/description/ocs2_mm/meshes/ur5/visual/wrist2.dae"
                                                     }
                                                   ]
                                                 }
@@ -337,7 +337,7 @@ PROTO Ridgeback [
                                                         rotation 1.000000 0.000000 0.000000 1.570796
                                                         children [
                                                           DEF wrist3_visual CadShape {
-                                                            url "/home/lsy/upright_ws/src/mm_assets/description/OCS2_mobile_manipulator/meshes/ur5/visual/wrist3.dae"
+                                                            url "/home/lsy/upright_ws/src/mm_assets/description/ocs2_mm/meshes/ur5/visual/wrist3.dae"
                                                           }
                                                         ]
                                                       }
@@ -447,7 +447,7 @@ PROTO Ridgeback [
                   Shape {
                     appearance USE black
                     geometry DEF axle Mesh {
-                      url "/home/lsy/upright_ws/src/mm_assets/description/OCS2_mobile_manipulator/meshes/base/axle.stl"
+                      url "/home/lsy/upright_ws/src/mm_assets/description/ocs2_mm/meshes/base/axle.stl"
                     }
                   }
                 ]
@@ -461,7 +461,7 @@ PROTO Ridgeback [
                       Shape {
                         appearance USE black
                         geometry DEF rocker Mesh {
-                          url "/home/lsy/upright_ws/src/mm_assets/description/OCS2_mobile_manipulator/meshes/base/rocker.stl"
+                          url "/home/lsy/upright_ws/src/mm_assets/description/ocs2_mm/meshes/base/rocker.stl"
                         }
                       }
                     ]
@@ -489,7 +489,7 @@ PROTO Ridgeback [
                             Shape {
                               appearance USE black
                               geometry DEF wheel Mesh {
-                                url "/home/lsy/upright_ws/src/mm_assets/description/OCS2_mobile_manipulator/meshes/base/wheel.stl"
+                                url "/home/lsy/upright_ws/src/mm_assets/description/ocs2_mm/meshes/base/wheel.stl"
                               }
                             }
                           ]

@@ -29,13 +29,12 @@ int main(int argc, char **argv) {
   ros::NodeHandle nodeHandle;
 
   // Robot interface
-  const std::string taskFile = ros::package::getPath("mm_assets") +
-                               "/config/OCS2_mobile_manipulator/task.info";
-  const std::string libFolder = ros::package::getPath("mm_assets") +
-                                "/auto_generated/OCS2_mobile_manipulator";
-  const std::string urdfFile =
-      ros::package::getPath("mm_assets") +
-      "/description/OCS2_mobile_manipulator/urdf/ridgeback_ur5.urdf";
+  const std::string taskFile =
+      ros::package::getPath("mm_assets") + "/config/ocs2_mm/task.info";
+  const std::string libFolder =
+      ros::package::getPath("mm_assets") + "/auto_generated/ocs2_mm";
+  const std::string urdfFile = ros::package::getPath("mm_assets") +
+                               "/description/ocs2_mm/urdf/ridgeback_ur5.urdf";
   upright::ControllerInterface mobileManipulatorInetface(taskFile, libFolder,
                                                          urdfFile);
   // ROS ReferenceManager
