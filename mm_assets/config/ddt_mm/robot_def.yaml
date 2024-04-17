@@ -1,0 +1,18 @@
+motors_name:
+  - left_j5
+  - right_j5
+  - joint1
+  - joint2
+  - joint3
+  - joint4
+  - joint5
+  - joint6
+pos_sensor_name:
+  - left_j5_sensor
+  - right_j5_sensor
+  - joint1_sensor
+  - joint2_sensor
+  - joint3_sensor
+  - joint4_sensor
+  - joint5_sensor
+  - joint6_sensor

@@ -1,5 +1,0 @@
-<launch>
-    <include file="$(find mm_assets)/launch/load_hw.launch"/>
-    <include file="$(find mm_assets)/launch/load_controller.launch"/>
-    <include file="$(find mm_assets)/launch/rviz_target.launch"/>
-</launch>

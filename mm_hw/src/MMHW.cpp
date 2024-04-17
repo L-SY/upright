@@ -14,8 +14,7 @@ bool MMHW::init(ros::NodeHandle &root_nh, ros::NodeHandle &robot_hw_nh) {
     return false;
   }
   XmlRpc::XmlRpcValue motorsNameList;
-  if (root_nh.getParam("/robot_def/ridgeback_ur5/motors_name",
-                       motorsNameList)) {
+  if (root_nh.getParam("/robot_def/motors_name", motorsNameList)) {
     if (motorsNameList.getType() == XmlRpc::XmlRpcValue::TypeArray) {
       for (int i = 0; i < motorsNameList.size(); ++i) {
         if (motorsNameList[i].getType() == XmlRpc::XmlRpcValue::TypeString) {

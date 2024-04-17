@@ -1,0 +1,14 @@
+<launch>
+    <arg name="robot_type" default="diablo_manipulator"/>
+
+    <param name="robot_description"
+           command="$(find xacro)/xacro $(find mm_assets)/description/ddt_mm/urdf/diablo_manipulator/robot_pinocchio.urdf"/>
+
+    <rosparam file="$(find mm_assets)/config/ddt_mm/robot_def.yaml" command="load"
+              ns="robot_def"/>
+
+    <param name="robot_type" value="$(arg robot_type)"/>
+    <rosparam file="$(find mm_assets)/config/ddt_mm/hw.yaml" command="load"/>
+    <node name="mm_hw" pkg="mm_hw" type="mm_hw" respawn="false"
+          clear_params="true"/>
+</launch>
