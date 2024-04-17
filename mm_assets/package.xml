@@ -12,8 +12,8 @@
     <build_depend>roscpp</build_depend>
     <build_export_depend>roscpp</build_export_depend>
     <exec_depend>roscpp</exec_depend>
-    <depend>ocs2_mm</depend>
-    <depend>ocs2_mm_ros</depend>
+    <depend>ocs2_mobile_manipulator</depend>
+    <depend>ocs2_mobile_manipulator_ros</depend>
     <depend>urdf</depend>
     <depend>rviz</depend>
     <depend>upright_gazebo</depend>

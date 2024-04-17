@@ -3,8 +3,8 @@ project(mm_assets)
 
 find_package(catkin REQUIRED COMPONENTS
         roscpp
-        ocs2_mm
-        ocs2_mm_ros
+        ocs2_mobile_manipulator
+        ocs2_mobile_manipulator_ros
         urdf
         rviz
         upright_gazebo
@@ -14,7 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
         INCLUDE_DIRS
         LIBRARIES
-        CATKIN_DEPENDS roscpp ocs2_mm ocs2_mm_ros urdf rviz upright_gazebo
+        CATKIN_DEPENDS roscpp ocs2_mobile_manipulator ocs2_mobile_manipulator_ros urdf rviz upright_gazebo
         DEPENDS
 )
 

@@ -27,11 +27,11 @@ include_directories(
         ${catkin_INCLUDE_DIRS}
 )
 
-set(SOURCE src/mm_hw.cpp src/MobileManipulatorHW.cpp)
+set(SOURCE src/mm_hw.cpp src/MMHW.cpp)
 
 add_executable(${PROJECT_NAME}
         src/mm_hw.cpp
-        src/MobileManipulatorHW.cpp
+        src/MMHW.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}

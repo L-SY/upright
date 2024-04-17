@@ -2,15 +2,14 @@
 // Created by lsy on 24-3-7.
 //
 
-#include "mm_hw/MobileManipulatorHW.h"
+#include "mm_hw/MMHW.h"
 
 #include <sensor_msgs/Joy.h>
 #include <std_msgs/Float64MultiArray.h>
 #include <std_msgs/Int16MultiArray.h>
 
 namespace generally {
-bool MobileManipulatorHW::init(ros::NodeHandle &root_nh,
-                               ros::NodeHandle &robot_hw_nh) {
+bool MMHW::init(ros::NodeHandle &root_nh, ros::NodeHandle &robot_hw_nh) {
   if (!GenerallyHW::init(root_nh, robot_hw_nh)) {
     return false;
   }
@@ -38,13 +37,11 @@ bool MobileManipulatorHW::init(ros::NodeHandle &root_nh,
   return true;
 }
 
-void MobileManipulatorHW::read(const ros::Time &time,
-                               const ros::Duration & /*period*/) {
+void MMHW::read(const ros::Time &time, const ros::Duration & /*period*/) {
   is_reading_ = true;
 }
 
-void MobileManipulatorHW::write(const ros::Time & /*time*/,
-                                const ros::Duration & /*period*/) {
+void MMHW::write(const ros::Time & /*time*/, const ros::Duration & /*period*/) {
   is_writing_ = true;
   std_msgs::Float64MultiArray command;
   command.data.resize(effort_joint_handles_.size());
@@ -58,21 +55,18 @@ void MobileManipulatorHW::write(const ros::Time & /*time*/,
   is_writing_ = false;
 }
 
-bool MobileManipulatorHW::setupTopic(ros::NodeHandle &nh) {
+bool MMHW::setupTopic(ros::NodeHandle &nh) {
   rosMotorCmdPub_ =
       nh.advertise<std_msgs::Float64MultiArray>("/ros_motor_cmd", 1);
   webotsMotorPosSub_ = nh.subscribe<std_msgs::Float64MultiArray>(
-      "/webots_motor_pos", 1, &MobileManipulatorHW::webotMotorPosCallback,
-      this);
+      "/webots_motor_pos", 1, &MMHW::webotMotorPosCallback, this);
   webotsMotorVelSub_ = nh.subscribe<std_msgs::Float64MultiArray>(
-      "/webots_motor_vel", 1, &MobileManipulatorHW::webotMotorVelCallback,
-      this);
+      "/webots_motor_vel", 1, &MMHW::webotMotorVelCallback, this);
   webotsMotorTorSub_ = nh.subscribe<std_msgs::Float64MultiArray>(
-      "/webots_motor_tor", 1, &MobileManipulatorHW::webotMotorTorCallback,
-      this);
+      "/webots_motor_tor", 1, &MMHW::webotMotorTorCallback, this);
 }
 
-bool MobileManipulatorHW::setupJoints() {
+bool MMHW::setupJoints() {
   int joint_index = 0;
   for (const auto &joint : robotMotorName_) {
     hardware_interface::JointStateHandle state_handle(

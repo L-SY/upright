@@ -28,8 +28,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ******************************************************************************/
 
 #include "upright_control/constraint/EndEffectorConstraint.h"
-#include <ocs2_mm/MobileManipulatorPreComputation.h>
-#include <ocs2_mm/constraint/EndEffectorConstraint.h>
+#include <ocs2_mobile_manipulator/MobileManipulatorPreComputation.h>
+#include <ocs2_mobile_manipulator/constraint/EndEffectorConstraint.h>
 
 #include <ocs2_core/misc/LinearInterpolation.h>
 

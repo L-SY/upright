@@ -17,7 +17,7 @@
 #include <ocs2_core/Types.h>
 #include <ocs2_core/misc/Benchmark.h>
 #include <ocs2_ddp/GaussNewtonDDP_MPC.h>
-#include <ocs2_mm/MobileManipulatorInterface.h>
+#include <ocs2_mobile_manipulator/MobileManipulatorInterface.h>
 #include <ocs2_mpc/MPC_MRT_Interface.h>
 #include <ros/package.h>
 #include <upright_control/MobileManipulatorInterface.h>

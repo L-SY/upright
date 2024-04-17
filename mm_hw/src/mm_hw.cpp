@@ -2,7 +2,7 @@
 // Created by lsy on 24-3-7.
 //
 
-#include "mm_hw/MobileManipulatorHW.h"
+#include "mm_hw/MMHW.h"
 
 #include <generally_hw/GenerallyHWLoop.h>
 
@@ -22,14 +22,13 @@ int main(int argc, char **argv) {
 
   try {
     // Create the hardware interface specific to your robot
-    std::shared_ptr<generally::MobileManipulatorHW> MobileManipulatorHW =
-        std::make_shared<generally::MobileManipulatorHW>();
+    std::shared_ptr<generally::MMHW> MMHW = std::make_shared<generally::MMHW>();
     // Initialize the hardware interface:
     // 1. retrieve configuration from rosparam
     // 2. initialize the hardware and interface it with ros_control
-    MobileManipulatorHW->init(nh, robotHwNh);
+    MMHW->init(nh, robotHwNh);
     // Start the control loop
-    generally::GenerallyHWLoop controlLoop(nh, MobileManipulatorHW);
+    generally::GenerallyHWLoop controlLoop(nh, MMHW);
     // Wait until shutdown signal received
     ros::waitForShutdown();
   } catch (const ros::Exception &e) {
