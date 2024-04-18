@@ -42,22 +42,14 @@ bool MobileManipulatorController::init(hardware_interface::RobotHW *robot_hw,
   // Hardware interface
   auto *effortJointInterface =
       robot_hw->get<hardware_interface::EffortJointInterface>();
-  jointHandles_.push_back(effortJointInterface->getHandle("front_left_wheel"));
-  jointHandles_.push_back(effortJointInterface->getHandle("front_right_wheel"));
-  jointHandles_.push_back(effortJointInterface->getHandle("rear_left_wheel"));
-  jointHandles_.push_back(effortJointInterface->getHandle("rear_right_wheel"));
-  jointHandles_.push_back(
-      effortJointInterface->getHandle("ur_arm_shoulder_pan_joint"));
-  jointHandles_.push_back(
-      effortJointInterface->getHandle("ur_arm_shoulder_lift_joint"));
-  jointHandles_.push_back(
-      effortJointInterface->getHandle("ur_arm_elbow_joint"));
-  jointHandles_.push_back(
-      effortJointInterface->getHandle("ur_arm_wrist_1_joint"));
-  jointHandles_.push_back(
-      effortJointInterface->getHandle("ur_arm_wrist_2_joint"));
-  jointHandles_.push_back(
-      effortJointInterface->getHandle("ur_arm_wrist_3_joint"));
+  jointHandles_.push_back(effortJointInterface->getHandle("left_j3"));
+  jointHandles_.push_back(effortJointInterface->getHandle("right_j3"));
+  jointHandles_.push_back(effortJointInterface->getHandle("joint1"));
+  jointHandles_.push_back(effortJointInterface->getHandle("joint2"));
+  jointHandles_.push_back(effortJointInterface->getHandle("joint3"));
+  jointHandles_.push_back(effortJointInterface->getHandle("joint4"));
+  jointHandles_.push_back(effortJointInterface->getHandle("joint5"));
+  jointHandles_.push_back(effortJointInterface->getHandle("joint6"));
   //  auto *velocityJointInterface =
   //      robot_hw->get<hardware_interface::VelocityJointInterface>();
   //  jointHandles_.push_back(
@@ -84,17 +76,17 @@ bool MobileManipulatorController::init(hardware_interface::RobotHW *robot_hw,
   // Odom TF
   odom2base_.header.frame_id = "world";
   odom2base_.header.stamp = ros::Time::now();
-  odom2base_.child_frame_id = "base_link";
+  odom2base_.child_frame_id = "diablo_base_link";
 
   tf2::Quaternion quaternion;
-  quaternion.setRPY(0, 0, -1.57);
+  quaternion.setRPY(0, 0, 0);
   odom2base_.transform.rotation.x = quaternion.x();
   odom2base_.transform.rotation.y = quaternion.y();
   odom2base_.transform.rotation.z = quaternion.z();
   odom2base_.transform.rotation.w = quaternion.w();
 
   odom2base_.transform.translation.x = 0;
-  odom2base_.transform.translation.y = -1;
+  odom2base_.transform.translation.y = 0;
   odom2base_.transform.translation.z = 0;
   tfRtBroadcaster_.init(root_nh);
   tfRtBroadcaster_.sendTransform(odom2base_);
@@ -126,8 +118,8 @@ void MobileManipulatorController::update(const ros::Time &time,
   }
 
   // Visualization
-  //        visualizer_->update(currentObservation_,
-  //        mpcMrtInterface_->getPolicy(), mpcMrtInterface_->getCommand());
+  visualizer_->update(currentObservation_, mpcMrtInterface_->getPolicy(),
+                      mpcMrtInterface_->getCommand());
 
   // Publish the observation. Only needed for the command interface
   observationPublisher_.publish(
@@ -150,9 +142,9 @@ void MobileManipulatorController::updateTfOdom(const ros::Time &time,
   odom2base_.transform.rotation.w = quaternion.w();
 
   position(0) += currentObservation_.state(9) * period.toSec() *
-                 cos(currentObservation_.state(3));
+                 cos(currentObservation_.state(2));
   position(1) += currentObservation_.state(9) * period.toSec() *
-                 sin(currentObservation_.state(3));
+                 sin(currentObservation_.state(2));
 
   odom2base_.header.stamp = time;
   odom2base_.transform.translation.x = position(0);
@@ -169,31 +161,26 @@ void MobileManipulatorController::updateStateEstimation(
     jointPos(i) = jointHandles_[i].getPosition();
     jointVel(i) = jointHandles_[i].getVelocity();
   }
-  //      for base
+
   currentObservation_.state(0) = odom2base_.transform.translation.x;
   currentObservation_.state(1) = odom2base_.transform.translation.y;
   double yaw = yawFromQuat(odom2base_.transform.rotation);
   currentObservation_.state(2) = yaw;
-  double lV = (jointVel(0) + jointVel(2)) * wheeelR / 2;
-  double rV = (jointVel(1) + jointVel(3)) * wheeelR / 2;
-  double xV = lV / 2 + rV / 2;
-  double wV = -lV / baseW_ + rV / baseW_;
+  double xV = (jointVel(0) + jointVel(1)) * wheeelR_ / 2;
+  double wV = (-jointVel(0) + jointVel(1)) / baseL_;
   currentObservation_.state(9) = xV;
   currentObservation_.state(10) = wV;
-  double xVLast = (jointVelLast_(0) + jointVelLast_(1) + jointVelLast_(2) +
-                   jointVelLast_(3)) /
-                  4;
-  double wVLast = (-jointVelLast_(0) + jointVelLast_(1) + jointVelLast_(2) -
-                   jointVelLast_(3)) /
-                  (baseL_ + baseW_);
+  double xVLast = (jointVelLast_(0) + jointVelLast_(1)) * wheeelR_ / 2;
+  double wVLast = (-jointVelLast_(0) + jointVelLast_(1)) / baseL_;
+
   currentObservation_.state(18) = (xV - xVLast) / (time - lastTime_).toSec();
   currentObservation_.state(19) = (wV - wVLast) / (time - lastTime_).toSec();
   //      for arm
   for (int i = 0; i < 6; ++i) {
-    currentObservation_.state(3 + i) = jointPos(3 + i);
-    currentObservation_.state(11 + i) = jointVel(3 + i);
+    currentObservation_.state(3 + i) = jointPos(2 + i);
+    currentObservation_.state(11 + i) = jointVel(2 + i);
     currentObservation_.state(19 + i) =
-        (jointVel(3 + i) - jointVelLast_(3 + i)) / (time - lastTime_).toSec();
+        (jointVel(2 + i) - jointVelLast_(2 + i)) / (time - lastTime_).toSec();
   }
   currentObservation_.time += period.toSec();
   jointVelLast_ = jointVel;
@@ -213,7 +200,6 @@ void MobileManipulatorController::starting(const ros::Time &time) {
   ocs2::TargetTrajectories targetTrajectories({currentObservation_.time},
                                               {initDesiredState},
                                               {currentObservation_.input});
-
   // Set the first observation and command and wait for optimization to finish
   mpcMrtInterface_->setCurrentObservation(currentObservation_);
   mpcMrtInterface_->getReferenceManager().setTargetTrajectories(
@@ -244,7 +230,7 @@ MobileManipulatorController::~MobileManipulatorController() {
 }
 
 void MobileManipulatorController::setupMpc(ros::NodeHandle &nh) {
-  const std::string robotName = "ridgeback_ur5";
+  const std::string robotName = "diablo_manipulator";
 
   // ROS ReferenceManager
   auto rosReferenceManagerPtr = std::make_shared<ddt::RosReferenceManager>(
@@ -345,20 +331,14 @@ void MobileManipulatorController::upright(const ros::Time &time,
   double xV = optimizedState(9);
   double wV = optimizedState(10);
 
-  double lV = xV - wV * baseW_ / 2;
-  double rV = xV + wV * baseW_ / 2;
-
-  double lW = lV / wheeelR;
-  double rW = rV / wheeelR;
-  //      left wheel
-  //        jointHandles_[0].setCommand(lW);
-  //        jointHandles_[2].setCommand(lW);
-  ////      right wheel
-  //        jointHandles_[1].setCommand(rW);
-  //        jointHandles_[3].setCommand(rW);
-  ////      for arm control
+  jointHandles_[0].setCommand(xV / wheeelR_ - baseL_ * wV / (2 * wheeelR_));
+  jointHandles_[1].setCommand(xV / wheeelR_ + baseL_ * wV / (2 * wheeelR_));
+  //  ROS_INFO_STREAM("left V  =" << xV / wheeelR_ - baseL_ * wV / (2 *
+  //  wheeelR_)); ROS_INFO_STREAM("right V  =" << xV / wheeelR_ + baseL_ * wV /
+  //  (2 * wheeelR_));
+  //      for arm control
   for (int i = 0; i < 6; ++i)
-    jointHandles_[i + 4].setCommand(optimizedState(11 + i));
+    jointHandles_[i + 2].setCommand(optimizedState(11 + i));
 
   lastOptimizedState = optimizedState;
 }

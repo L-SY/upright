@@ -1,0 +1,5 @@
+<launch>
+    <include file="$(find mm_assets)/launch/ddt_mm/load_ddt_hw.launch"/>
+    <include file="$(find mm_assets)/launch/ddt_mm/load_ddt_controller.launch"/>
+    <include file="$(find mm_assets)/launch/rviz_target.launch"/>
+</launch>
