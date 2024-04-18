@@ -23,8 +23,8 @@
 #include <algorithm>
 #include <iterator>
 
-#include "diablo_sdk/VulcanSerial/Exception.h"
-#include "diablo_sdk/VulcanSerial/SerialPort.h"
+#include "diablo_hw/VulcanSerial/Exception.h"
+#include "diablo_hw/VulcanSerial/SerialPort.h"
 
 #define BOTHER 0010000
 

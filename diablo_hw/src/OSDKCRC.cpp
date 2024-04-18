@@ -1,4 +1,4 @@
-#include "diablo_sdk/OSDKCRC.h"
+#include "diablo_hw/OSDKCRC.h"
 
 /*
  * CRC lookup table for bytes, generating polynomial is 0x8005

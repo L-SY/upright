@@ -1,6 +1,6 @@
-#include "diablo_sdk/OSDKHeader.h"
-#include "diablo_sdk/OSDKVehicle.h"
-#include "diablo_sdk/OSDKMovement.h"
+#include "diablo_hw/OSDKHeader.h"
+#include "diablo_hw/OSDKVehicle.h"
+#include "diablo_hw/OSDKMovement.h"
 
 using namespace std;
 using namespace DIABLO::OSDK;

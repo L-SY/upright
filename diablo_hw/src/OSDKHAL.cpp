@@ -1,6 +1,6 @@
-#include "diablo_sdk/OSDKCRC.h"
-#include "diablo_sdk/OSDKHAL.h"
-#include "diablo_sdk/OSDKHeader.h"
+#include "diablo_hw/OSDKCRC.h"
+#include "diablo_hw/OSDKHAL.h"
+#include "diablo_hw/OSDKHeader.h"
 
 using namespace std;
 using namespace DIABLO::OSDK;

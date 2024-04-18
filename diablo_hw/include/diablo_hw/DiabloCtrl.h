@@ -12,11 +12,11 @@
 #include <chrono>
 #include <thread>
 
-#include "diablo_sdk/OSDKVehicle.h"
-#include "diablo_sdk/OnboardSDKUartProtocol.h"
+#include "diablo_hw/OSDKVehicle.h"
+#include "diablo_hw/OnboardSDKUartProtocol.h"
 #include "realtime_tools/realtime_buffer.h"
 
-namespace diablo_sdk
+namespace diablo_hw
 {
 class DiabloRobot
 {
@@ -33,6 +33,18 @@ private:
   void commandCB(const geometry_msgs::TwistConstPtr& msg)
   {
     cmd_rt_buffer_.writeFromNonRT(*msg);
+    ROS_INFO_STREAM("111");
+  }
+
+  void pubDiabloInfo()
+  {
+    imuPub_.publish(imu_);
+    leftHipJointPub_.publish(leftHipJoint_);
+    rightHipJointPub_.publish(rightHipJoint_);
+    leftWheelJointPub_.publish(leftWheelJoint_);
+    rightWheelJointPub_.publish(rightWheelJoint_);
+    leftKneeJointPub_.publish(leftKneeJoint_);
+    rightKneeJointPub_.publish(rightKneeJoint_);
   }
 
   // Timing
@@ -51,6 +63,6 @@ private:
   realtime_tools::RealtimeBuffer<geometry_msgs::Twist> cmd_rt_buffer_;
   ros::Subscriber diabloCmdSub_;
   ros::Publisher leftHipJointPub_, rightHipJointPub_, leftWheelJointPub_, rightWheelJointPub_, leftKneeJointPub_,
-      rightKneeJointPub_;
+      rightKneeJointPub_, imuPub_;
 };
-}  // namespace diablo_sdk
+}  // namespace diablo_hw

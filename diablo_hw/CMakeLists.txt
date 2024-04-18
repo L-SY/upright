@@ -1,8 +1,5 @@
 cmake_minimum_required(VERSION 3.6.2)
-project(diablo_sdk)
-
-## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
+project(diablo_hw)
 
 find_package(catkin REQUIRED COMPONENTS
         roscpp
@@ -23,12 +20,8 @@ include_directories(
         ${catkin_INCLUDE_DIRS}
 )
 
-link_directories(
-
-)
-
 add_executable(${PROJECT_NAME}
-        src/mian.cpp
+        src/main.cpp
         src/DiabloCtrl.cpp
         src/OSDKCRC.cpp
         src/OSDKHAL.cpp
@@ -39,8 +32,6 @@ add_executable(${PROJECT_NAME}
         src/OSDKVehicle.cpp
         src/VulcanSerial/SerialPort.cpp
 )
-
-add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 target_link_libraries(${PROJECT_NAME}
         ${catkin_LIBRARIES}
@@ -63,6 +54,5 @@ install(DIRECTORY include/VulcanSerial/
         DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
 )
 
-install(TARGETS ${PROJECT_NAME}
-        RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+install(DIRECTORY launch
+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
