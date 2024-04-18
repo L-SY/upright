@@ -7,7 +7,6 @@ Panels:
         - /Global Options1
         - /TF1
         - /TF1/Frames1
-        - /TF1/Tree1/world1
       Splitter Ratio: 0.5
     Tree Height: 708
   - Class: rviz/Selection
@@ -171,7 +170,7 @@ Visualization Manager:
         command:
           Value: false
         diablo_base_link:
-          Value: false
+          Value: true
         left_leg1:
           Value: false
         left_leg2:
@@ -312,7 +311,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 2.043909788131714
+      Distance: 1.4872981309890747
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1

@@ -124,14 +124,14 @@ void MobileManipulatorDummyVisualization::publishObservation(
       ocs2::ros_msg_helpers::getVectorMsg(r_world_base);
   base_tf.transform.rotation =
       ocs2::ros_msg_helpers::getOrientationMsg(q_world_base);
-  tfBroadcaster_.sendTransform(base_tf);
+  //  tfBroadcaster_.sendTransform(base_tf);
 
   // publish joints transforms
   const auto j_arm = upright::getArmJointAngles(observation.state, modelInfo_);
   std::map<std::string, ocs2::scalar_t> jointPositions;
   for (size_t i = 0; i < modelInfo_.dofNames.size(); i++) {
     jointPositions[modelInfo_.dofNames[i]] = j_arm(i);
-    ROS_INFO_STREAM(modelInfo_.dofNames[i] << ": " << j_arm(i));
+    //    ROS_INFO_STREAM(modelInfo_.dofNames[i] << ": " << j_arm(i));
   }
   robotStatePublisherPtr_->publishTransforms(jointPositions, timeStamp);
 }

@@ -131,7 +131,7 @@ void MobileManipulatorController::updateTfOdom(const ros::Time &time,
   ocs2::vector_t position(3);
   position(0) = odom2base_.transform.translation.x;
   position(1) = odom2base_.transform.translation.y;
-  position(2) = 0;
+  position(2) = odom2base_.transform.translation.z;
   double yaw = yawFromQuat(odom2base_.transform.rotation);
   yaw += currentObservation_.state(10) * period.toSec();
   tf2::Quaternion quaternion;
@@ -150,7 +150,8 @@ void MobileManipulatorController::updateTfOdom(const ros::Time &time,
   odom2base_.transform.translation.x = position(0);
   odom2base_.transform.translation.y = position(1);
   odom2base_.transform.translation.z = position(2);
-
+  ROS_INFO_STREAM("X = " << position(0));
+  ROS_INFO_STREAM("Y = " << position(1));
   tfRtBroadcaster_.sendTransform(odom2base_);
 }
 
@@ -166,21 +167,29 @@ void MobileManipulatorController::updateStateEstimation(
   currentObservation_.state(1) = odom2base_.transform.translation.y;
   double yaw = yawFromQuat(odom2base_.transform.rotation);
   currentObservation_.state(2) = yaw;
-  double xV = (jointVel(0) + jointVel(1)) * wheeelR_ / 2;
-  double wV = (-jointVel(0) + jointVel(1)) / baseL_;
+  double xV = (jointVel(0) + jointVel(1)) * wheelR_ / 2;
+  double wV = (jointVel(0) - jointVel(1)) * wheelR_ / baseL_;
   currentObservation_.state(9) = xV;
   currentObservation_.state(10) = wV;
-  double xVLast = (jointVelLast_(0) + jointVelLast_(1)) * wheeelR_ / 2;
-  double wVLast = (-jointVelLast_(0) + jointVelLast_(1)) / baseL_;
+  double xVLast = (jointVelLast_(0) + jointVelLast_(1)) * wheelR_ / 2;
+  double wVLast = (jointVelLast_(0) - jointVelLast_(1)) * wheelR_ / baseL_;
 
-  currentObservation_.state(18) = (xV - xVLast) / (time - lastTime_).toSec();
-  currentObservation_.state(19) = (wV - wVLast) / (time - lastTime_).toSec();
+  currentObservation_.state(17) = 0;
+  currentObservation_.state(18) = 0;
+
+  ROS_INFO_STREAM("V X" << xV);
+  ROS_INFO_STREAM("V W" << wV);
+
+  ROS_INFO_STREAM("ACC X" << (xV - xVLast) / (time - lastTime_).toSec());
+  ROS_INFO_STREAM("ACC W" << (wV - wVLast) / (time - lastTime_).toSec());
   //      for arm
   for (int i = 0; i < 6; ++i) {
     currentObservation_.state(3 + i) = jointPos(2 + i);
     currentObservation_.state(11 + i) = jointVel(2 + i);
-    currentObservation_.state(19 + i) =
-        (jointVel(2 + i) - jointVelLast_(2 + i)) / (time - lastTime_).toSec();
+    currentObservation_.state(19 + i) = 0.;
+    //    currentObservation_.state(19 + i) =
+    //        (jointVel(2 + i) - jointVelLast_(2 + i)) / (time -
+    //        lastTime_).toSec();
   }
   currentObservation_.time += period.toSec();
   jointVelLast_ = jointVel;
@@ -194,7 +203,7 @@ void MobileManipulatorController::starting(const ros::Time &time) {
   currentObservation_.state = mobileManipulatorInterface_->getInitialState();
   ocs2::vector_t initDesiredState(7);
 
-  initDesiredState.head(3) << 0, 0, 1;
+  initDesiredState.head(3) << 0, 0, 0.5;
   initDesiredState.tail(4)
       << Eigen::Quaternion<ocs2::scalar_t>(1, 0, 0, 0).coeffs();
   ocs2::TargetTrajectories targetTrajectories({currentObservation_.time},
@@ -331,11 +340,14 @@ void MobileManipulatorController::upright(const ros::Time &time,
   double xV = optimizedState(9);
   double wV = optimizedState(10);
 
-  jointHandles_[0].setCommand(xV / wheeelR_ - baseL_ * wV / (2 * wheeelR_));
-  jointHandles_[1].setCommand(xV / wheeelR_ + baseL_ * wV / (2 * wheeelR_));
-  //  ROS_INFO_STREAM("left V  =" << xV / wheeelR_ - baseL_ * wV / (2 *
-  //  wheeelR_)); ROS_INFO_STREAM("right V  =" << xV / wheeelR_ + baseL_ * wV /
-  //  (2 * wheeelR_));
+  //  jointHandles_[0].setCommand(0);
+  //  jointHandles_[1].setCommand(0);
+
+  jointHandles_[0].setCommand(xV / wheelR_ + baseL_ * wV / (2 * wheelR_));
+  jointHandles_[1].setCommand(xV / wheelR_ - baseL_ * wV / (2 * wheelR_));
+  //  ROS_INFO_STREAM("left V  =" << xV / wheelR_ - baseL_ * wV / (2 *
+  //  wheelR_)); ROS_INFO_STREAM("right V  =" << xV / wheelR_ + baseL_ * wV /
+  //  (2 * wheelR_));
   //      for arm control
   for (int i = 0; i < 6; ++i)
     jointHandles_[i + 2].setCommand(optimizedState(11 + i));

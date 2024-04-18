@@ -105,6 +105,6 @@ private:
   ocs2::vector_t jointVelLast_{};
   ros::Time lastTime_{};
 
-  double baseL_ = 0.683, wheeelR_ = 0.15;
+  double baseL_ = 0.683, wheelR_ = 0.15;
 };
 } // namespace ddt
