@@ -12,7 +12,7 @@ DiabloRobot::DiabloRobot(DIABLO::OSDK::Vehicle* vehicle, DIABLO::OSDK::Movement_
   : vehicle_(vehicle), movementCtrl_(movementCtrl), loopRunning_(true)
 {
   diabloCmdSub_ = nodeHandle.subscribe<geometry_msgs::Twist>("diablo_cmd", 1, &DiabloRobot::commandCB, this);
-  testSub_ = nodeHandle.subscribe<std_msgs::String>("test_cmd", 1, &DiabloRobot::testCommandCB, this);
+  joySub_ = nodeHandle.subscribe<sensor_msgs::Joy>("/joy", 1, &DiabloRobot::joyCommandCB, this);
   imuPub_ = nodeHandle.advertise<sensor_msgs::Imu>("diablo_imu", 10);
   leftHipJointPub_ = nodeHandle.advertise<sensor_msgs::JointState>("left_hip_joint", 10);
   rightHipJointPub_ = nodeHandle.advertise<sensor_msgs::JointState>("right_hip_joint", 10);
@@ -31,8 +31,8 @@ DiabloRobot::DiabloRobot(DIABLO::OSDK::Vehicle* vehicle, DIABLO::OSDK::Movement_
   vehicle_->telemetry->configTopic(DIABLO::OSDK::TOPIC_QUATERNION, OSDK_PUSH_DATA_50Hz);
   vehicle_->telemetry->configTopic(DIABLO::OSDK::TOPIC_ACCL, OSDK_PUSH_DATA_50Hz);
   vehicle_->telemetry->configTopic(DIABLO::OSDK::TOPIC_GYRO, OSDK_PUSH_DATA_50Hz);
-  vehicle_->telemetry->configTopic(DIABLO::OSDK::TOPIC_MOTOR, OSDK_PUSH_DATA_10Hz);
-
+  vehicle_->telemetry->configTopic(DIABLO::OSDK::TOPIC_MOTOR, OSDK_PUSH_DATA_50Hz);
+  vehicle_->telemetry->configUpdate();
   // Load ros params
   int error = 0;
   int threadPriority = 0;
@@ -65,11 +65,6 @@ DiabloRobot::DiabloRobot(DIABLO::OSDK::Vehicle* vehicle, DIABLO::OSDK::Movement_
     ROS_WARN("Failed to set threads priority (one possible reason could be that the user and the group permissions "
              "are not set properly.).\n");
   }
-}
-void DiabloRobot::commandCB(const geometry_msgs::TwistConstPtr& msg)
-{
-  ROS_INFO_STREAM("111");
-  cmd_rt_buffer_.writeFromNonRT(*msg);
 }
 
 void DiabloRobot::read()
@@ -108,7 +103,6 @@ void DiabloRobot::read()
   }
   if (vehicle_->telemetry->newcome & 0x01)
   {
-    ROS_INFO_STREAM("1");
     leftHipJoint_.position = { vehicle_->telemetry->motors.left_hip.pos };
     leftHipJoint_.velocity = { vehicle_->telemetry->motors.left_hip.vel };
     leftHipJoint_.effort = { vehicle_->telemetry->motors.left_hip.iq };
@@ -139,37 +133,28 @@ void DiabloRobot::read()
 
 void DiabloRobot::write()
 {
-  if (!movementCtrl_->in_control())
+  judgeControlMode();
+  if (Mode_ != NONE)
+    if (!movementCtrl_->in_control())
+    {
+      ROS_INFO_STREAM("Try to get the control of robot movement!.\n");
+      movementCtrl_->obtain_control(500);
+    }
+
+  if (Mode_ == TOPIC)
   {
-    ROS_INFO_STREAM("Try to get the control of robot movement!.\n");
-    movementCtrl_->obtain_control();
+    movementCtrl_->ctrl_data.forward = 0.0f;
+    movementCtrl_->ctrl_data.left = 0.0f;
+
+    //  TODO: Should diy a msgs to control
+    geometry_msgs::Twist cmd = *cmd_rt_buffer_.readFromRT();
+
+    movementCtrl_->ctrl_data.forward = cmd.linear.x;
+    movementCtrl_->ctrl_data.left = cmd.angular.z;
+    //  ROS_INFO_STREAM(cmd.linear.x);
+
+    uint8_t result = movementCtrl_->SendMovementCtrlCmd();
   }
-  movementCtrl_->ctrl_data.up = 0.0f;
-  movementCtrl_->ctrl_data.forward = 0.0f;
-  movementCtrl_->ctrl_data.left = 0.0f;
-
-  //  TODO: Should diy a msgs to control
-  geometry_msgs::Twist cmd = *cmd_rt_buffer_.readFromRT();
-
-  //  movementCtrl_->ctrl_mode_cmd = true;
-  //  movementCtrl_->ctrl_mode_data.height_ctrl_mode = 1;
-  //  movementCtrl_->ctrl_mode_data.pitch_ctrl_mode = 1;
-
-  //  movementCtrl_->ctrl_data.forward = cmd.linear.x;
-  movementCtrl_->ctrl_data.forward = 1;
-  //  movementCtrl_->ctrl_data.up = cmd.linear.z;
-  //  movementCtrl_->ctrl_data.pitch = cmd.angular.y;
-  //  movementCtrl_->ctrl_data.roll = cmd.angular.x;
-  //  movementCtrl_->ctrl_data.left = cmd.angular.z;
-  //  ROS_INFO_STREAM(movementCtrl_->ctrl_data.forward);
-  //  if (movementCtrl_->ctrl_mode_cmd)
-  //  {
-  //    uint8_t result = movementCtrl_->SendMovementModeCtrlCmd();
-  //  }
-  //  else
-  //  {
-  movementCtrl_->SendMovementCtrlCmd();
-  //  }
 }
 
 void DiabloRobot::update()
@@ -187,9 +172,9 @@ void DiabloRobot::update()
   const double cycle_time_error = (elapsedTime_ - ros::Duration(desiredDuration.count())).toSec();
   if (cycle_time_error > cycleTimeErrorThreshold_)
   {
-    //    ROS_WARN_STREAM("Cycle time exceeded error threshold by: " << cycle_time_error - cycleTimeErrorThreshold_ << "s, "
-    //                                                               << "cycle time: " << elapsedTime_ << "s, "
-    //                                                               << "threshold: " << cycleTimeErrorThreshold_ << "s");
+    ROS_WARN_STREAM("Cycle time exceeded error threshold by: " << cycle_time_error - cycleTimeErrorThreshold_ << "s, "
+                                                               << "cycle time: " << elapsedTime_ << "s, "
+                                                               << "threshold: " << cycleTimeErrorThreshold_ << "s");
   }
 
   // Input

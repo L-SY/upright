@@ -1,5 +1,5 @@
 diablo_hw:
-  loop_frequency: 100
+  loop_frequency: 50
   cycle_time_error_threshold: 0.001
   thread_priority: 95
   dev: /dev/ttyUSB0
