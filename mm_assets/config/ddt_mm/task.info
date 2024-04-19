@@ -79,14 +79,14 @@ rollout
 ; MPC settings
 mpc
 {
-  timeHorizon                     1 ; [s]
-  solutionTimeWindow              0.1   ; [s]
+  timeHorizon                     2 ; [s]
+  solutionTimeWindow              0.2   ; [s]
   coldStart                       false
 
   debugPrint                      false
 
-  mpcDesiredFrequency             500   ; [Hz]
-  mrtDesiredFrequency             800   ; [Hz]
+  mpcDesiredFrequency             100   ; [Hz]
+  mrtDesiredFrequency             500   ; [Hz]
 }
 
 ; settings for the sequential quadratic programming solver
@@ -133,16 +133,16 @@ Cost
     (0,0) 0.0    ; M(0,0)
     (1,1) 0.0    ; M(1,1)
     (2,2) 0.0    ; M(2,2)
-    (3,3) 0.0    ; M(3,3)
-    (4,4) 0.0    ; M(4,4)
+    (3,3) 2.0    ; M(3,3)
+    (4,4) 2.0    ; M(4,4)
     (5,5) 0.0    ; M(5,5)
     (6,6) 0.0    ; M(6,6)
     (7,7) 0.0    ; M(7,7)
     (8,8) 0.0    ; M(8,8)
 
     ; the vel weight
-    (9,9) 0.0   ; M(9,9)
-    (10,10) 0.0 ; M(10,10)
+    (9,9) 5.0   ; M(9,9)
+    (10,10) 5.0 ; M(10,10)
     (11,11) 1.0 ; M(11,11)
     (12,12) 1.0 ; M(12,12)
     (13,13) 1.0 ; M(13,13)
@@ -196,15 +196,15 @@ Constraint
         xyz_lower
         {
           scaling 1e+0
-          (0,0) -4.0   ; xyz_lower_x
-          (1,0) -4.0   ; xyz_lower_y
+          (0,0) -1.5   ; xyz_lower_x
+          (1,0) -1.5   ; xyz_lower_y
           (2,0) -1.5   ; xyz_lower_z
         }
         xyz_upper
         {
           scaling 1e+0
-          (0,0) 4.0    ; xyz_upper_x
-          (1,0) 4.0    ; xyz_upper_y
+          (0,0) 1.5    ; xyz_upper_x
+          (1,0) 1.5    ; xyz_upper_y
           (2,0) 1.5    ; xyz_upper_z
         }
     }

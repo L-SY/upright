@@ -8,7 +8,7 @@
 #include <sensor_msgs/JointState.h>
 #include <sensor_msgs/Imu.h>
 #include <geometry_msgs/Twist.h>
-
+#include <std_msgs/String.h>
 #include <chrono>
 #include <thread>
 
@@ -30,10 +30,10 @@ public:
   void update();
 
 private:
-  void commandCB(const geometry_msgs::TwistConstPtr& msg)
+  void commandCB(const geometry_msgs::TwistConstPtr& msg);
+  void testCommandCB(const std_msgs::StringConstPtr& msg)
   {
-    cmd_rt_buffer_.writeFromNonRT(*msg);
-    ROS_INFO_STREAM("111");
+    ROS_INFO_STREAM("CB");
   }
 
   void pubDiabloInfo()
@@ -61,7 +61,7 @@ private:
       rightKneeJoint_;
 
   realtime_tools::RealtimeBuffer<geometry_msgs::Twist> cmd_rt_buffer_;
-  ros::Subscriber diabloCmdSub_;
+  ros::Subscriber diabloCmdSub_, testSub_;
   ros::Publisher leftHipJointPub_, rightHipJointPub_, leftWheelJointPub_, rightWheelJointPub_, leftKneeJointPub_,
       rightKneeJointPub_, imuPub_;
 };

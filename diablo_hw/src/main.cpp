@@ -15,6 +15,9 @@ int main(int argc, char** argv)
     ROS_ERROR("No dev info in /diablo_hw/dev !");
     return -1;
   }
+  //  ros::AsyncSpinner spinner(3);
+  //  spinner.start();
+
   DIABLO::OSDK::HAL_Pi Hal;
   if (Hal.init(dev, 460800))
     return -1;

@@ -1,0 +1,20 @@
+<launch>
+    <arg name="can_device" default="0"/>
+    <arg name="is_teacher" default="false"/>
+    <arg name="with_gripper" default="false"/>
+
+    <node if="$(arg is_teacher)" name="airbot_play_teachear_node" pkg="qz_hw" type="airbot_play_node" respawn="false"
+          clear_params="true" output="screen">
+        <param name="can_device" value="$(arg can_device)"/>
+        <param name="is_teacher" value="$(arg is_teacher)"/>
+        <param name="with_gripper" value="$(arg with_gripper)"/>
+    </node>
+
+    <node unless="$(arg is_teacher)" name="airbot_play_follower_node" pkg="qz_hw" type="airbot_play_node"
+          respawn="false" clear_params="true" output="screen">
+        <param name="can_device" value="$(arg can_device)"/>
+        <param name="is_teacher" value="$(arg is_teacher)"/>
+        <param name="with_gripper" value="$(arg with_gripper)"/>
+    </node>
+
+</launch>
