@@ -83,6 +83,21 @@ target_link_libraries(mobile_manipulator_controller
 )
 target_compile_options(mobile_manipulator_controller PUBLIC ${OCS2_CXX_FLAGS})
 
+
+add_library(diablo_qz_controller
+        src/DiabloQzController.cpp
+)
+add_dependencies(diablo_qz_controller
+        ${PROJECT_NAME}
+        ${catkin_EXPORTED_TARGETS}
+)
+target_link_libraries(diablo_qz_controller
+        ${PROJECT_NAME}
+        ${catkin_LIBRARIES}
+)
+target_compile_options(diablo_qz_controller PUBLIC ${OCS2_CXX_FLAGS})
+
+
 # Mobile manipulator target node
 add_executable(ddt_mobile_manipulator_target
         src/DDTMobileManipulatorTarget.cpp
