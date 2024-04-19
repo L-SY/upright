@@ -2,7 +2,7 @@
 // Created by lsy on 24-3-7.
 //
 
-#include "mm_hw/MMHW.h"
+#include "upright_hw/UprightHW.h"
 
 #include <generally_hw/GenerallyHWLoop.h>
 
@@ -22,14 +22,14 @@ int main(int argc, char **argv) {
 
   try {
     // Create the hardware interface specific to your robot
-    std::shared_ptr<generally::UprightHW> MMHW =
+    std::shared_ptr<generally::UprightHW> UprightHW =
         std::make_shared<generally::UprightHW>();
     // Initialize the hardware interface:
     // 1. retrieve configuration from rosparam
     // 2. initialize the hardware and interface it with ros_control
-    MMHW->init(nh, robotHwNh);
+    UprightHW->init(nh, robotHwNh);
     // Start the control loop
-    generally::GenerallyHWLoop controlLoop(nh, MMHW);
+    generally::GenerallyHWLoop controlLoop(nh, UprightHW);
     // Wait until shutdown signal received
     ros::waitForShutdown();
   } catch (const ros::Exception &e) {

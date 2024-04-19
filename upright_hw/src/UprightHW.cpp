@@ -2,7 +2,7 @@
 // Created by lsy on 24-3-7.
 //
 
-#include "mm_hw/MMHW.h"
+#include "upright_hw/UprightHW.h"
 
 #include <sensor_msgs/Joy.h>
 #include <std_msgs/Float64MultiArray.h>

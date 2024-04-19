@@ -9,7 +9,7 @@
 #include <std_msgs/Float64MultiArray.h>
 
 namespace generally {
-struct MobileManipulatorMotorData {
+struct UprightMotorData {
   double pos_, vel_, tau_;          // state
   double posDes_, velDes_, tauDes_; // command
 };
@@ -68,8 +68,7 @@ private:
   bool setupTopic(ros::NodeHandle &nh);
 
   const int jointNum = 8;
-  MobileManipulatorMotorData
-      jointData_[8]{}; // NOLINT(modernize-avoid-c-arrays)
+  UprightMotorData jointData_[8]{}; // NOLINT(modernize-avoid-c-arrays)
   ros::Subscriber webotsMotorPosSub_;
   ros::Subscriber webotsMotorVelSub_;
   ros::Subscriber webotsMotorTorSub_;
