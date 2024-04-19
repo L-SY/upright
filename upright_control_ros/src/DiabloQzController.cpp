@@ -50,27 +50,6 @@ bool DiabloQzController::init(hardware_interface::RobotHW *robot_hw,
   jointHandles_.push_back(effortJointInterface->getHandle("joint4"));
   jointHandles_.push_back(effortJointInterface->getHandle("joint5"));
   jointHandles_.push_back(effortJointInterface->getHandle("joint6"));
-  //  auto *velocityJointInterface =
-  //      robot_hw->get<hardware_interface::VelocityJointInterface>();
-  //  jointHandles_.push_back(
-  //      velocityJointInterface->getHandle("front_left_wheel"));
-  //  jointHandles_.push_back(
-  //      velocityJointInterface->getHandle("front_right_wheel"));
-  //  jointHandles_.push_back(velocityJointInterface->getHandle("rear_left_wheel"));
-  //  jointHandles_.push_back(
-  //      velocityJointInterface->getHandle("rear_right_wheel"));
-  //  jointHandles_.push_back(
-  //      velocityJointInterface->getHandle("ur_arm_shoulder_pan_joint"));
-  //  jointHandles_.push_back(
-  //      velocityJointInterface->getHandle("ur_arm_shoulder_lift_joint"));
-  //  jointHandles_.push_back(
-  //      velocityJointInterface->getHandle("ur_arm_elbow_joint"));
-  //  jointHandles_.push_back(
-  //      velocityJointInterface->getHandle("ur_arm_wrist_1_joint"));
-  //  jointHandles_.push_back(
-  //      velocityJointInterface->getHandle("ur_arm_wrist_2_joint"));
-  //  jointHandles_.push_back(
-  //      velocityJointInterface->getHandle("ur_arm_wrist_3_joint"));
   controlState_ = UPRIGHT;
 
   // Odom TF
@@ -187,9 +166,6 @@ void DiabloQzController::updateStateEstimation(const ros::Time &time,
     currentObservation_.state(3 + i) = jointPos(2 + i);
     currentObservation_.state(11 + i) = jointVel(2 + i);
     currentObservation_.state(19 + i) = 0.;
-    //    currentObservation_.state(19 + i) =
-    //        (jointVel(2 + i) - jointVelLast_(2 + i)) / (time -
-    //        lastTime_).toSec();
   }
   currentObservation_.time += period.toSec();
   jointVelLast_ = jointVel;
@@ -252,20 +228,6 @@ void DiabloQzController::setupMpc(ros::NodeHandle &nh) {
   observationPublisher_ = nh.advertise<ocs2_msgs::mpc_observation>(
       "/mobile_manipulator_mpc_observation", 1);
 }
-
-//``````````````````````OCS2 mobile_manipulator MRT
-// setting``````````````````````````````
-//    // MRT
-//    MRT_ROS_Interface mrt(robotName);
-//    mrt.initRollout(&interface.getRollout());
-//    mrt.launchNodes(nodeHandle);
-//
-//    // Dummy MRT
-//    MRT_ROS_Dummy_Loop dummy(mrt,
-//    interface.mpcSettings().mrtDesiredFrequency_,
-//    interface.mpcSettings().mpcDesiredFrequency_);
-//    dummy.subscribeObservers({dummyVisualization});
-//````````````````````````````````````````````````````````````````````````````````````````
 
 void DiabloQzController::setupMrt() {
   mpcMrtInterface_ = std::make_shared<ocs2::MPC_MRT_Interface>(*mpc_);
@@ -339,9 +301,6 @@ void DiabloQzController::upright(const ros::Time &time,
   //      for wheel control
   double xV = optimizedState(9);
   double wV = optimizedState(10);
-
-  //  jointHandles_[0].setCommand(0);
-  //  jointHandles_[1].setCommand(0);
 
   jointHandles_[0].setCommand(xV / wheelR_ + baseL_ * wV / (2 * wheelR_));
   jointHandles_[1].setCommand(xV / wheelR_ - baseL_ * wV / (2 * wheelR_));

@@ -24,6 +24,7 @@
 
 #include "upright_control_ros/MobileManipulatorVisualization.h"
 #include "upright_control_ros/synchronized_module/RosReferenceManager.h"
+#include <qz_hw/hybrid_force.h>
 #include <upright_common/ori_tool.h>
 #include <upright_common/tf_rt_broadcaster.h>
 
@@ -78,7 +79,6 @@ protected:
   // Interface
   std::shared_ptr<upright::ControllerInterface> mobileManipulatorInterface_;
   std::vector<hardware_interface::JointHandle> jointHandles_;
-  //    hardware_interface::ImuSensorHandle imuSensorHandle_;
 
   // State Estimation
   ocs2::SystemObservation currentObservation_;
@@ -86,7 +86,6 @@ protected:
   // Nonlinear MPC
   std::unique_ptr<ocs2::MultipleShootingMpc> mpc_;
   std::shared_ptr<ocs2::MPC_MRT_Interface> mpcMrtInterface_;
-  //    LeggedBalanceParameters params_;
 
   // Visualization
   std::shared_ptr<ddt::MobileManipulatorDummyVisualization> visualizer_;
@@ -106,5 +105,10 @@ private:
   ros::Time lastTime_{};
 
   double baseL_ = 0.683, wheelR_ = 0.15;
+  // QZ hardware
+  std::vector<double> qzJointPos_, qzJointVel_, qzJointEff_;
+  ros::Subscriber qzJointInfoSub_;
+  ros::Publisher qzJointCmdPub_;
+  qz_hw::hybrid_force qzCmdMsgs;
 };
 } // namespace ddt

@@ -12,10 +12,11 @@ set(CATKIN_PACKAGE_DEPENDENCIES
         effort_controllers
         pluginlib
 
+        qz_hw
         upright_common
         upright_control
 )
-
+find_package(pinocchio REQUIRED)
 add_definitions(-DBOOST_MPL_LIMIT_LIST_SIZE=30)
 
 find_package(catkin REQUIRED COMPONENTS
@@ -94,6 +95,7 @@ add_dependencies(diablo_qz_controller
 target_link_libraries(diablo_qz_controller
         ${PROJECT_NAME}
         ${catkin_LIBRARIES}
+        pinocchio::pinocchio
 )
 target_compile_options(diablo_qz_controller PUBLIC ${OCS2_CXX_FLAGS})
 

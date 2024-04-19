@@ -20,6 +20,7 @@
     <depend>effort_controllers</depend>
     <depend>pluginlib</depend>
     <depend>upright_common</depend>
+    <depend>qz_hw</depend>
 
     <depend>upright_control</depend>
 
