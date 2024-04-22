@@ -85,7 +85,7 @@ private:
   bool setupTopic(ros::NodeHandle& nh);
   std::vector<double> qzJointPos_, qzJointVel_, qzJointEff_;
   const int jointNum = 8;
-  DiabloMotorData diabloMotorData[2]{};
+  DiabloMotorData diabloMotorData[3]{};
   QzMotorData qzMotorData[6]{};  // NOLINT(modernize-avoid-c-arrays)
   ros::Subscriber qzJointSub_, diabloOdomSub_;
   ros::Publisher qzMotorPub_, diabloMotorPub_;

@@ -36,22 +36,24 @@ bool DiabloQzController::init(hardware_interface::RobotHW *robot_hw,
   currentObservation_.state.setZero(STATE_DIM);
   currentObservation_.input.setZero(INPUT_DIM);
 
-  jointVelLast_.resize(10);
-  lastTime_ = ros::Time::now();
-
   // Hardware interface
-  auto *effortJointInterface =
-      robot_hw->get<hardware_interface::EffortJointInterface>();
-  jointHandles_.push_back(effortJointInterface->getHandle("left_j3"));
-  jointHandles_.push_back(effortJointInterface->getHandle("right_j3"));
-  jointHandles_.push_back(effortJointInterface->getHandle("joint1"));
-  jointHandles_.push_back(effortJointInterface->getHandle("joint2"));
-  jointHandles_.push_back(effortJointInterface->getHandle("joint3"));
-  jointHandles_.push_back(effortJointInterface->getHandle("joint4"));
-  jointHandles_.push_back(effortJointInterface->getHandle("joint5"));
-  jointHandles_.push_back(effortJointInterface->getHandle("joint6"));
+  auto *hybridJointInterface =
+      robot_hw->get<hardware_interface::HybridJointInterface>();
+  std::vector<std::string> qzJointNames{"joint1", "joint2", "joint3",
+                                        "joint4", "joint5", "joint6"};
+  for (const auto &joint_name : qzJointNames) {
+    hybridJointHandles_.push_back(hybridJointInterface->getHandle(joint_name));
+  }
+
+  auto *velocityJointInterface =
+      robot_hw->get<hardware_interface::VelocityJointInterface>();
+  velocityJointHandles_.push_back(velocityJointInterface->getHandle("diabloX"));
+  velocityJointHandles_.push_back(
+      velocityJointInterface->getHandle("diabloYaw"));
   controlState_ = UPRIGHT;
 
+  //  Pinocchio interface
+  pinocchioInterface_.init(controller_nh);
   // Odom TF
   odom2base_.header.frame_id = "world";
   odom2base_.header.stamp = ros::Time::now();
@@ -103,16 +105,13 @@ void DiabloQzController::update(const ros::Time &time,
   // Publish the observation. Only needed for the command interface
   observationPublisher_.publish(
       ocs2::ros_msg_conversions::createObservationMsg(currentObservation_));
+  pinocchioInterface_.pubDynamics();
 }
 
 void DiabloQzController::updateTfOdom(const ros::Time &time,
                                       const ros::Duration &period) {
-  ocs2::vector_t position(3);
-  position(0) = odom2base_.transform.translation.x;
-  position(1) = odom2base_.transform.translation.y;
-  position(2) = odom2base_.transform.translation.z;
-  double yaw = yawFromQuat(odom2base_.transform.rotation);
-  yaw += currentObservation_.state(10) * period.toSec();
+  odom2base_.header.stamp = time;
+  double yaw = velocityJointHandles_[2].getPosition();
   tf2::Quaternion quaternion;
   quaternion.setRPY(0, 0, yaw);
   odom2base_.transform.rotation.x = quaternion.x();
@@ -120,56 +119,35 @@ void DiabloQzController::updateTfOdom(const ros::Time &time,
   odom2base_.transform.rotation.z = quaternion.z();
   odom2base_.transform.rotation.w = quaternion.w();
 
-  position(0) += currentObservation_.state(9) * period.toSec() *
-                 cos(currentObservation_.state(2));
-  position(1) += currentObservation_.state(9) * period.toSec() *
-                 sin(currentObservation_.state(2));
+  odom2base_.transform.translation.x = velocityJointHandles_[0].getPosition();
+  odom2base_.transform.translation.y = velocityJointHandles_[1].getPosition();
+  odom2base_.transform.translation.z = 0;
 
-  odom2base_.header.stamp = time;
-  odom2base_.transform.translation.x = position(0);
-  odom2base_.transform.translation.y = position(1);
-  odom2base_.transform.translation.z = position(2);
-  ROS_INFO_STREAM("X = " << position(0));
-  ROS_INFO_STREAM("Y = " << position(1));
   tfRtBroadcaster_.sendTransform(odom2base_);
 }
 
 void DiabloQzController::updateStateEstimation(const ros::Time &time,
                                                const ros::Duration &period) {
-  ocs2::vector_t jointPos(CONTROL_DIM), jointVel(CONTROL_DIM);
-  for (size_t i = 0; i < CONTROL_DIM; ++i) {
-    jointPos(i) = jointHandles_[i].getPosition();
-    jointVel(i) = jointHandles_[i].getVelocity();
-  }
+  //  Diablo odom info
+  currentObservation_.state(0) = velocityJointHandles_[0].getPosition();
+  currentObservation_.state(1) = velocityJointHandles_[1].getPosition();
+  currentObservation_.state(2) = velocityJointHandles_[2].getPosition();
 
-  currentObservation_.state(0) = odom2base_.transform.translation.x;
-  currentObservation_.state(1) = odom2base_.transform.translation.y;
-  double yaw = yawFromQuat(odom2base_.transform.rotation);
-  currentObservation_.state(2) = yaw;
-  double xV = (jointVel(0) + jointVel(1)) * wheelR_ / 2;
-  double wV = (jointVel(0) - jointVel(1)) * wheelR_ / baseL_;
-  currentObservation_.state(9) = xV;
-  currentObservation_.state(10) = wV;
-  double xVLast = (jointVelLast_(0) + jointVelLast_(1)) * wheelR_ / 2;
-  double wVLast = (jointVelLast_(0) - jointVelLast_(1)) * wheelR_ / baseL_;
+  currentObservation_.state(9) = velocityJointHandles_[0].getVelocity();
+  currentObservation_.state(10) = velocityJointHandles_[2].getPosition();
 
+  //  All accs are set to zero due to ros:: inaccurate and unstable time
   currentObservation_.state(17) = 0;
   currentObservation_.state(18) = 0;
 
-  ROS_INFO_STREAM("V X" << xV);
-  ROS_INFO_STREAM("V W" << wV);
-
-  ROS_INFO_STREAM("ACC X" << (xV - xVLast) / (time - lastTime_).toSec());
-  ROS_INFO_STREAM("ACC W" << (wV - wVLast) / (time - lastTime_).toSec());
-  //      for arm
+  //  arm info
   for (int i = 0; i < 6; ++i) {
-    currentObservation_.state(3 + i) = jointPos(2 + i);
-    currentObservation_.state(11 + i) = jointVel(2 + i);
+    currentObservation_.state(3 + i) = hybridJointHandles_[i].getPosition();
+    currentObservation_.state(11 + i) = hybridJointHandles_[i].getVelocity();
+    //  All accs are set to zero due to ros:: inaccurate and unstable time
     currentObservation_.state(19 + i) = 0.;
   }
   currentObservation_.time += period.toSec();
-  jointVelLast_ = jointVel;
-  lastTime_ = time;
 }
 
 void DiabloQzController::starting(const ros::Time &time) {
@@ -298,19 +276,19 @@ void DiabloQzController::upright(const ros::Time &time,
                                    optimizedInput, plannedMode);
   currentObservation_.input = optimizedInput;
 
-  //      for wheel control
-  double xV = optimizedState(9);
-  double wV = optimizedState(10);
+  //  for diablo control
+  velocityJointHandles_[0].setCommand(optimizedState(9));
+  velocityJointHandles_[2].setCommand(optimizedState(10));
 
-  jointHandles_[0].setCommand(xV / wheelR_ + baseL_ * wV / (2 * wheelR_));
-  jointHandles_[1].setCommand(xV / wheelR_ - baseL_ * wV / (2 * wheelR_));
-  //  ROS_INFO_STREAM("left V  =" << xV / wheelR_ - baseL_ * wV / (2 *
-  //  wheelR_)); ROS_INFO_STREAM("right V  =" << xV / wheelR_ + baseL_ * wV /
-  //  (2 * wheelR_));
-  //      for arm control
-  for (int i = 0; i < 6; ++i)
-    jointHandles_[i + 2].setCommand(optimizedState(11 + i));
-
+  pinocchioInterface_
+      .computerInverseDynamics<hardware_interface::HybridJointHandle>(
+          hybridJointHandles_);
+  for (int i = 0; i < 6; ++i) {
+    hybridJointHandles_[i].setPositionDesired(optimizedState(3 + i));
+    hybridJointHandles_[i].setVelocityDesired(optimizedState(11 + i));
+    hybridJointHandles_[i].setFeedforward(
+        pinocchioInterface_.tau_without_a_[i]);
+  }
   lastOptimizedState = optimizedState;
 }
 

@@ -14,19 +14,20 @@
 #include <hardware_interface/imu_sensor_interface.h>
 #include <hardware_interface/joint_command_interface.h>
 
+#include "generally_hw/hardware_interface/HybridJointInterface.h"
+#include "pinocchio_interface/pinocchio_interface.h"
+#include "upright_control_ros/MobileManipulatorVisualization.h"
+#include "upright_control_ros/synchronized_module/RosReferenceManager.h"
 #include <ocs2_core/Types.h>
 #include <ocs2_core/misc/Benchmark.h>
 #include <ocs2_ddp/GaussNewtonDDP_MPC.h>
 #include <ocs2_mobile_manipulator/MobileManipulatorInterface.h>
 #include <ocs2_mpc/MPC_MRT_Interface.h>
-#include <ros/package.h>
-#include <upright_control/MobileManipulatorInterface.h>
-
-#include "upright_control_ros/MobileManipulatorVisualization.h"
-#include "upright_control_ros/synchronized_module/RosReferenceManager.h"
 #include <qz_hw/hybrid_force.h>
+#include <ros/package.h>
 #include <upright_common/ori_tool.h>
 #include <upright_common/tf_rt_broadcaster.h>
+#include <upright_control/MobileManipulatorInterface.h>
 
 namespace ddt {
 class DiabloQzController
@@ -96,19 +97,14 @@ private:
   std::thread mpcThread_;
   std::atomic_bool controllerRunning_{}, mpcRunning_{};
   ocs2::benchmark::RepeatedTimer mpcTimer_;
+  //  Pinocchio interface
+  pinocchio_interface::PinocchioInterface pinocchioInterface_;
 
   // Odom TF
   upright::TfRtBroadcaster tfRtBroadcaster_;
   geometry_msgs::TransformStamped odom2base_{};
 
-  ocs2::vector_t jointVelLast_{};
-  ros::Time lastTime_{};
-
-  double baseL_ = 0.683, wheelR_ = 0.15;
-  // QZ hardware
-  std::vector<double> qzJointPos_, qzJointVel_, qzJointEff_;
-  ros::Subscriber qzJointInfoSub_;
-  ros::Publisher qzJointCmdPub_;
-  qz_hw::hybrid_force qzCmdMsgs;
+  std::vector<hardware_interface::HybridJointHandle> hybridJointHandles_;
+  std::vector<hardware_interface::JointHandle> velocityJointHandles_;
 };
 } // namespace ddt

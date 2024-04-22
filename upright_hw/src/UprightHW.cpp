@@ -73,7 +73,8 @@ bool UprightHW::setupJoints()
 {
   // Two vel-joint for diablo x-yaw
   diabloMotorData[0].name_ = "diabloX";
-  diabloMotorData[1].name_ = "diabloYaw";
+  diabloMotorData[1].name_ = "diabloY";
+  diabloMotorData[2].name_ = "diabloYaw";
   for (auto& joint : diabloMotorData)
   {
     hardware_interface::JointStateHandle state_handle(joint.name_, &joint.pos_, &joint.vel_, &joint.tau_);

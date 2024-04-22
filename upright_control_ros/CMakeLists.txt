@@ -13,6 +13,7 @@ set(CATKIN_PACKAGE_DEPENDENCIES
         pluginlib
 
         qz_hw
+        generally_hw
         upright_common
         upright_control
 )
