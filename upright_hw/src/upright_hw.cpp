@@ -6,7 +6,8 @@
 
 #include <generally_hw/GenerallyHWLoop.h>
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv)
+{
   ros::init(argc, argv, "mm_hw");
   ros::NodeHandle nh;
   ros::NodeHandle robotHwNh("~");
@@ -20,10 +21,10 @@ int main(int argc, char **argv) {
   ros::AsyncSpinner spinner(3);
   spinner.start();
 
-  try {
+  try
+  {
     // Create the hardware interface specific to your robot
-    std::shared_ptr<generally::UprightHW> UprightHW =
-        std::make_shared<generally::UprightHW>();
+    std::shared_ptr<generally::UprightHW> UprightHW = std::make_shared<generally::UprightHW>();
     // Initialize the hardware interface:
     // 1. retrieve configuration from rosparam
     // 2. initialize the hardware and interface it with ros_control
@@ -32,7 +33,9 @@ int main(int argc, char **argv) {
     generally::GenerallyHWLoop controlLoop(nh, UprightHW);
     // Wait until shutdown signal received
     ros::waitForShutdown();
-  } catch (const ros::Exception &e) {
+  }
+  catch (const ros::Exception& e)
+  {
     ROS_FATAL_STREAM("Error in the hardware interface:\n"
                      << "\t" << e.what());
     return 1;
