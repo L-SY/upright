@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="robot">
+
+    <xacro:arg name="robot_type" default="diablo"/>
+
+    <xacro:include filename="$(find mm_assets)/description/ddt_mm/urdf/diablo/diablo.xacro"/>
+    <xacro:include filename="$(find mm_assets)/description/ddt_mm/urdf/diablo/gazebo.xacro"/>
+    <!--    <xacro:include filename="$(find mm_assets)/description/urdf/diablo/imu.xacro"/>-->
+
+</robot>

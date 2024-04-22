@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+    <xacro:include filename="$(find mm_assets)/description/ddt_mm/urdf/common/common.xacro"/>
+
+    <!-- Define transmissions for each joint -->
+    <xacro:create_transmission joint_name="joint1"/>
+    <xacro:create_transmission joint_name="joint2"/>
+    <xacro:create_transmission joint_name="joint3"/>
+    <xacro:create_transmission joint_name="joint4"/>
+    <xacro:create_transmission joint_name="joint5"/>
+    <xacro:create_transmission joint_name="joint6"/>
+
+</robot>

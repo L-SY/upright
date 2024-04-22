@@ -1,0 +1,8 @@
+<launch>
+    <arg name="rvizconfig" default="$(find upright_asset)/rviz/mobile_manipulator.rviz"/>
+
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" output="screen"/>
+    <node pkg="ocs2_mobile_manipulator_ros" type="mobile_manipulator_target" name="mobile_manipulator_target"
+          output="screen" launch-prefix=""/>
+</launch>
