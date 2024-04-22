@@ -10,6 +10,7 @@
 #include <sensor_msgs/Joy.h>
 #include <geometry_msgs/Twist.h>
 #include <std_msgs/String.h>
+#include <std_msgs/Float64MultiArray.h>
 #include <chrono>
 #include <thread>
 
@@ -80,7 +81,8 @@ private:
   }
 
   // Timing
-  double cycleTimeErrorThreshold_{}, loopHz_{};
+  bool is_init_ = false;
+  double cycleTimeErrorThreshold_{}, loopHz_{}, init_odom_x_;
   std::thread loopThread_;
   std::atomic_bool loopRunning_{};
   ros::Duration elapsedTime_;
@@ -96,7 +98,7 @@ private:
   realtime_tools::RealtimeBuffer<geometry_msgs::Twist> cmd_rt_buffer_;
   ros::Subscriber diabloCmdSub_, joySub_;
   ros::Publisher leftHipJointPub_, rightHipJointPub_, leftWheelJointPub_, rightWheelJointPub_, leftKneeJointPub_,
-      rightKneeJointPub_, imuPub_;
+      rightKneeJointPub_, imuPub_, odomPub_;
   ctrl_mode Mode_ = NONE;
   ros::Time lastJoyCmdTime_, lastTopicCmdTime_;
 };

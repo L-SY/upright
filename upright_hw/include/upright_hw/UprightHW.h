@@ -8,6 +8,8 @@
 #include <generally_hw/GenerallyHW.h>
 #include <std_msgs/Float64MultiArray.h>
 #include <sensor_msgs/JointState.h>
+#include <geometry_msgs/Twist.h>
+#include <qz_hw/hybrid_force.h>
 
 namespace generally
 {
@@ -58,21 +60,23 @@ public:
 
   void qzHWCallBack(const sensor_msgs::JointStateConstPtr& data)
   {
-    //  qz_joint_state_ = data.get();
-    if (!recv_one_)
+    int i = 0;
+    for (auto& qzJoint : hybrid_joint_handles_)
     {
-      for (size_t i = 0; i < 6; i++)
-      {
-        qzCmdMsgs.positions[i] = data->position[i];
-      }
-      recv_one_ = true;
+      qzMotorData[i].pos_ = data->position[i];
+      qzMotorData[i].vel_ = data->velocity[i];
+      qzMotorData[i].tau_ = data->effort[i];
+      i++;
     }
-    for (size_t i = 0; i < 6; i++)
-    {
-      qzJointPos_[i] = data->position[i];
-      qzJointVel_[i] = data->velocity[i];
-      qzJointEff_[i] = data->effort[i];
-    }
+  }
+
+  void diabloOdomCallBack(const std_msgs::Float64MultiArrayConstPtr& data)
+  {
+    // TODO ： Make it right
+    diabloMotorData[0].pos_ = data.get()->data[0];
+    diabloMotorData[0].vel_ = data.get()->data[0];
+    diabloMotorData[1].pos_ = data.get()->data[1];
+    diabloMotorData[1].vel_ = data.get()->data[1];
   }
 
 private:
@@ -83,8 +87,8 @@ private:
   const int jointNum = 8;
   DiabloMotorData diabloMotorData[2]{};
   QzMotorData qzMotorData[6]{};  // NOLINT(modernize-avoid-c-arrays)
-  ros::Subscriber qzJointInfo_, diabloOdomInfo_;
-  ros::Publisher qzMotorCmd_, diabloMotorCmd_;
+  ros::Subscriber qzJointSub_, diabloOdomSub_;
+  ros::Publisher qzMotorPub_, diabloMotorPub_;
   std::vector<std::string> robotMotorName_;
 };
 

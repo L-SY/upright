@@ -11,9 +11,10 @@ DiabloRobot::DiabloRobot(DIABLO::OSDK::Vehicle* vehicle, DIABLO::OSDK::Movement_
                          ros::NodeHandle nodeHandle)
   : vehicle_(vehicle), movementCtrl_(movementCtrl), loopRunning_(true)
 {
-  diabloCmdSub_ = nodeHandle.subscribe<geometry_msgs::Twist>("diablo_cmd", 1, &DiabloRobot::commandCB, this);
+  diabloCmdSub_ = nodeHandle.subscribe<geometry_msgs::Twist>("/diablo_cmd", 1, &DiabloRobot::commandCB, this);
   joySub_ = nodeHandle.subscribe<sensor_msgs::Joy>("/joy", 1, &DiabloRobot::joyCommandCB, this);
   imuPub_ = nodeHandle.advertise<sensor_msgs::Imu>("diablo_imu", 10);
+  odomPub_ = nodeHandle.advertise<std_msgs::Float64MultiArray>("/diablo_odom", 10);
   leftHipJointPub_ = nodeHandle.advertise<sensor_msgs::JointState>("left_hip_joint", 10);
   rightHipJointPub_ = nodeHandle.advertise<sensor_msgs::JointState>("right_hip_joint", 10);
   leftWheelJointPub_ = nodeHandle.advertise<sensor_msgs::JointState>("left_wheel_joint", 10);
@@ -129,6 +130,19 @@ void DiabloRobot::read()
     vehicle_->telemetry->eraseNewcomeFlag(0xFE);
   }
   pubDiabloInfo();
+  if (!is_init_)
+    init_odom_x_ = vehicle_->telemetry->motors.right_knee.pos / 10.0;  // for compensation the init x
+  std_msgs::Float64MultiArray diablo_world_data;
+  diablo_world_data.data.push_back(vehicle_->telemetry->motors.right_knee.pos / 10.0 - init_odom_x_);  // x
+  diablo_world_data.data.push_back(0.);                                                                // y
+  diablo_world_data.data.push_back(vehicle_->telemetry->motors.left_knee.pos / 10.0 - 0.05);           // z
+
+  diablo_world_data.data.push_back(vehicle_->telemetry->quaternion.x);
+  diablo_world_data.data.push_back(vehicle_->telemetry->quaternion.y);
+  diablo_world_data.data.push_back(vehicle_->telemetry->quaternion.z);
+  diablo_world_data.data.push_back(vehicle_->telemetry->quaternion.w);
+
+  odomPub_.publish(diablo_world_data);
 }
 
 void DiabloRobot::write()

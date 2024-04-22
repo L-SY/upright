@@ -8,6 +8,7 @@ find_package(catkin REQUIRED
         roscpp
 
         generally_hw
+        qz_hw
 )
 
 catkin_package(
@@ -16,6 +17,7 @@ catkin_package(
         CATKIN_DEPENDS
         roscpp
         generally_hw
+        qz_hw
 )
 
 ###########

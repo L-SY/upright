@@ -16,32 +16,6 @@ bool UprightHW::init(ros::NodeHandle& root_nh, ros::NodeHandle& robot_hw_nh)
   {
     return false;
   }
-  XmlRpc::XmlRpcValue motorsNameList;
-  if (root_nh.getParam("/robot_def/motors_name", motorsNameList))
-  {
-    if (motorsNameList.getType() == XmlRpc::XmlRpcValue::TypeArray)
-    {
-      for (int i = 0; i < motorsNameList.size(); ++i)
-      {
-        if (motorsNameList[i].getType() == XmlRpc::XmlRpcValue::TypeString)
-        {
-          robotMotorName_.push_back(static_cast<std::string>(motorsNameList[i]));
-        }
-        else
-        {
-          ROS_ERROR("Motor name is not a string.");
-        }
-      }
-    }
-    else
-    {
-      ROS_ERROR("Motors name list is not an array.");
-    }
-  }
-  else
-  {
-    ROS_ERROR("Failed to get motors name from parameter server.");
-  }
   setupJoints();
   setupTopic(robot_hw_nh);
   ROS_INFO_STREAM("HW Init Finish!");
@@ -56,6 +30,11 @@ void UprightHW::read(const ros::Time& time, const ros::Duration& /*period*/)
 void UprightHW::write(const ros::Time& /*time*/, const ros::Duration& /*period*/)
 {
   is_writing_ = true;
+  geometry_msgs::Twist diabloCmd;
+  diabloCmd.linear.x = velocityJointInterface_.getHandle("diabloX").getCommand();
+  diabloCmd.angular.z = velocityJointInterface_.getHandle("diabloYaw").getCommand();
+  diabloMotorPub_.publish(diabloCmd);
+
   std_msgs::Float64MultiArray command;
   command.data.resize(effort_joint_handles_.size());
   int i = 0;
@@ -64,15 +43,30 @@ void UprightHW::write(const ros::Time& /*time*/, const ros::Duration& /*period*/
     command.data[i] = joint.getCommand();
     i++;
   }
-
-  rosMotorCmdPub_.publish(command);
+  qz_hw::hybrid_force qzCmdMsg;
+  qzCmdMsg.header.stamp = ros::Time::now();
+  int j = 0;
+  for (auto& qzJoint : hybrid_joint_handles_)
+  {
+    qzCmdMsg.joint_names.push_back(hybrid_joint_handles_[i].getName());
+    qzCmdMsg.effort.push_back(hybrid_joint_handles_[i].getFeedforward());
+    qzCmdMsg.positions.push_back(hybrid_joint_handles_[i].getPositionDesired());
+    qzCmdMsg.velocities.push_back(hybrid_joint_handles_[i].getVelocityDesired());
+    qzCmdMsg.kds.push_back(hybrid_joint_handles_[i].getKd());
+    qzCmdMsg.kps.push_back(hybrid_joint_handles_[i].getKp());
+    j++;
+  }
+  qzMotorPub_.publish(qzCmdMsg);
   is_writing_ = false;
 }
 
 bool UprightHW::setupTopic(ros::NodeHandle& nh)
 {
-  rosMotorCmdPub_ = nh.advertise<std_msgs::Float64MultiArray>("/ros_motor_cmd", 1);
-  qzJointInfo_ = nh.subscribe<sensor_msgs::JointState>("/airbot_play/joint_states", 1, &UprightHW::qzHWCallBack, this);
+  qzMotorPub_ = nh.advertise<qz_hw::hybrid_force>("/airbot_play/joint_command", 1);
+  qzJointSub_ = nh.subscribe<sensor_msgs::JointState>("/airbot_play/joint_states", 1, &UprightHW::qzHWCallBack, this);
+  diabloMotorPub_ = nh.advertise<geometry_msgs::Twist>("/diablo", 1);
+  diabloOdomSub_ = nh.subscribe<std_msgs::Float64MultiArray>("/diablo_odom", 1, &UprightHW::diabloOdomCallBack, this);
+  return true;
 }
 
 bool UprightHW::setupJoints()
@@ -92,7 +86,7 @@ bool UprightHW::setupJoints()
   // Six hybrid-joint for qz arm
   for (int i = 0; i < 6; ++i)
   {
-    qzMotorData[i].name_ = "qzJoint" + std::to_string(i);
+    qzMotorData[i].name_ = "joint" + std::to_string(i);
     ROS_INFO_STREAM(qzMotorData[i].name_);
   }
   for (auto& joint : qzMotorData)
