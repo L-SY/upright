@@ -54,7 +54,7 @@ protected:
       velocity_joint_handles_{}; // NOLINT(misc-non-private-member-variables-in-classes)
   hardware_interface::HybridJointInterface
       hybridJointInterface_; // NOLINT(misc-non-private-member-variables-in-classes)
-  std::vector<hardware_interface::JointHandle>
+  std::vector<hardware_interface::HybridJointHandle>
       hybrid_joint_handles_{}; // NOLINT(misc-non-private-member-variables-in-classes)
   // URDF model of the robot
   std::shared_ptr<urdf::Model>

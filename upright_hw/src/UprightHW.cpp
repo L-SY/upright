@@ -72,28 +72,38 @@ void UprightHW::write(const ros::Time& /*time*/, const ros::Duration& /*period*/
 bool UprightHW::setupTopic(ros::NodeHandle& nh)
 {
   rosMotorCmdPub_ = nh.advertise<std_msgs::Float64MultiArray>("/ros_motor_cmd", 1);
-  webotsMotorPosSub_ =
-      nh.subscribe<std_msgs::Float64MultiArray>("/webots_motor_pos", 1, &UprightHW::webotMotorPosCallback, this);
-  webotsMotorVelSub_ =
-      nh.subscribe<std_msgs::Float64MultiArray>("/webots_motor_vel", 1, &UprightHW::webotMotorVelCallback, this);
-  webotsMotorTorSub_ =
-      nh.subscribe<std_msgs::Float64MultiArray>("/webots_motor_tor", 1, &UprightHW::webotMotorTorCallback, this);
+  qzJointInfo_ = nh.subscribe<sensor_msgs::JointState>("/airbot_play/joint_states", 1, &UprightHW::qzHWCallBack, this);
 }
 
 bool UprightHW::setupJoints()
 {
-  int joint_index = 0;
-  for (const auto& joint : robotMotorName_)
+  // Two vel-joint for diablo x-yaw
+  diabloMotorData[0].name_ = "diabloX";
+  diabloMotorData[1].name_ = "diabloYaw";
+  for (auto& joint : diabloMotorData)
   {
-    hardware_interface::JointStateHandle state_handle(joint, &jointData_[joint_index].pos_,
-                                                      &jointData_[joint_index].vel_, &jointData_[joint_index].tau_);
+    hardware_interface::JointStateHandle state_handle(joint.name_, &joint.pos_, &joint.vel_, &joint.tau_);
     jointStateInterface_.registerHandle(state_handle);
-    hardware_interface::JointHandle joint_handle(state_handle, &jointData_[joint_index].tauDes_);
-    effortJointInterface_.registerHandle(joint_handle);
-    effort_joint_handles_.push_back(effortJointInterface_.getHandle(joint));
-
-    joint_index++;
+    hardware_interface::JointHandle joint_handle(state_handle, &joint.velDes_);
+    velocityJointInterface_.registerHandle(joint_handle);
+    velocity_joint_handles_.push_back(effortJointInterface_.getHandle(joint.name_));
   }
+
+  // Six hybrid-joint for qz arm
+  for (int i = 0; i < 6; ++i)
+  {
+    qzMotorData[i].name_ = "qzJoint" + std::to_string(i);
+    ROS_INFO_STREAM(qzMotorData[i].name_);
+  }
+  for (auto& joint : qzMotorData)
+  {
+    hardware_interface::JointStateHandle state_handle(joint.name_, &joint.pos_, &joint.vel_, &joint.tau_);
+    jointStateInterface_.registerHandle(state_handle);
+    hybridJointInterface_.registerHandle(hardware_interface::HybridJointHandle(
+        state_handle, &joint.posDes_, &joint.velDes_, &joint.kp_, &joint.kd_, &joint.ff_));
+    hybrid_joint_handles_.push_back(hybridJointInterface_.getHandle(joint.name_));
+  }
+
   return true;
 }
 

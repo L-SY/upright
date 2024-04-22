@@ -7,13 +7,22 @@
 
 #include <generally_hw/GenerallyHW.h>
 #include <std_msgs/Float64MultiArray.h>
+#include <sensor_msgs/JointState.h>
 
 namespace generally
 {
-struct UprightMotorData
+struct DiabloMotorData
 {
-  double pos_, vel_, tau_;           // state
-  double posDes_, velDes_, tauDes_;  // command
+  std::string name_;
+  double pos_, vel_, tau_;  // state
+  double velDes_;           // command
+};
+
+struct QzMotorData
+{
+  std::string name_;
+  double pos_, vel_, tau_;  // state
+  double posDes_, velDes_, kp_, kd_, ff_;
 };
 
 class UprightHW : public GenerallyHW
@@ -47,38 +56,35 @@ public:
    */
   void write(const ros::Time& time, const ros::Duration& period) override;
 
-  void webotMotorPosCallback(const std_msgs::Float64MultiArrayConstPtr& data)
+  void qzHWCallBack(const sensor_msgs::JointStateConstPtr& data)
   {
-    if (is_reading_)
-      for (int i = 0; i < jointNum; ++i)
-        jointData_[i].pos_ = data->data[i];
-  }
-
-  void webotMotorVelCallback(const std_msgs::Float64MultiArrayConstPtr& data)
-  {
-    if (is_reading_)
-      for (int i = 0; i < jointNum; ++i)
-        jointData_[i].vel_ = data->data[i];
-  }
-
-  void webotMotorTorCallback(const std_msgs::Float64MultiArrayConstPtr& data)
-  {
-    if (is_reading_)
-      for (int i = 0; i < jointNum; ++i)
-        jointData_[i].tau_ = data->data[i];
+    //  qz_joint_state_ = data.get();
+    if (!recv_one_)
+    {
+      for (size_t i = 0; i < 6; i++)
+      {
+        qzCmdMsgs.positions[i] = data->position[i];
+      }
+      recv_one_ = true;
+    }
+    for (size_t i = 0; i < 6; i++)
+    {
+      qzJointPos_[i] = data->position[i];
+      qzJointVel_[i] = data->velocity[i];
+      qzJointEff_[i] = data->effort[i];
+    }
   }
 
 private:
-  bool setupJoints(), is_writing_ = false, is_reading_ = false;
+  bool setupJoints(), is_writing_ = false, is_reading_ = false, recv_one_ = false;
 
   bool setupTopic(ros::NodeHandle& nh);
-
+  std::vector<double> qzJointPos_, qzJointVel_, qzJointEff_;
   const int jointNum = 8;
-  UprightMotorData jointData_[8]{};  // NOLINT(modernize-avoid-c-arrays)
-  ros::Subscriber webotsMotorPosSub_;
-  ros::Subscriber webotsMotorVelSub_;
-  ros::Subscriber webotsMotorTorSub_;
-  ros::Publisher rosMotorCmdPub_;
+  DiabloMotorData diabloMotorData[2]{};
+  QzMotorData qzMotorData[6]{};  // NOLINT(modernize-avoid-c-arrays)
+  ros::Subscriber qzJointInfo_, diabloOdomInfo_;
+  ros::Publisher qzMotorCmd_, diabloMotorCmd_;
   std::vector<std::string> robotMotorName_;
 };
 
