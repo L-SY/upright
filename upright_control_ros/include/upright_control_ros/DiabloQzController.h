@@ -6,7 +6,7 @@
 
 #include "MobileManipulatorControlCmd.h"
 #include "definitions.h"
-
+#include "pinocchio_interface/pinocchio_interface.h"
 #include <controller_interface/multi_interface_controller.h>
 #include <effort_controllers/joint_effort_controller.h>
 #include <effort_controllers/joint_position_controller.h>
@@ -15,7 +15,6 @@
 #include <hardware_interface/joint_command_interface.h>
 
 #include "generally_hw/hardware_interface/HybridJointInterface.h"
-#include "pinocchio_interface/pinocchio_interface.h"
 #include "upright_control_ros/MobileManipulatorVisualization.h"
 #include "upright_control_ros/synchronized_module/RosReferenceManager.h"
 #include <ocs2_core/Types.h>
@@ -94,6 +93,7 @@ protected:
 
 private:
   int controlState_ = UPRIGHT;
+  double init_x_, init_y_, init_z_;
   std::thread mpcThread_;
   std::atomic_bool controllerRunning_{}, mpcRunning_{};
   ocs2::benchmark::RepeatedTimer mpcTimer_;

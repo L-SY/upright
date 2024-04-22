@@ -48,12 +48,32 @@ bool DiabloQzController::init(hardware_interface::RobotHW *robot_hw,
   auto *velocityJointInterface =
       robot_hw->get<hardware_interface::VelocityJointInterface>();
   velocityJointHandles_.push_back(velocityJointInterface->getHandle("diabloX"));
+  velocityJointHandles_.push_back(velocityJointInterface->getHandle("diabloY"));
   velocityJointHandles_.push_back(
       velocityJointInterface->getHandle("diabloYaw"));
+
+  double p, d;
+  for (int i = 1; i <= 6; ++i) {
+    std::string joint_name = "motor_parameter/joint" + std::to_string(i);
+    if (controller_nh.getParam(joint_name + "/p", p) &&
+        controller_nh.getParam(joint_name + "/d", d)) {
+      hybridJointHandles_[i - 1].setKp(p);
+      hybridJointHandles_[i - 1].setKd(d);
+    } else {
+      ROS_ERROR_STREAM("Failed to get PID parameters for " << joint_name);
+      return false;
+    }
+  }
+
+  controller_nh.getParam("init_pos/x", init_x_);
+  controller_nh.getParam("init_pos/y", init_y_);
+  controller_nh.getParam("init_pos/z", init_z_);
+
   controlState_ = UPRIGHT;
 
   //  Pinocchio interface
-  pinocchioInterface_.init(controller_nh);
+  ros::NodeHandle pinocchio_nh(controller_nh, "pinocchio");
+  pinocchioInterface_.init(pinocchio_nh);
   // Odom TF
   odom2base_.header.frame_id = "world";
   odom2base_.header.stamp = ros::Time::now();
@@ -157,7 +177,7 @@ void DiabloQzController::starting(const ros::Time &time) {
   currentObservation_.state = mobileManipulatorInterface_->getInitialState();
   ocs2::vector_t initDesiredState(7);
 
-  initDesiredState.head(3) << 0, 0, 0.5;
+  initDesiredState.head(3) << init_x_, init_y_, init_z_;
   initDesiredState.tail(4)
       << Eigen::Quaternion<ocs2::scalar_t>(1, 0, 0, 0).coeffs();
   ocs2::TargetTrajectories targetTrajectories({currentObservation_.time},
