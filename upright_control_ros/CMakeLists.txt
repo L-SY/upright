@@ -178,5 +178,13 @@ install(DIRECTORY launch rviz
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
+install(
+        FILES mobile_manipulator_controller_plugins.xml
+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
+install(
+        FILES diablo_qz_controller_plugins.xml
+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
