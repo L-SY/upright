@@ -4,7 +4,7 @@
 
     <xacro:arg name="robot_type" default="qz_arm"/>
 
-    <xacro:include filename="$(find mm_assets)/description/ddt_mm/urdf/manipulator/qz_arm.xacro"/>
-    <xacro:include filename="$(find mm_assets)/description/ddt_mm/urdf/manipulator/gazebo.xacro"/>
+    <xacro:include filename="$(find upright_asset)/description/urdf/manipulator/qz_arm.xacro"/>
+    <xacro:include filename="$(find upright_asset)/description/urdf/manipulator/gazebo.xacro"/>
 
 </robot>

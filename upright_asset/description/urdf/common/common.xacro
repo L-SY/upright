@@ -2,7 +2,8 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
 
     <!-- Macro for creating links -->
-    <xacro:macro name="create_link" params="name mass ixx ixy ixz iyy iyz izz mesh_file material_name">
+    <xacro:macro name="create_link"
+                 params="name mass ixx ixy ixz iyy iyz izz mesh_file material_name scale='1 1 1' origin_xyz='0 0 0' origin_rpy='0 0 0' ">
         <link name="${name}">
             <inertial>
                 <origin xyz="0 0 0" rpy="0 0 0"/>
@@ -10,30 +11,31 @@
                 <inertia ixx="${ixx}" ixy="${ixy}" ixz="${ixz}" iyy="${iyy}" iyz="${iyz}" izz="${izz}"/>
             </inertial>
             <visual>
-                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <origin xyz="${origin_xyz}" rpy="${origin_rpy}"/>
                 <geometry>
-                    <mesh filename="${mesh_file}"/>
+                    <mesh filename="${mesh_file}" scale="${scale}"/>
                 </geometry>
                 <material name="${material_name}"/>
             </visual>
             <collision>
-                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <origin xyz="${origin_xyz}" rpy="${origin_rpy}"/>
                 <geometry>
-                    <mesh filename="${mesh_file}"/>
+                    <mesh filename="${mesh_file}" scale="${scale}"/>
                 </geometry>
             </collision>
         </link>
     </xacro:macro>
 
     <!-- Macro for creating joints with optional limits -->
-    <xacro:macro name="create_joint" params="name type parent child origin_xyz origin_rpy axis_xyz lower='0' upper='0' effort='0' velocity='0'">
+    <xacro:macro name="create_joint"
+                 params="name type parent child origin_xyz origin_rpy axis_xyz='0 0 1' lower='0' upper='0' effort='0' velocity='0'">
         <joint name="${name}" type="${type}">
             <origin xyz="${origin_xyz}" rpy="${origin_rpy}"/>
             <parent link="${parent}"/>
             <child link="${child}"/>
-            <axis xyz="${axis_xyz}"/>
             <!-- Conditionally add limits for revolute joints -->
             <xacro:if value="${type == 'revolute'}">
+                <axis xyz="${axis_xyz}"/>
                 <limit lower="${lower}" upper="${upper}" effort="${effort}" velocity="${velocity}"/>
             </xacro:if>
         </joint>
