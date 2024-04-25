@@ -18,7 +18,7 @@ bool UprightHW::init(ros::NodeHandle& root_nh, ros::NodeHandle& robot_hw_nh)
   }
   setupJoints();
   setupTopic(robot_hw_nh);
-  ROS_INFO_STREAM("HW Init Finish!");
+  ROS_INFO_STREAM("upright hw Init Finish!");
   return true;
 }
 
@@ -81,15 +81,12 @@ bool UprightHW::setupJoints()
     jointStateInterface_.registerHandle(state_handle);
     hardware_interface::JointHandle joint_handle(state_handle, &joint.velDes_);
     velocityJointInterface_.registerHandle(joint_handle);
-    velocity_joint_handles_.push_back(effortJointInterface_.getHandle(joint.name_));
+    velocity_joint_handles_.push_back(velocityJointInterface_.getHandle(joint.name_));
   }
 
   // Six hybrid-joint for qz arm
   for (int i = 0; i < 6; ++i)
-  {
-    qzMotorData[i].name_ = "joint" + std::to_string(i);
-    ROS_INFO_STREAM(qzMotorData[i].name_);
-  }
+    qzMotorData[i].name_ = "joint" + std::to_string(i + 1);
   for (auto& joint : qzMotorData)
   {
     hardware_interface::JointStateHandle state_handle(joint.name_, &joint.pos_, &joint.vel_, &joint.tau_);

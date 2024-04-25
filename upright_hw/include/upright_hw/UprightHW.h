@@ -72,11 +72,12 @@ public:
 
   void diabloOdomCallBack(const std_msgs::Float64MultiArrayConstPtr& data)
   {
-    // TODO ： Make it right
+    //    the msg is build by [ x, y, z, roll, pitch, yaw, vx, vy, vz, v_roll, v_pitch, v_yaw]
     diabloMotorData[0].pos_ = data.get()->data[0];
-    diabloMotorData[0].vel_ = data.get()->data[0];
+    diabloMotorData[0].vel_ = data.get()->data[6];
     diabloMotorData[1].pos_ = data.get()->data[1];
-    diabloMotorData[1].vel_ = data.get()->data[1];
+    diabloMotorData[2].pos_ = data.get()->data[5];
+    diabloMotorData[2].vel_ = data.get()->data[11];
   }
 
 private:
