@@ -7,11 +7,4 @@
         </description>
     </class>
 
-    <class name="ddt/DiabloQzController" type="ddt::DiabloQzController"
-           base_class_type="controller_interface::ControllerBase">
-        <description>
-            The diablo-qz controller use ocs2 to realize mpc.
-        </description>
-    </class>
-
 </library>
