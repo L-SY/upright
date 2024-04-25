@@ -128,21 +128,45 @@ void DiabloRobot::read()
     rightWheelJoint_.velocity = { vehicle_->telemetry->motors.right_wheel.vel };
     rightWheelJoint_.effort = { vehicle_->telemetry->motors.right_wheel.iq };
     vehicle_->telemetry->eraseNewcomeFlag(0xFE);
+
+    if (!is_init_)
+    {
+      init_odom_x_ = vehicle_->telemetry->motors.right_wheel.pos / 10.0;  // for compensation the init x
+      is_init_ = true;
+    }
+
+    //    the msg is build by [ x, y, z, roll, pitch, yaw, vx, vy, vz, v_roll, v_pitch, v_yaw]
+    std_msgs::Float64MultiArray diablo_odom_data;
+    double yaw = vehicle_->telemetry->motors.left_wheel.pos / 10;
+    double v_x = (vehicle_->telemetry->motors.left_wheel.vel) + (vehicle_->telemetry->motors.right_wheel.vel) / 2;
+    const auto currentTime = Clock::now();
+    Duration time_span = std::chrono::duration_cast<Duration>(currentTime - lastTime_);
+    double time = ros::Duration(time_span.count()).toSec();
+    odom_y_ += sin(yaw) * v_x * time;
+    diablo_odom_data.data.push_back(vehicle_->telemetry->motors.right_wheel.pos / 10.0 - init_odom_x_);  // x
+    // for the loopHz is almost be follow and (1/ loopHz_) is small
+    diablo_odom_data.data.push_back(odom_y_);                                                  // y
+    diablo_odom_data.data.push_back(vehicle_->telemetry->motors.left_knee.pos / 10.0 - 0.05);  // z
+    diablo_odom_data.data.push_back(0.);                                                       // roll
+    diablo_odom_data.data.push_back(0.);                                                       // pitch
+    diablo_odom_data.data.push_back(yaw);                                                      // yaw
+    diablo_odom_data.data.push_back(v_x);                                                      // v_x
+    diablo_odom_data.data.push_back(0.);                                                       // v_y
+    diablo_odom_data.data.push_back(0.);                                                       // v_z
+    diablo_odom_data.data.push_back(0.);                                                       // v_roll
+    diablo_odom_data.data.push_back(0.);                                                       // v_pitch
+    // 0.49 is the distance of two wheels
+    diablo_odom_data.data.push_back((vehicle_->telemetry->motors.left_wheel.vel) -
+                                    (vehicle_->telemetry->motors.right_wheel.vel) / 0.49);  // v_yaw
+    //  double x = (vehicle_->telemetry->quaternion.x);
+    //  double y = (vehicle_->telemetry->quaternion.y);
+    //  double z = (vehicle_->telemetry->quaternion.z);
+    //  double w = (vehicle_->telemetry->quaternion.w);
+    //  double yaw = std::atan2(2 * (x * y + w * z), w * w + x * x - y * y - z * z);
+    //  diablo_odom_data.data.push_back(yaw);
+    odomPub_.publish(diablo_odom_data);
   }
   pubDiabloInfo();
-  if (!is_init_)
-    init_odom_x_ = vehicle_->telemetry->motors.right_knee.pos / 10.0;  // for compensation the init x
-  std_msgs::Float64MultiArray diablo_world_data;
-  diablo_world_data.data.push_back(vehicle_->telemetry->motors.right_knee.pos / 10.0 - init_odom_x_);  // x
-  diablo_world_data.data.push_back(0.);                                                                // y
-  diablo_world_data.data.push_back(vehicle_->telemetry->motors.left_knee.pos / 10.0 - 0.05);           // z
-
-  diablo_world_data.data.push_back(vehicle_->telemetry->quaternion.x);
-  diablo_world_data.data.push_back(vehicle_->telemetry->quaternion.y);
-  diablo_world_data.data.push_back(vehicle_->telemetry->quaternion.z);
-  diablo_world_data.data.push_back(vehicle_->telemetry->quaternion.w);
-
-  odomPub_.publish(diablo_world_data);
 }
 
 void DiabloRobot::write()

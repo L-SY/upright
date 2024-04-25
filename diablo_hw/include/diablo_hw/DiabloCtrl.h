@@ -82,7 +82,7 @@ private:
 
   // Timing
   bool is_init_ = false;
-  double cycleTimeErrorThreshold_{}, loopHz_{}, init_odom_x_;
+  double cycleTimeErrorThreshold_{}, loopHz_{}, init_odom_x_, odom_y_ = 0;
   std::thread loopThread_;
   std::atomic_bool loopRunning_{};
   ros::Duration elapsedTime_;
