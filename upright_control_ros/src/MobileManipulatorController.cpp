@@ -50,27 +50,6 @@ bool MobileManipulatorController::init(hardware_interface::RobotHW *robot_hw,
   jointHandles_.push_back(effortJointInterface->getHandle("joint4"));
   jointHandles_.push_back(effortJointInterface->getHandle("joint5"));
   jointHandles_.push_back(effortJointInterface->getHandle("joint6"));
-  //  auto *velocityJointInterface =
-  //      robot_hw->get<hardware_interface::VelocityJointInterface>();
-  //  jointHandles_.push_back(
-  //      velocityJointInterface->getHandle("front_left_wheel"));
-  //  jointHandles_.push_back(
-  //      velocityJointInterface->getHandle("front_right_wheel"));
-  //  jointHandles_.push_back(velocityJointInterface->getHandle("rear_left_wheel"));
-  //  jointHandles_.push_back(
-  //      velocityJointInterface->getHandle("rear_right_wheel"));
-  //  jointHandles_.push_back(
-  //      velocityJointInterface->getHandle("ur_arm_shoulder_pan_joint"));
-  //  jointHandles_.push_back(
-  //      velocityJointInterface->getHandle("ur_arm_shoulder_lift_joint"));
-  //  jointHandles_.push_back(
-  //      velocityJointInterface->getHandle("ur_arm_elbow_joint"));
-  //  jointHandles_.push_back(
-  //      velocityJointInterface->getHandle("ur_arm_wrist_1_joint"));
-  //  jointHandles_.push_back(
-  //      velocityJointInterface->getHandle("ur_arm_wrist_2_joint"));
-  //  jointHandles_.push_back(
-  //      velocityJointInterface->getHandle("ur_arm_wrist_3_joint"));
   controlState_ = UPRIGHT;
 
   // Odom TF
