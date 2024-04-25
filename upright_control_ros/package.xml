@@ -3,7 +3,7 @@
     <name>upright_control_ros</name>
     <version>0.0.0</version>
     <description>The upright_control_ros package</description>
-    <maintainer email="lsy@todo.todo">yuchen</maintainer>
+    <maintainer email="lsy@todo.todo">4yang</maintainer>
     <license>TODO</license>
 
     <buildtool_depend>catkin</buildtool_depend>
@@ -26,5 +26,6 @@
 
     <export>
         <controller_interface plugin="${prefix}/mobile_manipulator_controller_plugins.xml"/>
+        <controller_interface plugin="${prefix}/diablo_qz_controller_plugins.xml"/>
     </export>
 </package>
