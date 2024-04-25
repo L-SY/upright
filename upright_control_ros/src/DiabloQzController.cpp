@@ -44,7 +44,6 @@ bool DiabloQzController::init(hardware_interface::RobotHW *robot_hw,
   for (const auto &joint_name : qzJointNames) {
     hybridJointHandles_.push_back(hybridJointInterface->getHandle(joint_name));
   }
-
   auto *velocityJointInterface =
       robot_hw->get<hardware_interface::VelocityJointInterface>();
   velocityJointHandles_.push_back(velocityJointInterface->getHandle("diabloX"));
@@ -306,8 +305,11 @@ void DiabloQzController::upright(const ros::Time &time,
   for (int i = 0; i < 6; ++i) {
     hybridJointHandles_[i].setPositionDesired(optimizedState(3 + i));
     hybridJointHandles_[i].setVelocityDesired(optimizedState(11 + i));
-    hybridJointHandles_[i].setFeedforward(
-        pinocchioInterface_.tau_without_a_[i]);
+    if (i != 0) {
+      hybridJointHandles_[i].setFeedforward(
+          pinocchioInterface_.tau_without_a_[i]);
+    } else
+      hybridJointHandles_[i].setFeedforward(0);
   }
   lastOptimizedState = optimizedState;
 }

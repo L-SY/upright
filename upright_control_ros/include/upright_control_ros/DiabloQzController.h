@@ -8,10 +8,6 @@
 #include "definitions.h"
 #include "pinocchio_interface/pinocchio_interface.h"
 #include <controller_interface/multi_interface_controller.h>
-#include <effort_controllers/joint_effort_controller.h>
-#include <effort_controllers/joint_position_controller.h>
-#include <effort_controllers/joint_velocity_controller.h>
-#include <hardware_interface/imu_sensor_interface.h>
 #include <hardware_interface/joint_command_interface.h>
 
 #include "generally_hw/hardware_interface/HybridJointInterface.h"
@@ -31,7 +27,8 @@
 namespace ddt {
 class DiabloQzController
     : public controller_interface::MultiInterfaceController<
-          hardware_interface::EffortJointInterface> {
+          hardware_interface::HybridJointInterface,
+          hardware_interface::VelocityJointInterface> {
   enum ControllerState {
     NORMAL,  // Only try to achieve EE to reach a specified point in space
     UPRIGHT, // On the basis of normal, increase the importance of keeping the
