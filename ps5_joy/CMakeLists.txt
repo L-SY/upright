@@ -16,6 +16,7 @@ find_package(catkin REQUIRED
 
 catkin_package(
         INCLUDE_DIRS
+        include
         CATKIN_DEPENDS
         roscpp
         DEPENDS
@@ -24,6 +25,7 @@ catkin_package(
 )
 
 include_directories(
+        include
         ${catkin_INCLUDE_DIRS}
 )
 
