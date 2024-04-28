@@ -52,7 +52,7 @@ add_executable(testPS5 test/testPS5Joy.cpp)
 
 target_link_libraries(testPS5 ${catkin_LIBRARIES})
 
-add_executable(test_rm src/demo.cpp)
+add_executable(test_rm test/demo.cpp)
 
 target_link_libraries(test_rm ${catkin_LIBRARIES} rm_hw)
 
