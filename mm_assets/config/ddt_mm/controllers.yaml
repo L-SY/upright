@@ -1,7 +1,0 @@
-controllers:
-  joint_state_controller:
-    type: joint_state_controller/JointStateController
-    publish_rate: 100
-
-  mobile_manipulator_controller:
-    type: ddt/MobileManipulatorController

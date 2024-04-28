@@ -9,7 +9,6 @@
 #include <std_msgs/Float64MultiArray.h>
 #include <sensor_msgs/JointState.h>
 #include <geometry_msgs/Twist.h>
-#include <qz_hw/hybrid_force.h>
 
 namespace generally
 {
@@ -20,11 +19,11 @@ struct DiabloMotorData
   double velDes_;           // command
 };
 
-struct QzMotorData
+struct RMMotorData
 {
   std::string name_;
   double pos_, vel_, tau_;  // state
-  double posDes_, velDes_, kp_, kd_, ff_;
+  double posDes_;
 };
 
 class UprightHW : public GenerallyHW
@@ -58,14 +57,14 @@ public:
    */
   void write(const ros::Time& time, const ros::Duration& period) override;
 
-  void qzHWCallBack(const sensor_msgs::JointStateConstPtr& data)
+  void rmHWCallBack(const sensor_msgs::JointStateConstPtr& data)
   {
     int i = 0;
-    for (auto& qzJoint : hybrid_joint_handles_)
+    for (auto& RMJoint : position_joint_handles_)
     {
-      qzMotorData[i].pos_ = data->position[i];
-      qzMotorData[i].vel_ = data->velocity[i];
-      qzMotorData[i].tau_ = data->effort[i];
+      rmMotorData[i].pos_ = data->position[i];
+      rmMotorData[i].vel_ = data->velocity[i];
+      rmMotorData[i].tau_ = data->effort[i];
       i++;
     }
   }
@@ -84,12 +83,12 @@ private:
   bool setupJoints(), is_writing_ = false, is_reading_ = false, recv_one_ = false;
 
   bool setupTopic(ros::NodeHandle& nh);
-  std::vector<double> qzJointPos_, qzJointVel_, qzJointEff_;
+  std::vector<double> rmJointPos_, rmJointVel_, rmJointEff_;
   const int jointNum = 8;
   DiabloMotorData diabloMotorData[3]{};
-  QzMotorData qzMotorData[6]{};  // NOLINT(modernize-avoid-c-arrays)
-  ros::Subscriber qzJointSub_, diabloOdomSub_;
-  ros::Publisher qzMotorPub_, diabloMotorPub_;
+  RMMotorData rmMotorData[6]{};  // NOLINT(modernize-avoid-c-arrays)
+  ros::Subscriber rmJointSub_, diabloOdomSub_;
+  ros::Publisher rmMotorPub_, diabloMotorPub_;
   std::vector<std::string> robotMotorName_;
 };
 

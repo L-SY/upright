@@ -2,9 +2,8 @@
 
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="robot">
 
-    <xacro:arg name="robot_type" default="qz_arm"/>
+    <xacro:arg name="robot_type" default="rm_a65"/>
 
-    <xacro:include filename="$(find upright_asset)/description/urdf/manipulator/qz_arm.xacro"/>
-    <xacro:include filename="$(find upright_asset)/description/urdf/manipulator/gazebo.xacro"/>
+    <xacro:include filename="$(find upright_asset)/description/urdf/manipulator/rm_65.urdf.xacro"/>
 
 </robot>

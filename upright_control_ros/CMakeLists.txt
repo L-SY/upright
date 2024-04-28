@@ -12,7 +12,6 @@ set(CATKIN_PACKAGE_DEPENDENCIES
         effort_controllers
         pluginlib
 
-        qz_hw
         generally_hw
         upright_common
         upright_control
@@ -84,22 +83,6 @@ target_link_libraries(mobile_manipulator_controller
         ${catkin_LIBRARIES}
 )
 target_compile_options(mobile_manipulator_controller PUBLIC ${OCS2_CXX_FLAGS})
-
-
-add_library(diablo_qz_controller
-        src/DiabloQzController.cpp
-)
-add_dependencies(diablo_qz_controller
-        ${PROJECT_NAME}
-        ${catkin_EXPORTED_TARGETS}
-)
-target_link_libraries(diablo_qz_controller
-        ${PROJECT_NAME}
-        ${catkin_LIBRARIES}
-        pinocchio::pinocchio
-)
-target_compile_options(diablo_qz_controller PUBLIC ${OCS2_CXX_FLAGS})
-
 
 # Mobile manipulator target node
 add_executable(ddt_mobile_manipulator_target
@@ -180,10 +163,6 @@ install(DIRECTORY launch rviz
 
 install(
         FILES mobile_manipulator_controller_plugins.xml
-        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-)
-install(
-        FILES diablo_qz_controller_plugins.xml
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 set(CMAKE_CXX_STANDARD 14)

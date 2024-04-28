@@ -15,9 +15,9 @@ int main() {
   const std::string taskFile = ros::package::getPath("upright_control") +
                                "/test/config/test_config.info";
   const std::string libFolder =
-      ros::package::getPath("mm_assets") + "/auto_generated";
+      ros::package::getPath("upright_asset") + "/auto_generated";
   const std::string urdfFile =
-      ros::package::getPath("mm_assets") +
+      ros::package::getPath("upright_asset") +
       "/description/ocs2_mobile_manipulator/urdf/ridgeback_ur5.urdf";
   settings = upright::creatControllerSetting(taskFile, libFolder, urdfFile);
   ROS_INFO_STREAM("GET FINISH");

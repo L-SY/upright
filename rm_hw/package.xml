@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package format="2">
+    <name>rm_hw</name>
+    <version>0.0.0</version>
+    <description>The rm_hw package</description>
+
+    <maintainer email="liusiyang.cn@gmail.com">Siyang Liu</maintainer>
+
+    <license>BSD</license>
+    <author email="liusiyang.cn@gmail.com">Siyang Liu</author>
+
+    <buildtool_depend>catkin</buildtool_depend>
+    <depend>roscpp</depend>
+    <depend>ps5_joy</depend>
+    <depend>geometry_msgs</depend>
+    <depend>rm_msgs</depend>
+    <depend>tf2</depend>
+    <depend>tf2_geometry_msgs</depend>
+    <depend>tf2_ros</depend>
+    <!-- The export tag contains other, unspecified, tags -->
+    <export>
+        <!-- Other tools can request additional information be placed here -->
+
+    </export>
+</package>

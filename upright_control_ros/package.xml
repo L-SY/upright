@@ -20,12 +20,10 @@
     <depend>effort_controllers</depend>
     <depend>pluginlib</depend>
     <depend>upright_common</depend>
-    <depend>qz_hw</depend>
     <depend>generally_hw</depend>
     <depend>upright_control</depend>
 
     <export>
         <controller_interface plugin="${prefix}/mobile_manipulator_controller_plugins.xml"/>
-        <controller_interface plugin="${prefix}/diablo_qz_controller_plugins.xml"/>
     </export>
 </package>

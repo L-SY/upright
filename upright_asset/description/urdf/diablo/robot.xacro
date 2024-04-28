@@ -4,8 +4,8 @@
 
     <xacro:arg name="robot_type" default="diablo"/>
 
-    <xacro:include filename="$(find mm_assets)/description/ddt_mm/urdf/diablo/diablo.xacro"/>
-    <xacro:include filename="$(find mm_assets)/description/ddt_mm/urdf/diablo/gazebo.xacro"/>
-    <!--    <xacro:include filename="$(find mm_assets)/description/urdf/diablo/imu.xacro"/>-->
+    <xacro:include filename="$(find upright_asset)/description/urdf/diablo/diablo.xacro"/>
+    <xacro:include filename="$(find upright_asset)/description/urdf/diablo/gazebo.xacro"/>
+    <!--    <xacro:include filename="$(find upright_asset)/description/urdf/diablo/imu.xacro"/>-->
 
 </robot>

@@ -43,27 +43,11 @@ void UprightHW::write(const ros::Time& /*time*/, const ros::Duration& /*period*/
     command.data[i] = joint.getCommand();
     i++;
   }
-  qz_hw::hybrid_force qzCmdMsg;
-  qzCmdMsg.header.stamp = ros::Time::now();
-  int j = 0;
-  for (auto& qzJoint : hybrid_joint_handles_)
-  {
-    qzCmdMsg.joint_names.push_back(hybrid_joint_handles_[i].getName());
-    qzCmdMsg.effort.push_back(hybrid_joint_handles_[i].getFeedforward());
-    qzCmdMsg.positions.push_back(hybrid_joint_handles_[i].getPositionDesired());
-    qzCmdMsg.velocities.push_back(hybrid_joint_handles_[i].getVelocityDesired());
-    qzCmdMsg.kds.push_back(hybrid_joint_handles_[i].getKd());
-    qzCmdMsg.kps.push_back(hybrid_joint_handles_[i].getKp());
-    j++;
-  }
-  qzMotorPub_.publish(qzCmdMsg);
   is_writing_ = false;
 }
 
 bool UprightHW::setupTopic(ros::NodeHandle& nh)
 {
-  qzMotorPub_ = nh.advertise<qz_hw::hybrid_force>("/airbot_play/joint_command", 1);
-  qzJointSub_ = nh.subscribe<sensor_msgs::JointState>("/airbot_play/joint_states", 1, &UprightHW::qzHWCallBack, this);
   diabloMotorPub_ = nh.advertise<geometry_msgs::Twist>("/diablo", 1);
   diabloOdomSub_ = nh.subscribe<std_msgs::Float64MultiArray>("/diablo_odom", 1, &UprightHW::diabloOdomCallBack, this);
   return true;
@@ -84,16 +68,15 @@ bool UprightHW::setupJoints()
     velocity_joint_handles_.push_back(velocityJointInterface_.getHandle(joint.name_));
   }
 
-  // Six hybrid-joint for qz arm
+  // Six hybrid-joint for rm arm
   for (int i = 0; i < 6; ++i)
-    qzMotorData[i].name_ = "joint" + std::to_string(i + 1);
-  for (auto& joint : qzMotorData)
+    rmMotorData[i].name_ = "joint" + std::to_string(i + 1);
+  for (auto& joint : rmMotorData)
   {
     hardware_interface::JointStateHandle state_handle(joint.name_, &joint.pos_, &joint.vel_, &joint.tau_);
     jointStateInterface_.registerHandle(state_handle);
-    hybridJointInterface_.registerHandle(hardware_interface::HybridJointHandle(
-        state_handle, &joint.posDes_, &joint.velDes_, &joint.kp_, &joint.kd_, &joint.ff_));
-    hybrid_joint_handles_.push_back(hybridJointInterface_.getHandle(joint.name_));
+    positionJointInterface_.registerHandle(hardware_interface::JointHandle(state_handle, &joint.posDes_));
+    position_joint_handles_.push_back(positionJointInterface_.getHandle(joint.name_));
   }
 
   return true;

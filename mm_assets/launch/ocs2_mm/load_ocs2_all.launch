@@ -1,5 +1,0 @@
-<launch>
-    <include file="$(find mm_assets)/launch/ocs2_mm/load_ocs2_hw.launch"/>
-    <include file="load_ocs2_controller.launch"/>
-    <include file="$(find mm_assets)/launch/rviz_target.launch"/>
-</launch>

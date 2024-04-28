@@ -1,12 +1,12 @@
 <launch>
     <param name="robot_description"
-           command="$(find xacro)/xacro $(find mm_assets)/description/urdf/manipulator/robot.xacro"/>
+           command="$(find xacro)/xacro $(find upright_asset)/description/urdf/manipulator/robot.xacro"/>
 
     <param name="manipulator_description"
-           command="$(find xacro)/xacro $(find mm_assets)/description/urdf/manipulator/robot.xacro"/>
+           command="$(find xacro)/xacro $(find upright_asset)/description/urdf/manipulator/robot.xacro"/>
 
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
-        <arg name="world_name" value="$(find mm_assets)/worlds/empty_world.world"/>
+        <arg name="world_name" value="$(find upright_asset)/worlds/empty_world.world"/>
         <arg name="paused" value="true"/>
     </include>
     <!-- push robot_description to factory and spawn robot in gazebo -->

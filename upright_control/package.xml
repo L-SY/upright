@@ -31,5 +31,5 @@
     <depend>pinocchio</depend>
     <depend>roscpp</depend>
     <depend>upright_core</depend>
-    <depend>mm_assets</depend>
+    <depend>upright_asset</depend>
 </package>

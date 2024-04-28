@@ -2,10 +2,10 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="qm">
 
     <xacro:arg name="robot_type" default="ddt"/>
-    <xacro:include filename="$(find mm_assets)/description/ddt_mm/urdf/diablo/robot.xacro"/>
+    <xacro:include filename="$(find upright_asset)/description/urdf/diablo/robot.xacro"/>
 
     <!-- manipulatior -->
-    <xacro:include filename="$(find mm_assets)/description/ddt_mm/urdf/manipulator/robot.xacro"/>
+    <xacro:include filename="$(find upright_asset)/description/urdf/manipulator/robot.xacro"/>
 
     <joint name="manipulator_joint" type="fixed">
         <parent link="diablo_base_link"/>
@@ -29,7 +29,7 @@
     <!--    <gazebo>-->
     <!--        <plugin name="gazebo_ros_control" filename="libqm_hw_sim.so">-->
     <!--            <robotNamespace>/</robotNamespace>-->
-    <!--            <robotParam>mm_assets</robotParam>-->
+    <!--            <robotParam>upright_asset</robotParam>-->
     <!--            <robotSimType>qm_gazebo/QMHWSim</robotSimType>-->
     <!--        </plugin>-->
     <!--    </gazebo>-->

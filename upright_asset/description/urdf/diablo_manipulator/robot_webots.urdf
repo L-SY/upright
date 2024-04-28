@@ -40,14 +40,14 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mm_assets/description/ddt_mm/meshes/diablo/base_link.STL"/>
+        <mesh filename="package://upright_asset/description/meshes/diablo/base_link.STL"/>
       </geometry>
       <material name="grey"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mm_assets/description/ddt_mm/meshes/diablo/base_link.STL"/>
+        <mesh filename="package://upright_asset/description/meshes/diablo/base_link.STL"/>
       </geometry>
     </collision>
   </link>
@@ -60,14 +60,14 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mm_assets/description/ddt_mm/meshes/diablo/left_motor.STL"/>
+        <mesh filename="package://upright_asset/description/meshes/diablo/left_motor.STL"/>
       </geometry>
       <material name="silver"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mm_assets/description/ddt_mm/meshes/diablo/left_motor.STL"/>
+        <mesh filename="package://upright_asset/description/meshes/diablo/left_motor.STL"/>
       </geometry>
     </collision>
   </link>
@@ -80,14 +80,14 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mm_assets/description/ddt_mm/meshes/diablo/left_leg1.STL"/>
+        <mesh filename="package://upright_asset/description/meshes/diablo/left_leg1.STL"/>
       </geometry>
       <material name="silver"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mm_assets/description/ddt_mm/meshes/diablo/left_leg1.STL"/>
+        <mesh filename="package://upright_asset/description/meshes/diablo/left_leg1.STL"/>
       </geometry>
     </collision>
   </link>
@@ -100,14 +100,14 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mm_assets/description/ddt_mm/meshes/diablo/left_leg2.STL"/>
+        <mesh filename="package://upright_asset/description/meshes/diablo/left_leg2.STL"/>
       </geometry>
       <material name="silver"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mm_assets/description/ddt_mm/meshes/diablo/left_leg2.STL"/>
+        <mesh filename="package://upright_asset/description/meshes/diablo/left_leg2.STL"/>
       </geometry>
     </collision>
   </link>
@@ -120,14 +120,14 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mm_assets/description/ddt_mm/meshes/diablo/left_wheel.STL"/>
+        <mesh filename="package://upright_asset/description/meshes/diablo/left_wheel.STL"/>
       </geometry>
       <material name="black"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mm_assets/description/ddt_mm/meshes/diablo/left_wheel.STL"/>
+        <mesh filename="package://upright_asset/description/meshes/diablo/left_wheel.STL"/>
       </geometry>
     </collision>
   </link>
@@ -140,14 +140,14 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mm_assets/description/ddt_mm/meshes/diablo/left_leg3.STL"/>
+        <mesh filename="package://upright_asset/description/meshes/diablo/left_leg3.STL"/>
       </geometry>
       <material name="brown"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mm_assets/description/ddt_mm/meshes/diablo/left_leg3.STL"/>
+        <mesh filename="package://upright_asset/description/meshes/diablo/left_leg3.STL"/>
       </geometry>
     </collision>
   </link>
@@ -160,14 +160,14 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mm_assets/description/ddt_mm/meshes/diablo/right_motor.STL"/>
+        <mesh filename="package://upright_asset/description/meshes/diablo/right_motor.STL"/>
       </geometry>
       <material name="silver"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mm_assets/description/ddt_mm/meshes/diablo/right_motor.STL"/>
+        <mesh filename="package://upright_asset/description/meshes/diablo/right_motor.STL"/>
       </geometry>
     </collision>
   </link>
@@ -180,14 +180,14 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mm_assets/description/ddt_mm/meshes/diablo/right_leg1.STL"/>
+        <mesh filename="package://upright_asset/description/meshes/diablo/right_leg1.STL"/>
       </geometry>
       <material name="silver"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mm_assets/description/ddt_mm/meshes/diablo/right_leg1.STL"/>
+        <mesh filename="package://upright_asset/description/meshes/diablo/right_leg1.STL"/>
       </geometry>
     </collision>
   </link>
@@ -200,14 +200,14 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mm_assets/description/ddt_mm/meshes/diablo/right_leg2.STL"/>
+        <mesh filename="package://upright_asset/description/meshes/diablo/right_leg2.STL"/>
       </geometry>
       <material name="silver"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mm_assets/description/ddt_mm/meshes/diablo/right_leg2.STL"/>
+        <mesh filename="package://upright_asset/description/meshes/diablo/right_leg2.STL"/>
       </geometry>
     </collision>
   </link>
@@ -220,14 +220,14 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mm_assets/description/ddt_mm/meshes/diablo/right_wheel.STL"/>
+        <mesh filename="package://upright_asset/description/meshes/diablo/right_wheel.STL"/>
       </geometry>
       <material name="black"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mm_assets/description/ddt_mm/meshes/diablo/right_wheel.STL"/>
+        <mesh filename="package://upright_asset/description/meshes/diablo/right_wheel.STL"/>
       </geometry>
     </collision>
   </link>
@@ -240,14 +240,14 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mm_assets/description/ddt_mm/meshes/diablo/right_leg3.STL"/>
+        <mesh filename="package://upright_asset/description/meshes/diablo/right_leg3.STL"/>
       </geometry>
       <material name="brown"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mm_assets/description/ddt_mm/meshes/diablo/right_leg3.STL"/>
+        <mesh filename="package://upright_asset/description/meshes/diablo/right_leg3.STL"/>
       </geometry>
     </collision>
   </link>
@@ -316,7 +316,7 @@
       <rpyOffsets>0 0 0</rpyOffsets>
     </plugin>
   </gazebo>
-  <!--    <xacro:include filename="$(find mm_assets)/description/urdf/diablo/imu.xacro"/>-->
+  <!--    <xacro:include filename="$(find upright_asset)/description/urdf/diablo/imu.xacro"/>-->
   <link name="arm_base_link">
     <inertial>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -326,14 +326,14 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mm_assets/description/ddt_mm/meshes/manipulator/base_link.STL"/>
+        <mesh filename="package://upright_asset/description/meshes/manipulator/base_link.STL"/>
       </geometry>
       <material name="grey"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mm_assets/description/ddt_mm/meshes/manipulator/base_link.STL"/>
+        <mesh filename="package://upright_asset/description/meshes/manipulator/base_link.STL"/>
       </geometry>
     </collision>
   </link>
@@ -346,14 +346,14 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mm_assets/description/ddt_mm/meshes/manipulator/link1.STL"/>
+        <mesh filename="package://upright_asset/description/meshes/manipulator/link1.STL"/>
       </geometry>
       <material name="grey"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mm_assets/description/ddt_mm/meshes/manipulator/link1.STL"/>
+        <mesh filename="package://upright_asset/description/meshes/manipulator/link1.STL"/>
       </geometry>
     </collision>
   </link>
@@ -366,14 +366,14 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mm_assets/description/ddt_mm/meshes/manipulator/link2.STL"/>
+        <mesh filename="package://upright_asset/description/meshes/manipulator/link2.STL"/>
       </geometry>
       <material name="grey"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mm_assets/description/ddt_mm/meshes/manipulator/link2.STL"/>
+        <mesh filename="package://upright_asset/description/meshes/manipulator/link2.STL"/>
       </geometry>
     </collision>
   </link>
@@ -386,14 +386,14 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mm_assets/description/ddt_mm/meshes/manipulator/link3.STL"/>
+        <mesh filename="package://upright_asset/description/meshes/manipulator/link3.STL"/>
       </geometry>
       <material name="grey"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mm_assets/description/ddt_mm/meshes/manipulator/link3.STL"/>
+        <mesh filename="package://upright_asset/description/meshes/manipulator/link3.STL"/>
       </geometry>
     </collision>
   </link>
@@ -406,14 +406,14 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mm_assets/description/ddt_mm/meshes/manipulator/link4.STL"/>
+        <mesh filename="package://upright_asset/description/meshes/manipulator/link4.STL"/>
       </geometry>
       <material name="grey"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mm_assets/description/ddt_mm/meshes/manipulator/link4.STL"/>
+        <mesh filename="package://upright_asset/description/meshes/manipulator/link4.STL"/>
       </geometry>
     </collision>
   </link>
@@ -426,14 +426,14 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mm_assets/description/ddt_mm/meshes/manipulator/link5.STL"/>
+        <mesh filename="package://upright_asset/description/meshes/manipulator/link5.STL"/>
       </geometry>
       <material name="grey"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mm_assets/description/ddt_mm/meshes/manipulator/link5.STL"/>
+        <mesh filename="package://upright_asset/description/meshes/manipulator/link5.STL"/>
       </geometry>
     </collision>
   </link>
@@ -446,14 +446,14 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mm_assets/description/ddt_mm/meshes/manipulator/link6.STL"/>
+        <mesh filename="package://upright_asset/description/meshes/manipulator/link6.STL"/>
       </geometry>
       <material name="grey"/>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://mm_assets/description/ddt_mm/meshes/manipulator/link6.STL"/>
+        <mesh filename="package://upright_asset/description/meshes/manipulator/link6.STL"/>
       </geometry>
     </collision>
   </link>

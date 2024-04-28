@@ -1,6 +1,6 @@
 <launch>
     <param name="robot_description"
-           command="$(find xacro)/xacro $(find mm_assets)/description/urdf/diablo/diablo.xacro"/>
+           command="$(find xacro)/xacro $(find upright_asset)/description/urdf/diablo/diablo.xacro"/>
 
     <!-- send fake joint values -->
     <node pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" name="joint_state_publisher_gui">
@@ -12,6 +12,6 @@
     </node>
 
     <!-- view -->
-    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find mm_assets)/rviz/diablo_view.rviz" required="true"/>
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find upright_asset)/rviz/diablo_view.rviz" required="true"/>
 
 </launch>

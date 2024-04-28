@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(upright_common)
+project(rm_hw)
 
 ## Use C++14
 set(CMAKE_CXX_STANDARD 14)
@@ -9,50 +9,52 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 ## enforcing cleaner code.
 add_definitions(-Wall -Werror -Wno-enum-compare)
 
-find_package(Eigen3 REQUIRED)
-
 find_package(catkin REQUIRED
         COMPONENTS
         roscpp
-        tf
         geometry_msgs
-        control_msgs
-        controller_manager_msgs
-        dynamic_reconfigure
-        imu_complementary_filter
-        imu_filter_madgwick
-        realtime_tools
+        ps5_joy
+        rm_msgs
+        tf2
+        tf2_ros
+        tf2_geometry_msgs
+
 )
 
 catkin_package(
         INCLUDE_DIRS
         include
-        ${EIGEN3_INCLUDE_DIR}
         CATKIN_DEPENDS
-        tf
         geometry_msgs
-        control_msgs
-        controller_manager_msgs
-        imu_complementary_filter
-        imu_filter_madgwick
         roscpp
-        dynamic_reconfigure
+        ps5_joy
+        rm_msgs
+        tf2
+        tf2_ros
+        tf2_geometry_msgs
         DEPENDS
         LIBRARIES
-        upright_common
+        rm_hw
 )
 
 include_directories(
         include
         ${catkin_INCLUDE_DIRS}
-        ${EIGEN3_INCLUDE_DIR}
 )
 
 file(GLOB_RECURSE sources "src/*.cpp")
 
-add_library(upright_common SHARED ${sources})
+add_library(rm_hw SHARED ${sources})
 
-target_link_libraries(upright_common ${catkin_LIBRARIES})
+target_link_libraries(rm_hw ${catkin_LIBRARIES})
+
+add_executable(testPS5 test/testPS5Joy.cpp)
+
+target_link_libraries(testPS5 ${catkin_LIBRARIES})
+
+add_executable(test_rm src/demo.cpp)
+
+target_link_libraries(test_rm ${catkin_LIBRARIES} rm_hw)
 
 #############
 ## Install ##
