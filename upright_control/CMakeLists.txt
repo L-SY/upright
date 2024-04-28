@@ -88,7 +88,7 @@ add_library(${PROJECT_NAME} SHARED
         src/InertialAlignment.cpp
         src/MobileManipulatorInterface.cpp
         src/constraint/BoundedBalancingConstraints.cpp
-        src/constraint/EndEffectorConstraint.cpp
+        #        src/constraint/EndEffectorConstraint.cpp
 )
 add_dependencies(${PROJECT_NAME}
         ${catkin_EXPORTED_TARGETS}
@@ -117,14 +117,6 @@ install(DIRECTORY include/${PROJECT_NAME}/
 #############
 ## Testing ##
 #############
-add_executable(${PROJECT_NAME}_test
-        test/TestConfig.cpp)
-
-add_executable(${PROJECT_NAME}_balance_test
-        test/TestBalanceConfig.cpp)
-
-target_link_libraries(${PROJECT_NAME}_test ${PROJECT_NAME} ${catkin_LIBRARIES})
-target_link_libraries(${PROJECT_NAME}_balance_test ${PROJECT_NAME} ${catkin_LIBRARIES})
 #if (CATKIN_ENABLE_TESTING)
 #    catkin_add_gtest(${PROJECT_NAME}_test
 #            test/TestConfig.cpp

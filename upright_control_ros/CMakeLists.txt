@@ -89,6 +89,7 @@ add_executable(ddt_mobile_manipulator_target
         src/DDTMobileManipulatorTarget.cpp
 )
 add_dependencies(ddt_mobile_manipulator_target
+        ${PROJECT_NAME}
         ${catkin_EXPORTED_TARGETS}
 )
 target_link_libraries(ddt_mobile_manipulator_target

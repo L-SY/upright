@@ -29,7 +29,7 @@
 #include <upright_control/constraint/BoundedBalancingConstraints.h>
 #include <upright_control/constraint/ConstraintType.h>
 #include <upright_control/constraint/EndEffectorBoxConstraint.h>
-#include <upright_control/constraint/EndEffectorConstraint.h>
+// #include <upright_control/constraint/EndEffectorConstraint.h>
 #include <upright_control/constraint/JointStateInputLimits.h>
 #include <upright_control/constraint/ObstacleConstraint.h>
 #include <upright_control/constraint/ProjectilePathConstraint.h>
@@ -57,20 +57,22 @@
 #include <pinocchio/multibody/model.hpp>
 #include <pinocchio/parsers/urdf.hpp>
 
-namespace upright {
+namespace upright
+{
 
 std::tuple<pinocchio::Model, pinocchio::GeometryModel>
-build_dynamic_obstacle_model(const std::vector<DynamicObstacle> &obstacles) {
+build_dynamic_obstacle_model(const std::vector<DynamicObstacle>& obstacles)
+{
   pinocchio::Model model;
   model.name = "dynamic_obstacles";
   pinocchio::GeometryModel geom_model;
 
-  for (const auto &obstacle : obstacles) {
+  for (const auto& obstacle : obstacles)
+  {
     // free-floating joint
     std::string joint_name = obstacle.name + "_joint";
     auto joint_placement = pinocchio::SE3::Identity();
-    auto joint_id = model.addJoint(0, pinocchio::JointModelTranslation(),
-                                   joint_placement, joint_name);
+    auto joint_id = model.addJoint(0, pinocchio::JointModelTranslation(), joint_placement, joint_name);
 
     // body
     ocs2::scalar_t mass = 1.0;
@@ -79,47 +81,42 @@ build_dynamic_obstacle_model(const std::vector<DynamicObstacle> &obstacles) {
     model.appendBodyToJoint(joint_id, inertia, body_placement);
 
     // collision model
-    pinocchio::GeometryObject::CollisionGeometryPtr shape_ptr(
-        new hpp::fcl::Sphere(obstacle.radius));
-    pinocchio::GeometryObject geom_obj(obstacle.name, joint_id, shape_ptr,
-                                       body_placement);
+    pinocchio::GeometryObject::CollisionGeometryPtr shape_ptr(new hpp::fcl::Sphere(obstacle.radius));
+    pinocchio::GeometryObject geom_obj(obstacle.name, joint_id, shape_ptr, body_placement);
     geom_model.addGeometryObject(geom_obj);
   }
 
-  return {model, geom_model};
+  return { model, geom_model };
 }
 
-pinocchio::GeometryModel build_geometry_model(const std::string &urdf_path) {
+pinocchio::GeometryModel build_geometry_model(const std::string& urdf_path)
+{
   ocs2::PinocchioInterface::Model model;
   pinocchio::urdf::buildModel(urdf_path, model);
   pinocchio::GeometryModel geom_model;
-  pinocchio::urdf::buildGeom(model, urdf_path, pinocchio::COLLISION,
-                             geom_model);
+  pinocchio::urdf::buildGeom(model, urdf_path, pinocchio::COLLISION, geom_model);
   return geom_model;
 }
 
-void add_ground_plane(const ocs2::PinocchioInterface::Model &model,
-                      pinocchio::GeometryModel &geom_model) {
+void add_ground_plane(const ocs2::PinocchioInterface::Model& model, pinocchio::GeometryModel& geom_model)
+{
   auto ground_placement = pinocchio::SE3::Identity();
-  pinocchio::GeometryObject::CollisionGeometryPtr ground_shape_ptr(
-      new hpp::fcl::Halfspace(Vec3d::UnitZ(), 0));
-  pinocchio::GeometryObject ground_obj("ground", model.frames[0].parent,
-                                       ground_shape_ptr, ground_placement);
+  pinocchio::GeometryObject::CollisionGeometryPtr ground_shape_ptr(new hpp::fcl::Halfspace(Vec3d::UnitZ(), 0));
+  pinocchio::GeometryObject ground_obj("ground", model.frames[0].parent, ground_shape_ptr, ground_placement);
   geom_model.addGeometryObject(ground_obj);
 }
 
-ControllerInterface::ControllerInterface(const std::string &taskFile,
-                                         const std::string &libraryFolder,
-                                         const std::string &urdfFile) {
+ControllerInterface::ControllerInterface(const std::string& taskFile, const std::string& libraryFolder,
+                                         const std::string& urdfFile)
+{
   settings_ = creatControllerSetting(taskFile, libraryFolder, urdfFile);
   // Pinocchio interface
   std::cerr << "Robot URDF: " << settings_.robot_urdf_path << std::endl;
   pinocchio_interface_ptr.reset(
-      new ocs2::PinocchioInterface(createPinocchioInterface(
-          settings_.robot_urdf_path, settings_.robot_base_type)));
+      new ocs2::PinocchioInterface(createPinocchioInterface(settings_.robot_urdf_path, settings_.robot_base_type)));
 
-  mobileManipulatorInfo_.reset(new MobileManipulatorInfo(
-      createMobileManipulatorInfo(getPinocchioInterface(), settings_)));
+  mobileManipulatorInfo_.reset(
+      new MobileManipulatorInfo(createMobileManipulatorInfo(getPinocchioInterface(), settings_)));
 
   const bool recompile_libraries = settings_.recompile_libraries;
   settings_.sqp.integratorType = ocs2::SensitivityIntegratorType::RK4;
@@ -127,14 +124,11 @@ ControllerInterface::ControllerInterface(const std::string &taskFile,
   // Dynamics
   // NOTE: we don't have any branches here because every system we use
   // currently is an integrator
-  std::unique_ptr<ocs2::SystemDynamicsBase> dynamics_ptr(
-      new SystemDynamics<NonholonomicDynamics<ocs2::ad_scalar_t>>(
-          "system_dynamics", settings_.dims, settings_.lib_folder,
-          recompile_libraries, true));
+  std::unique_ptr<ocs2::SystemDynamicsBase> dynamics_ptr(new SystemDynamics<NonholonomicDynamics<ocs2::ad_scalar_t>>(
+      "system_dynamics", settings_.dims, settings_.lib_folder, recompile_libraries, true));
 
   // Rollout
-  rollout_ptr_.reset(
-      new ocs2::TimeTriggeredRollout(*dynamics_ptr, settings_.rollout));
+  rollout_ptr_.reset(new ocs2::TimeTriggeredRollout(*dynamics_ptr, settings_.rollout));
 
   // Reference manager
   reference_manager_ptr_.reset(new ocs2::ReferenceManager);
@@ -149,12 +143,13 @@ ControllerInterface::ControllerInterface(const std::string &taskFile,
   NonholonomicPinocchioMapping<ocs2::ad_scalar_t> mapping(settings_.dims.robot);
 
   /* Constraints */
-  if (settings_.limit_constraint_type == ConstraintType::Soft) {
-    problem_.softConstraintPtr->add(
-        "joint_state_input_limits",
-        get_soft_joint_state_input_limit_constraint());
+  if (settings_.limit_constraint_type == ConstraintType::Soft)
+  {
+    problem_.softConstraintPtr->add("joint_state_input_limits", get_soft_joint_state_input_limit_constraint());
     std::cerr << "Soft state and input limits are enabled." << std::endl;
-  } else {
+  }
+  else
+  {
     // std::unique_ptr<ocs2::StateInputConstraint>
     //     joint_state_input_constraint(new JointStateInputConstraint(
     //         settings_.dims, settings_.state_limit_lower,
@@ -164,18 +159,13 @@ ControllerInterface::ControllerInterface(const std::string &taskFile,
     //     "joint_state_input_limits",
     //     std::move(joint_state_input_constraint));
 
-    problem_.boundConstraintPtr->setZero(settings_.dims.x(),
-                                         settings_.dims.u());
-    problem_.boundConstraintPtr->state_lb_.head(settings_.dims.robot.x) =
-        settings_.state_limit_lower;
-    problem_.boundConstraintPtr->state_ub_.head(settings_.dims.robot.x) =
-        settings_.state_limit_upper;
+    problem_.boundConstraintPtr->setZero(settings_.dims.x(), settings_.dims.u());
+    problem_.boundConstraintPtr->state_lb_.head(settings_.dims.robot.x) = settings_.state_limit_lower;
+    problem_.boundConstraintPtr->state_ub_.head(settings_.dims.robot.x) = settings_.state_limit_upper;
     problem_.boundConstraintPtr->setStateIndices(0, settings_.dims.robot.x);
 
-    problem_.boundConstraintPtr->input_lb_.head(settings_.dims.robot.u) =
-        settings_.input_limit_lower;
-    problem_.boundConstraintPtr->input_ub_.head(settings_.dims.robot.u) =
-        settings_.input_limit_upper;
+    problem_.boundConstraintPtr->input_lb_.head(settings_.dims.robot.u) = settings_.input_limit_lower;
+    problem_.boundConstraintPtr->input_ub_.head(settings_.dims.robot.u) = settings_.input_limit_upper;
     problem_.boundConstraintPtr->setInputIndices(0, settings_.dims.robot.u);
 
     std::cerr << "Hard state and input limits are enabled." << std::endl;
@@ -262,15 +252,14 @@ ControllerInterface::ControllerInterface(const std::string &taskFile,
   std::cout << "Enter pinocchio init" << std::endl;
   std::cout << settings_.dims.x() << std::endl;
   ocs2::PinocchioEndEffectorKinematicsCppAd end_effector_kinematics(
-      *pinocchio_interface_ptr, mapping, {settings_.end_effector_link_name},
-      settings_.dims.x(), settings_.dims.u(), "end_effector_kinematics",
-      settings_.lib_folder, true, false);
+      *pinocchio_interface_ptr, mapping, { settings_.end_effector_link_name }, settings_.dims.x(), settings_.dims.u(),
+      "end_effector_kinematics", settings_.lib_folder, true, false);
   // Store for possible use by other callers.
   std::cout << "Finish pinocchio init" << std::endl;
   end_effector_kinematics_ptr_.reset(end_effector_kinematics.clone());
   // End effector pose cost
-  std::unique_ptr<ocs2::StateCost> end_effector_cost(new EndEffectorCost(
-      settings_.end_effector_weight, end_effector_kinematics));
+  std::unique_ptr<ocs2::StateCost> end_effector_cost(
+      new EndEffectorCost(settings_.end_effector_weight, end_effector_kinematics));
   problem_.stateCostPtr->add("end_effector_cost", std::move(end_effector_cost));
   // Alternative auto-diff version with full Hessian
   // std::unique_ptr<ocs2::StateCost> end_effector_cost(new
@@ -281,26 +270,23 @@ ControllerInterface::ControllerInterface(const std::string &taskFile,
   //                            std::move(end_effector_cost));
   // End effector position box constraint
 
-  problem_.stateSoftConstraintPtr->add(
-      "endEffector",
-      getEndEffectorConstraint(taskFile, "Constraint.endEffector"));
-  problem_.finalSoftConstraintPtr->add(
-      "finalEndEffector",
-      getEndEffectorConstraint(taskFile, "Constraint.finalEndEffector"));
+  //  problem_.stateSoftConstraintPtr->add("endEffector", getEndEffectorConstraint(taskFile, "Constraint.endEffector"));
+  //  problem_.finalSoftConstraintPtr->add("finalEndEffector",
+  //                                       getEndEffectorConstraint(taskFile, "Constraint.finalEndEffector"));
 
-  if (settings_.end_effector_box_constraint_enabled) {
+  if (settings_.end_effector_box_constraint_enabled)
+  {
     std::cout << "End effector box constraint is enabled." << std::endl;
-    std::unique_ptr<ocs2::StateConstraint> end_effector_box_constraint(
-        new EndEffectorBoxConstraint(settings_.xyz_lower, settings_.xyz_upper,
-                                     end_effector_kinematics,
-                                     *reference_manager_ptr_));
+    std::unique_ptr<ocs2::StateConstraint> end_effector_box_constraint(new EndEffectorBoxConstraint(
+        settings_.xyz_lower, settings_.xyz_upper, end_effector_kinematics, *reference_manager_ptr_));
     std::cout << "End effector box ." << std::endl;
     problem_.inequalityConstraintPtr->add(
         "end_effector_box_constraint",
-        std::unique_ptr<ocs2::StateInputConstraint>(
-            new StateToStateInputConstraint(*end_effector_box_constraint)));
+        std::unique_ptr<ocs2::StateInputConstraint>(new StateToStateInputConstraint(*end_effector_box_constraint)));
     std::cout << "End effector box ." << std::endl;
-  } else {
+  }
+  else
+  {
     std::cout << "End effector box constraint is disabled." << std::endl;
   }
 
@@ -333,99 +319,97 @@ ControllerInterface::ControllerInterface(const std::string &taskFile,
   //        }
   //
   //        // Inertial alignment
-  if (settings_.inertial_alignment_settings.cost_enabled) {
-    std::unique_ptr<ocs2::StateInputCost> inertial_alignment_cost(
-        new InertialAlignmentCostGaussNewton(
-            end_effector_kinematics, settings_.inertial_alignment_settings,
-            settings_.gravity, settings_.dims, true));
-    problem_.costPtr->add("inertial_alignment_cost",
-                          std::move(inertial_alignment_cost));
+  if (settings_.inertial_alignment_settings.cost_enabled)
+  {
+    std::unique_ptr<ocs2::StateInputCost> inertial_alignment_cost(new InertialAlignmentCostGaussNewton(
+        end_effector_kinematics, settings_.inertial_alignment_settings, settings_.gravity, settings_.dims, true));
+    problem_.costPtr->add("inertial_alignment_cost", std::move(inertial_alignment_cost));
     std::cout << "Inertial alignment cost enabled." << std::endl;
   }
-  if (settings_.inertial_alignment_settings.constraint_enabled) {
+  if (settings_.inertial_alignment_settings.constraint_enabled)
+  {
     std::unique_ptr<ocs2::StateInputConstraint> inertial_alignment_constraint(
-        new InertialAlignmentConstraint(
-            end_effector_kinematics, settings_.inertial_alignment_settings,
-            settings_.gravity, settings_.dims, recompile_libraries));
-    problem_.inequalityConstraintPtr->add(
-        "inertial_alignment_constraint",
-        std::move(inertial_alignment_constraint));
+        new InertialAlignmentConstraint(end_effector_kinematics, settings_.inertial_alignment_settings,
+                                        settings_.gravity, settings_.dims, recompile_libraries));
+    problem_.inequalityConstraintPtr->add("inertial_alignment_constraint", std::move(inertial_alignment_constraint));
     std::cout << "Inertial alignment constraint enabled." << std::endl;
   }
 
   // TODO we're getting too nested here
-  if (settings_.balancing_settings.enabled) {
-    if (settings_.balancing_settings.use_force_constraints) {
-      problem_.equalityConstraintPtr->add(
-          "object_dynamics", get_object_dynamics_constraint(
-                                 end_effector_kinematics, recompile_libraries));
+  if (settings_.balancing_settings.enabled)
+  {
+    if (settings_.balancing_settings.use_force_constraints)
+    {
+      problem_.equalityConstraintPtr->add("object_dynamics",
+                                          get_object_dynamics_constraint(end_effector_kinematics, recompile_libraries));
 
       // Inequalities for the friction cones
       // NOTE: the hard inequality constraints appear to work much better
       // (avoid phantom gradients and such)
-      if (settings_.balancing_settings.constraint_type ==
-          ConstraintType::Soft) {
-        std::cerr << "Soft contact force-based balancing constraints enabled."
-                  << std::endl;
-        problem_.softConstraintPtr->add(
-            "contact_forces",
-            get_soft_contact_force_constraint(end_effector_kinematics,
-                                              recompile_libraries));
-      } else {
-        std::cerr << "Hard contact force-based balancing constraints enabled."
-                  << std::endl;
+      if (settings_.balancing_settings.constraint_type == ConstraintType::Soft)
+      {
+        std::cerr << "Soft contact force-based balancing constraints enabled." << std::endl;
+        problem_.softConstraintPtr->add("contact_forces", get_soft_contact_force_constraint(end_effector_kinematics,
+                                                                                            recompile_libraries));
+      }
+      else
+      {
+        std::cerr << "Hard contact force-based balancing constraints enabled." << std::endl;
         const bool frictionless = (settings_.dims.nf == 1);
-        if (frictionless) {
+        if (frictionless)
+        {
           // lower bounds are already zero, make the upper ones
           // arbitrary high values
-          problem_.boundConstraintPtr->input_ub_.tail(settings_.dims.f())
-              .setConstant(1e6);
+          problem_.boundConstraintPtr->input_ub_.tail(settings_.dims.f()).setConstant(1e6);
           // indicate that all inputs are now box constrained (real
           // inputs and contact forces)
           problem_.boundConstraintPtr->setInputIndices(0, settings_.dims.u());
 
-          std::cout << problem_.boundConstraintPtr->input_lb_.transpose()
-                    << std::endl;
-          std::cout << problem_.boundConstraintPtr->input_ub_.transpose()
-                    << std::endl;
-        } else {
-          problem_.inequalityConstraintPtr->add(
-              "contact_forces",
-              get_contact_force_constraint(end_effector_kinematics,
-                                           recompile_libraries));
+          std::cout << problem_.boundConstraintPtr->input_lb_.transpose() << std::endl;
+          std::cout << problem_.boundConstraintPtr->input_ub_.transpose() << std::endl;
+        }
+        else
+        {
+          problem_.inequalityConstraintPtr->add("contact_forces", get_contact_force_constraint(end_effector_kinematics,
+                                                                                               recompile_libraries));
         }
       }
-    } else {
-      if (settings_.balancing_settings.constraint_type ==
-          ConstraintType::Soft) {
+    }
+    else
+    {
+      if (settings_.balancing_settings.constraint_type == ConstraintType::Soft)
+      {
         std::cerr << "Soft ZMP/limit surface-based balancing "
                      "constraints enabled."
                   << std::endl;
 
-        problem_.softConstraintPtr->add(
-            "balancing", get_soft_balancing_constraint(end_effector_kinematics,
-                                                       recompile_libraries));
-
-      } else {
+        problem_.softConstraintPtr->add("balancing",
+                                        get_soft_balancing_constraint(end_effector_kinematics, recompile_libraries));
+      }
+      else
+      {
         std::cerr << "Hard ZMP/limit surface-based balancing "
                      "constraints enabled."
                   << std::endl;
-        problem_.inequalityConstraintPtr->add(
-            "balancing", get_balancing_constraint(end_effector_kinematics,
-                                                  recompile_libraries));
+        problem_.inequalityConstraintPtr->add("balancing",
+                                              get_balancing_constraint(end_effector_kinematics, recompile_libraries));
       }
     }
-  } else {
+  }
+  else
+  {
     std::cerr << "Balancing constraints disabled." << std::endl;
   }
 
   std::cout << " Balancing init finish " << std::endl;
   // Initialization state
-  if (settings_.use_operating_points) {
-    initializer_ptr_.reset(new ocs2::OperatingPoints(
-        settings_.operating_times, settings_.operating_states,
-        settings_.operating_inputs));
-  } else {
+  if (settings_.use_operating_points)
+  {
+    initializer_ptr_.reset(
+        new ocs2::OperatingPoints(settings_.operating_times, settings_.operating_states, settings_.operating_inputs));
+  }
+  else
+  {
     initializer_ptr_.reset(new ocs2::DefaultInitializer(settings_.dims.u()));
   }
 
@@ -435,20 +419,20 @@ ControllerInterface::ControllerInterface(const std::string &taskFile,
   std::cerr << "Initial State:   " << initial_state_.transpose() << std::endl;
 }
 
-std::unique_ptr<ocs2::MultipleShootingMpc> ControllerInterface::get_mpc() {
+std::unique_ptr<ocs2::MultipleShootingMpc> ControllerInterface::get_mpc()
+{
   // if (settings_.solver_method == ControllerSettings::SolverMethod::DDP) {
   //     return std::unique_ptr<ocs2::MPC_BASE>(new ocs2::GaussNewtonDDP_MPC(
   //         mpcSettings_, ddpSettings_, *rollout_ptr_, problem_,
   //         *initializer_ptr_));
   // } else {
   return std::unique_ptr<ocs2::MultipleShootingMpc>(
-      new ocs2::MultipleShootingMpc(settings_.mpc, settings_.sqp, problem_,
-                                    getInitializer()));
+      new ocs2::MultipleShootingMpc(settings_.mpc, settings_.sqp, problem_, getInitializer()));
   // }
 }
 
-std::unique_ptr<ocs2::StateInputCost>
-ControllerInterface::get_quadratic_state_input_cost() {
+std::unique_ptr<ocs2::StateInputCost> ControllerInterface::get_quadratic_state_input_cost()
+{
   // augment R with cost on the contact forces
   //        MatXd input_weight =
   //                settings_.balancing_settings.force_weight *
@@ -473,183 +457,153 @@ ControllerInterface::get_quadratic_state_input_cost() {
   //        return std::unique_ptr<ocs2::StateInputCost>(
   //                new QuadraticJointStateInputCost(state_weight, input_weight,
   //                settings_.xd));
-  return std::unique_ptr<ocs2::StateInputCost>(
-      new QuadraticJointStateInputCost(state_weight, input_weight));
+  return std::unique_ptr<ocs2::StateInputCost>(new QuadraticJointStateInputCost(state_weight, input_weight));
 }
 
-std::unique_ptr<ocs2::StateCost>
-ControllerInterface::getEndEffectorConstraint(const std::string &taskFile,
-                                              const std::string &prefix) {
-  ocs2::scalar_t muPosition = 1.0;
-  ocs2::scalar_t muOrientation = 1.0;
-  const std::string name = "WRIST_2";
-
-  boost::property_tree::ptree pt;
-  boost::property_tree::read_info(taskFile, pt);
-  std::cerr << "\n #### " << prefix << " Settings: ";
-  std::cerr << "\n #### "
-               "==============================================================="
-               "==============\n";
-  ocs2::loadData::loadPtreeValue(pt, muPosition, prefix + ".muPosition", true);
-  ocs2::loadData::loadPtreeValue(pt, muOrientation, prefix + ".muOrientation",
-                                 true);
-  std::cerr << " #### "
-               "==============================================================="
-               "==============\n";
-
-  if (reference_manager_ptr_ == nullptr) {
-    throw std::runtime_error(
-        "[getEndEffectorConstraint] referenceManagerPtr_ should be set first!");
-  }
-
-  std::unique_ptr<ocs2::StateConstraint> constraint;
-  constraint.reset(new EndEffectorConstraint(get_end_effector_kinematics(),
-                                             *reference_manager_ptr_));
-
-  std::vector<std::unique_ptr<ocs2::PenaltyBase>> penaltyArray(6);
-  std::generate_n(penaltyArray.begin(), 3, [&] {
-    return std::make_unique<ocs2::QuadraticPenalty>(muPosition);
-  });
-  std::generate_n(penaltyArray.begin() + 3, 3, [&] {
-    return std::make_unique<ocs2::QuadraticPenalty>(muOrientation);
-  });
-
-  return std::make_unique<ocs2::StateSoftConstraint>(std::move(constraint),
-                                                     std::move(penaltyArray));
-}
+// std::unique_ptr<ocs2::StateCost> ControllerInterface::getEndEffectorConstraint(const std::string& taskFile,
+//                                                                                const std::string& prefix)
+//{
+//   ocs2::scalar_t muPosition = 1.0;
+//   ocs2::scalar_t muOrientation = 1.0;
+//   const std::string name = "WRIST_2";
+//
+//   boost::property_tree::ptree pt;
+//   boost::property_tree::read_info(taskFile, pt);
+//   std::cerr << "\n #### " << prefix << " Settings: ";
+//   std::cerr << "\n #### "
+//                "==============================================================="
+//                "==============\n";
+//   ocs2::loadData::loadPtreeValue(pt, muPosition, prefix + ".muPosition", true);
+//   ocs2::loadData::loadPtreeValue(pt, muOrientation, prefix + ".muOrientation", true);
+//   std::cerr << " #### "
+//                "==============================================================="
+//                "==============\n";
+//
+//   if (reference_manager_ptr_ == nullptr)
+//   {
+//     throw std::runtime_error("[getEndEffectorConstraint] referenceManagerPtr_ should be set first!");
+//   }
+//
+//   std::unique_ptr<ocs2::StateConstraint> constraint;
+////  constraint.reset(new EndEffectorConstraint(get_end_effector_kinematics(), *reference_manager_ptr_));
+//
+//  std::vector<std::unique_ptr<ocs2::PenaltyBase>> penaltyArray(6);
+//  std::generate_n(penaltyArray.begin(), 3, [&] { return std::make_unique<ocs2::QuadraticPenalty>(muPosition); });
+//  std::generate_n(penaltyArray.begin() + 3, 3, [&] { return std::make_unique<ocs2::QuadraticPenalty>(muOrientation); });
+//
+//  return std::make_unique<ocs2::StateSoftConstraint>(std::move(constraint), std::move(penaltyArray));
+//}
 
 std::unique_ptr<ocs2::StateInputConstraint>
-ControllerInterface::get_balancing_constraint(
-    const ocs2::PinocchioEndEffectorKinematicsCppAd &end_effector_kinematics,
-    bool recompile_libraries) {
-  return std::unique_ptr<ocs2::StateInputConstraint>(
-      new NominalBalancingConstraints(
-          end_effector_kinematics, settings_.balancing_settings,
-          settings_.gravity, settings_.dims, recompile_libraries));
+ControllerInterface::get_balancing_constraint(const ocs2::PinocchioEndEffectorKinematicsCppAd& end_effector_kinematics,
+                                              bool recompile_libraries)
+{
+  return std::unique_ptr<ocs2::StateInputConstraint>(new NominalBalancingConstraints(
+      end_effector_kinematics, settings_.balancing_settings, settings_.gravity, settings_.dims, recompile_libraries));
 }
 
-std::unique_ptr<ocs2::StateInputCost>
-ControllerInterface::get_soft_balancing_constraint(
-    const ocs2::PinocchioEndEffectorKinematicsCppAd &end_effector_kinematics,
-    bool recompile_libraries) {
+std::unique_ptr<ocs2::StateInputCost> ControllerInterface::get_soft_balancing_constraint(
+    const ocs2::PinocchioEndEffectorKinematicsCppAd& end_effector_kinematics, bool recompile_libraries)
+{
   // compute the hard constraint
   std::unique_ptr<ocs2::StateInputConstraint> constraint =
       get_balancing_constraint(end_effector_kinematics, recompile_libraries);
 
   // make it soft via penalty function
-  std::vector<std::unique_ptr<ocs2::PenaltyBase>> penaltyArray(
-      constraint->getNumConstraints(0));
-  for (int i = 0; i < constraint->getNumConstraints(0); i++) {
-    penaltyArray[i].reset(new ocs2::RelaxedBarrierPenalty(
-        {settings_.balancing_settings.mu, settings_.balancing_settings.delta}));
+  std::vector<std::unique_ptr<ocs2::PenaltyBase>> penaltyArray(constraint->getNumConstraints(0));
+  for (int i = 0; i < constraint->getNumConstraints(0); i++)
+  {
+    penaltyArray[i].reset(
+        new ocs2::RelaxedBarrierPenalty({ settings_.balancing_settings.mu, settings_.balancing_settings.delta }));
   }
 
   return std::unique_ptr<ocs2::StateInputCost>(
-      new ocs2::StateInputSoftConstraint(std::move(constraint),
-                                         std::move(penaltyArray)));
+      new ocs2::StateInputSoftConstraint(std::move(constraint), std::move(penaltyArray)));
 }
 
-std::unique_ptr<ocs2::StateInputConstraint>
-ControllerInterface::get_object_dynamics_constraint(
-    const ocs2::PinocchioEndEffectorKinematicsCppAd &end_effector_kinematics,
-    bool recompile_libraries) {
-  return std::unique_ptr<ocs2::StateInputConstraint>(
-      new ObjectDynamicsConstraints(
-          end_effector_kinematics, settings_.balancing_settings,
-          settings_.gravity, settings_.dims, recompile_libraries));
+std::unique_ptr<ocs2::StateInputConstraint> ControllerInterface::get_object_dynamics_constraint(
+    const ocs2::PinocchioEndEffectorKinematicsCppAd& end_effector_kinematics, bool recompile_libraries)
+{
+  return std::unique_ptr<ocs2::StateInputConstraint>(new ObjectDynamicsConstraints(
+      end_effector_kinematics, settings_.balancing_settings, settings_.gravity, settings_.dims, recompile_libraries));
 }
 
-std::unique_ptr<ocs2::StateInputCost>
-ControllerInterface::get_soft_object_dynamics_constraint(
-    const ocs2::PinocchioEndEffectorKinematicsCppAd &end_effector_kinematics,
-    bool recompile_libraries) {
+std::unique_ptr<ocs2::StateInputCost> ControllerInterface::get_soft_object_dynamics_constraint(
+    const ocs2::PinocchioEndEffectorKinematicsCppAd& end_effector_kinematics, bool recompile_libraries)
+{
   // compute the hard constraint
   std::unique_ptr<ocs2::StateInputConstraint> constraint =
-      get_object_dynamics_constraint(end_effector_kinematics,
-                                     recompile_libraries);
+      get_object_dynamics_constraint(end_effector_kinematics, recompile_libraries);
 
   // make it soft via penalty function: since this is an equality constraint,
   // we use a quadratic penalty
   // TODO may need to increase the scaling
-  std::vector<std::unique_ptr<ocs2::PenaltyBase>> penaltyArray(
-      constraint->getNumConstraints(0));
-  for (int i = 0; i < constraint->getNumConstraints(0); i++) {
-    penaltyArray[i].reset(
-        new ocs2::QuadraticPenalty(settings_.balancing_settings.mu));
+  std::vector<std::unique_ptr<ocs2::PenaltyBase>> penaltyArray(constraint->getNumConstraints(0));
+  for (int i = 0; i < constraint->getNumConstraints(0); i++)
+  {
+    penaltyArray[i].reset(new ocs2::QuadraticPenalty(settings_.balancing_settings.mu));
   }
 
   return std::unique_ptr<ocs2::StateInputCost>(
-      new ocs2::StateInputSoftConstraint(std::move(constraint),
-                                         std::move(penaltyArray)));
+      new ocs2::StateInputSoftConstraint(std::move(constraint), std::move(penaltyArray)));
 }
 
-std::unique_ptr<ocs2::StateInputConstraint>
-ControllerInterface::get_contact_force_constraint(
-    const ocs2::PinocchioEndEffectorKinematicsCppAd &end_effector_kinematics,
-    bool recompile_libraries) {
-  return std::unique_ptr<ocs2::StateInputConstraint>(
-      new ContactForceBalancingConstraints(
-          end_effector_kinematics, settings_.balancing_settings,
-          settings_.gravity, settings_.dims, recompile_libraries));
+std::unique_ptr<ocs2::StateInputConstraint> ControllerInterface::get_contact_force_constraint(
+    const ocs2::PinocchioEndEffectorKinematicsCppAd& end_effector_kinematics, bool recompile_libraries)
+{
+  return std::unique_ptr<ocs2::StateInputConstraint>(new ContactForceBalancingConstraints(
+      end_effector_kinematics, settings_.balancing_settings, settings_.gravity, settings_.dims, recompile_libraries));
 }
 
-std::unique_ptr<ocs2::StateInputCost>
-ControllerInterface::get_soft_contact_force_constraint(
-    const ocs2::PinocchioEndEffectorKinematicsCppAd &end_effector_kinematics,
-    bool recompile_libraries) {
+std::unique_ptr<ocs2::StateInputCost> ControllerInterface::get_soft_contact_force_constraint(
+    const ocs2::PinocchioEndEffectorKinematicsCppAd& end_effector_kinematics, bool recompile_libraries)
+{
   // compute the hard constraint
   std::unique_ptr<ocs2::StateInputConstraint> constraint =
-      get_contact_force_constraint(end_effector_kinematics,
-                                   recompile_libraries);
+      get_contact_force_constraint(end_effector_kinematics, recompile_libraries);
 
   // make it soft via penalty function
-  std::vector<std::unique_ptr<ocs2::PenaltyBase>> penaltyArray(
-      constraint->getNumConstraints(0));
-  for (int i = 0; i < constraint->getNumConstraints(0); i++) {
-    penaltyArray[i].reset(new ocs2::SquaredHingePenalty(
-        {1, settings_.balancing_settings.delta})); // TODO
+  std::vector<std::unique_ptr<ocs2::PenaltyBase>> penaltyArray(constraint->getNumConstraints(0));
+  for (int i = 0; i < constraint->getNumConstraints(0); i++)
+  {
+    penaltyArray[i].reset(new ocs2::SquaredHingePenalty({ 1, settings_.balancing_settings.delta }));  // TODO
   }
 
   return std::unique_ptr<ocs2::StateInputCost>(
-      new ocs2::StateInputSoftConstraint(std::move(constraint),
-                                         std::move(penaltyArray)));
+      new ocs2::StateInputSoftConstraint(std::move(constraint), std::move(penaltyArray)));
 }
 
-std::unique_ptr<ocs2::StateConstraint>
-ControllerInterface::get_obstacle_constraint(
-    ocs2::PinocchioInterface &pinocchio_interface,
-    ocs2::PinocchioGeometryInterface &geom_interface,
-    const ObstacleSettings &settings, const std::string &library_folder,
-    bool recompile_libraries) {
-  std::cerr << "Number of extra collision spheres = "
-            << settings.extra_spheres.size() << std::endl;
+std::unique_ptr<ocs2::StateConstraint> ControllerInterface::get_obstacle_constraint(
+    ocs2::PinocchioInterface& pinocchio_interface, ocs2::PinocchioGeometryInterface& geom_interface,
+    const ObstacleSettings& settings, const std::string& library_folder, bool recompile_libraries)
+{
+  std::cerr << "Number of extra collision spheres = " << settings.extra_spheres.size() << std::endl;
 
-  const auto &model = pinocchio_interface.getModel();
+  const auto& model = pinocchio_interface.getModel();
   std::vector<pinocchio::GeometryObject> extra_spheres;
-  for (const auto &sphere : settings.extra_spheres) {
+  for (const auto& sphere : settings.extra_spheres)
+  {
     // The collision sphere is specified relative to a link, but the
     // geometry interface works relative to joints. Thus we need to find
     // the parent joint and the sphere's transform w.r.t. it.
     // TODO if possible, it would be better to specify w.r.t. to a joint
-    pinocchio::FrameIndex parent_frame_id =
-        model.getFrameId(sphere.parent_frame_name);
+    pinocchio::FrameIndex parent_frame_id = model.getFrameId(sphere.parent_frame_name);
     pinocchio::Frame parent_frame = model.frames[parent_frame_id];
 
     pinocchio::JointIndex parent_joint_id = parent_frame.parent;
     Mat3d R = Mat3d::Identity();
     pinocchio::SE3 T_jf = parent_frame.placement;
     pinocchio::SE3 T_fs(R, sphere.offset);
-    pinocchio::SE3 T_js = T_jf * T_fs; // sphere relative to joint
+    pinocchio::SE3 T_js = T_jf * T_fs;  // sphere relative to joint
 
-    pinocchio::GeometryObject::CollisionGeometryPtr geom_ptr(
-        new hpp::fcl::Sphere(sphere.radius));
-    extra_spheres.push_back(pinocchio::GeometryObject(
-        sphere.name, parent_joint_id, geom_ptr, T_js));
+    pinocchio::GeometryObject::CollisionGeometryPtr geom_ptr(new hpp::fcl::Sphere(sphere.radius));
+    extra_spheres.push_back(pinocchio::GeometryObject(sphere.name, parent_joint_id, geom_ptr, T_js));
   }
   geom_interface.addGeometryObjects(extra_spheres);
 
-  const auto &geom_model = geom_interface.getGeometryModel();
-  for (int i = 0; i < geom_model.ngeoms; ++i) {
+  const auto& geom_model = geom_interface.getGeometryModel();
+  for (int i = 0; i < geom_model.ngeoms; ++i)
+  {
     std::cout << geom_model.geometryObjects[i].name << std::endl;
   }
 
@@ -658,65 +612,50 @@ ControllerInterface::get_obstacle_constraint(
   const size_t nc = geom_interface.getNumCollisionPairs();
   std::cerr << "Testing for " << nc << " collision pairs." << std::endl;
 
-  std::vector<hpp::fcl::DistanceResult> distances =
-      geom_interface.computeDistances(pinocchio_interface);
-  for (int i = 0; i < distances.size(); ++i) {
+  std::vector<hpp::fcl::DistanceResult> distances = geom_interface.computeDistances(pinocchio_interface);
+  for (int i = 0; i < distances.size(); ++i)
+  {
     std::cout << "dist = " << distances[i].min_distance << std::endl;
   }
 
-  SystemPinocchioMapping<TripleIntegratorPinocchioMapping<ocs2::scalar_t>,
-                         ocs2::scalar_t>
-      mapping(settings_.dims);
+  SystemPinocchioMapping<TripleIntegratorPinocchioMapping<ocs2::scalar_t>, ocs2::scalar_t> mapping(settings_.dims);
 
   return std::unique_ptr<ocs2::StateConstraint>(
-      new ocs2::SelfCollisionConstraintCppAd(
-          pinocchio_interface, mapping, geom_interface,
-          settings.minimum_distance, "obstacle_avoidance", library_folder,
-          recompile_libraries, false));
+      new ocs2::SelfCollisionConstraintCppAd(pinocchio_interface, mapping, geom_interface, settings.minimum_distance,
+                                             "obstacle_avoidance", library_folder, recompile_libraries, false));
 }
 
-std::unique_ptr<ocs2::StateCost>
-ControllerInterface::get_soft_obstacle_constraint(
-    ocs2::PinocchioInterface &pinocchio_interface,
-    ocs2::PinocchioGeometryInterface &geom_interface,
-    const ObstacleSettings &settings, const std::string &library_folder,
-    bool recompile_libraries) {
+std::unique_ptr<ocs2::StateCost> ControllerInterface::get_soft_obstacle_constraint(
+    ocs2::PinocchioInterface& pinocchio_interface, ocs2::PinocchioGeometryInterface& geom_interface,
+    const ObstacleSettings& settings, const std::string& library_folder, bool recompile_libraries)
+{
   std::unique_ptr<ocs2::StateConstraint> constraint =
-      get_obstacle_constraint(pinocchio_interface, geom_interface, settings,
-                              library_folder, recompile_libraries);
+      get_obstacle_constraint(pinocchio_interface, geom_interface, settings, library_folder, recompile_libraries);
 
-  std::unique_ptr<ocs2::PenaltyBase> penalty(
-      new ocs2::RelaxedBarrierPenalty({settings.mu, settings.delta}));
+  std::unique_ptr<ocs2::PenaltyBase> penalty(new ocs2::RelaxedBarrierPenalty({ settings.mu, settings.delta }));
 
-  return std::unique_ptr<ocs2::StateCost>(
-      new ocs2::StateSoftConstraint(std::move(constraint), std::move(penalty)));
+  return std::unique_ptr<ocs2::StateCost>(new ocs2::StateSoftConstraint(std::move(constraint), std::move(penalty)));
 }
 
-std::unique_ptr<ocs2::StateInputConstraint>
-ControllerInterface::get_joint_state_input_limit_constraint() {
+std::unique_ptr<ocs2::StateInputConstraint> ControllerInterface::get_joint_state_input_limit_constraint()
+{
   VecXd state_limit_lower = settings_.state_limit_lower;
   VecXd state_limit_upper = settings_.state_limit_upper;
 
   VecXd input_limit_lower = settings_.input_limit_lower;
   VecXd input_limit_upper = settings_.input_limit_upper;
 
-  std::cout << "state limit lower: " << state_limit_lower.transpose()
-            << std::endl;
-  std::cout << "state limit upper: " << state_limit_upper.transpose()
-            << std::endl;
-  std::cout << "input limit lower: " << input_limit_lower.transpose()
-            << std::endl;
-  std::cout << "input limit upper: " << input_limit_upper.transpose()
-            << std::endl;
+  std::cout << "state limit lower: " << state_limit_lower.transpose() << std::endl;
+  std::cout << "state limit upper: " << state_limit_upper.transpose() << std::endl;
+  std::cout << "input limit lower: " << input_limit_lower.transpose() << std::endl;
+  std::cout << "input limit upper: " << input_limit_upper.transpose() << std::endl;
 
-  return std::unique_ptr<ocs2::StateInputConstraint>(
-      new JointStateInputLimits(settings_.dims));
+  return std::unique_ptr<ocs2::StateInputConstraint>(new JointStateInputLimits(settings_.dims));
 }
 
-std::unique_ptr<ocs2::StateInputCost>
-ControllerInterface::get_soft_joint_state_input_limit_constraint() {
-  std::unique_ptr<ocs2::StateInputConstraint> constraint =
-      get_joint_state_input_limit_constraint();
+std::unique_ptr<ocs2::StateInputCost> ControllerInterface::get_soft_joint_state_input_limit_constraint()
+{
+  std::unique_ptr<ocs2::StateInputConstraint> constraint = get_joint_state_input_limit_constraint();
 
   VecXd state_limit_lower = settings_.state_limit_lower;
   VecXd state_limit_upper = settings_.state_limit_upper;
@@ -733,30 +672,27 @@ ControllerInterface::get_soft_joint_state_input_limit_constraint() {
   std::vector<std::unique_ptr<ocs2::PenaltyBase>> penaltyArray(num_constraints);
 
   // State penalty
-  for (int i = 0; i < settings_.dims.robot.x; i++) {
+  for (int i = 0; i < settings_.dims.robot.x; i++)
+  {
     // barrierFunction.reset(new ocs2::RelaxedBarrierPenalty(
     //     {state_limit_mu, state_limit_delta}));
-    barrierFunction.reset(
-        new ocs2::SquaredHingePenalty({1, state_limit_delta}));
+    barrierFunction.reset(new ocs2::SquaredHingePenalty({ 1, state_limit_delta }));
     penaltyArray[i].reset(
-        new ocs2::DoubleSidedPenalty(state_limit_lower(i), state_limit_upper(i),
-                                     std::move(barrierFunction)));
+        new ocs2::DoubleSidedPenalty(state_limit_lower(i), state_limit_upper(i), std::move(barrierFunction)));
   }
 
   // Input penalty
-  for (int i = 0; i < settings_.dims.robot.u; i++) {
+  for (int i = 0; i < settings_.dims.robot.u; i++)
+  {
     // barrierFunction.reset(new ocs2::RelaxedBarrierPenalty(
     //     {input_limit_mu, input_limit_delta}));
-    barrierFunction.reset(
-        new ocs2::SquaredHingePenalty({1, input_limit_delta}));
+    barrierFunction.reset(new ocs2::SquaredHingePenalty({ 1, input_limit_delta }));
     penaltyArray[settings_.dims.robot.x + i].reset(
-        new ocs2::DoubleSidedPenalty(input_limit_lower(i), input_limit_upper(i),
-                                     std::move(barrierFunction)));
+        new ocs2::DoubleSidedPenalty(input_limit_lower(i), input_limit_upper(i), std::move(barrierFunction)));
   }
 
   return std::unique_ptr<ocs2::StateInputCost>(
-      new ocs2::StateInputSoftConstraint(std::move(constraint),
-                                         std::move(penaltyArray)));
+      new ocs2::StateInputSoftConstraint(std::move(constraint), std::move(penaltyArray)));
 }
 
-} // namespace upright
+}  // namespace upright
