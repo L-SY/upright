@@ -43,7 +43,7 @@ robot
     (24,0) 0.0       ; initial state x0_25
   }
 
-  tool_link_name "link6"  ; the name of the link representing the tool (i.e., the tray)
+  tool_link_name "Link6"  ; the name of the link representing the tool (i.e., the tray)
   base_link_name "diablo_base_link"
 
   arm_dim 6 ; the dof of arm

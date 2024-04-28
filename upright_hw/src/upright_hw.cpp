@@ -8,7 +8,7 @@
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "mm_hw");
+  ros::init(argc, argv, "upright_hw");
   ros::NodeHandle nh;
   ros::NodeHandle robotHwNh("~");
 

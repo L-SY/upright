@@ -61,6 +61,36 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
+        Link1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        Link2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        Link3:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        Link4:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        Link5:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        Link6:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         arm_base_link:
           Alpha: 1
           Show Axes: false
@@ -92,36 +122,6 @@ Visualization Manager:
           Show Trail: false
           Value: true
         left_wheel:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link1:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link2:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link3:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link4:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link5:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        link6:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -210,17 +210,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 0
-        Y: 0
-        Z: 0
+        X: -0.11691116541624069
+        Y: 0.04974754899740219
+        Z: 0.4951409697532654
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: -0.0596015639603138
+      Pitch: -0.04960153251886368
       Target Frame: <Fixed Frame>
-      Yaw: 1.6003972291946411
+      Yaw: 1.2504085302352905
     Saved: ~
 Window Geometry:
   Displays:

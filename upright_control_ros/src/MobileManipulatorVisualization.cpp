@@ -119,12 +119,12 @@ void MobileManipulatorDummyVisualization::publishObservation(
   geometry_msgs::TransformStamped base_tf;
   base_tf.header.stamp = timeStamp;
   base_tf.header.frame_id = "world";
-  base_tf.child_frame_id = modelInfo_.baseFrame;
+  base_tf.child_frame_id = "diablo_base_link";
   base_tf.transform.translation =
       ocs2::ros_msg_helpers::getVectorMsg(r_world_base);
   base_tf.transform.rotation =
       ocs2::ros_msg_helpers::getOrientationMsg(q_world_base);
-  //  tfBroadcaster_.sendTransform(base_tf);
+  tfBroadcaster_.sendTransform(base_tf);
 
   // publish joints transforms
   const auto j_arm = upright::getArmJointAngles(observation.state, modelInfo_);

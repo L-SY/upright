@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <robot name="rm_65" xmlns:xacro="http://www.ros.org/wiki/xacro">
-    <xacro:include filename="$(find upright_asset/description)/urdf/RM65/rm_65.transmission.xacro"/>
-    <xacro:include filename="$(find upright_asset/description)/urdf/RM65/rm_65.gazebo.xacro"/>
+    <xacro:include filename="$(find upright_asset)/description/urdf/manipulator/rm_65.transmission.xacro"/>
+    <xacro:include filename="$(find upright_asset)/description/urdf/manipulator/rm_65.gazebo.xacro"/>
     <!-- Inertial matrix -->
     <xacro:macro name="inertial_matrix" params="mass">
         <inertial>
@@ -17,34 +17,10 @@
                      izz="${m*(w*w + h*h)/12}"/>
         </inertial>
     </xacro:macro>
-    <link name="dummy">
-    </link>
 
     <!-- ///////////////////////////////////////   bottom_joint   ////////////////////////////////////////// -->
-    <joint name="bottom_joint" type="fixed">
-        <origin xyz="0 0 0" rpy="0 0 0"/>
-        <parent link="base_link"/>
-        <child link="bottom_link"/>
-    </joint>
-    <link name="bottom_link">
-        <visual>
-            <origin xyz=" 0 0 -0.02" rpy="0 0 0"/>
-            <geometry>
-                <box size="0.06 0.06 0.02"/>
-            </geometry>
-            <material name="Brown"/>
-        </visual>
-        <collision>
-            <origin xyz=" 0 0 0" rpy="0 0 0"/>
-            <geometry>
-                <box size="0.06 0.06 0.02"/>
-            </geometry>
-        </collision>
-        <xacro:Box_inertial_matrix m="500" l="1" w="1" h="0.02"/>
-    </link>
 
-    <link
-            name="base_link">
+    <link name="arm_base_link">
         <inertial>
             <origin
                     xyz="-0.000433277303987328 -3.54664423471128E-05 0.0599427668933796"
@@ -84,20 +60,7 @@
         </collision>
     </link>
 
-    <gazebo reference="base_link">
-        <mu1 value="200000.0"/>
-        <mu2 value="200000.0"/>
-        <kp value="100000000.0"/>
-        <kd value="1.0"/>
-    </gazebo>
-
-    <joint name="dummy_joint" type="fixed">
-        <parent link="dummy"/>
-        <child link="base_link"/>
-    </joint>
-
-    <link
-            name="Link1">
+    <link name="Link1">
         <inertial>
             <origin
                     xyz="1.2226305431569E-08 0.0211079974844683 -0.0251854220842269"
@@ -136,14 +99,13 @@
             </geometry>
         </collision>
     </link>
-    <joint
-            name="joint1"
-            type="revolute">
+    <joint name="joint1"
+           type="revolute">
         <origin
                 xyz="0 0 0.2405"
                 rpy="0 0 0"/>
         <parent
-                link="base_link"/>
+                link="arm_base_link"/>
         <child
                 link="Link1"/>
         <axis

@@ -1,6 +1,6 @@
 <launch>
     <param name="robot_description"
-           command="$(find xacro)/xacro $(find upright_asset)/description/urdf/manipulator/rm_65.urdf"/>
+           command="$(find xacro)/xacro $(find upright_asset)/description/urdf/manipulator/robot.xacro"/>
 
     <!-- send fake joint values -->
     <node pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" name="joint_state_publisher_gui">

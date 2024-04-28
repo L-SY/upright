@@ -1,0 +1,10 @@
+<library path="lib/libupright_controller">
+
+    <class name="ddt/UprightController" type="ddt::UprightrController"
+           base_class_type="controller_interface::ControllerBase">
+        <description>
+            The mobile manipulator controller use ocs2 to realize mpc.
+        </description>
+    </class>
+
+</library>

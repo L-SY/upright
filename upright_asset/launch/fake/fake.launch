@@ -1,0 +1,23 @@
+<launch>
+    <!-- Enable rviz visualization -->
+    <arg name="rviz" default="true"/>
+    <!-- Set nodes on debug mode -->
+    <arg name="debug" default="false"/>
+
+    <!-- The URDF model of the robot -->
+    <arg name="urdfFile"
+         value="$(find upright_asset)/description/urdf/diablo_manipulator/robot_pinocchio.urdf"/>
+    <!-- The task file for the mpc. -->
+    <arg name="taskFile" value="$(find upright_asset)/config/task.info"/>
+    <!-- The library folder to generate CppAD codegen into -->
+    <arg name="libFolder"
+         value="$(find upright_asset)/auto_generated"/>
+
+    <include file="$(find upright_asset)/launch/fake/mobile_manipulator.launch">
+        <arg name="rviz" value="$(arg rviz)"/>
+        <arg name="debug" value="$(arg debug)"/>
+        <arg name="urdfFile" value="$(arg urdfFile)"/>
+        <arg name="taskFile" value="$(arg taskFile)"/>
+        <arg name="libFolder" value="$(arg libFolder)"/>
+    </include>
+</launch>
