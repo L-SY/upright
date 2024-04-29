@@ -22,6 +22,7 @@ find_package(catkin REQUIRED
         imu_complementary_filter
         imu_filter_madgwick
         realtime_tools
+        upright_msgs
 )
 
 catkin_package(
@@ -37,6 +38,7 @@ catkin_package(
         imu_filter_madgwick
         roscpp
         dynamic_reconfigure
+        upright_msgs
         DEPENDS
         LIBRARIES
         upright_common
@@ -50,7 +52,7 @@ include_directories(
 
 file(GLOB_RECURSE sources "src/*.cpp")
 
-add_library(upright_common SHARED ${sources})
+add_library(upright_common SHARED ${sources} src/filters/lp_filter.cpp)
 
 target_link_libraries(upright_common ${catkin_LIBRARIES})
 
