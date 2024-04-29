@@ -11,6 +11,6 @@
     <node name="controller_loader" pkg="controller_manager" type="controller_manager" output="screen"
           args="load
               controllers/joint_state_controller
-              controllers/diablo_qz_controller
+              controllers/upright_controller
               "/>
 </launch>

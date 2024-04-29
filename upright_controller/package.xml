@@ -20,7 +20,9 @@
     <depend>effort_controllers</depend>
     <depend>pluginlib</depend>
     <depend>upright_common</depend>
+
     <depend>rm_hw</depend>
+    <depend>upright_hw</depend>
 
     <depend>upright_control</depend>
     <depend>upright_control_ros</depend>

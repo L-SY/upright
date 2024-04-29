@@ -17,7 +17,7 @@ void rmInterface::moveJ(std::vector<double>& joint_angles, double speed)
   }
 
   moveJ_Pose.speed = speed;
-  moveJ_pub_.publish(moveJ_Pose);
+  moveJPub_.publish(moveJ_Pose);
 }
 
 void rmInterface::servoControl(double d_x, double d_y, double d_z, double d_roll, double d_pitch, double d_yaw,
@@ -59,7 +59,7 @@ void rmInterface::moveToPoseWithQuaternion(double x, double y, double z, double 
   moveJ_P_TargetPose.Pose.orientation.w = w_orient;
   moveJ_P_TargetPose.speed = speed;
 
-  moveJ_P_pub_.publish(moveJ_P_TargetPose);
+  moveJPPub_.publish(moveJ_P_TargetPose);
 }
 
 void rmInterface::moveToPoseWithEuler(double x, double y, double z, double roll, double pitch, double yaw, double speed)

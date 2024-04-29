@@ -36,11 +36,11 @@ public:
     }
 
     // Subscribe to /joint_state and /rm_driver/Pose_State
-    joint_state_sub_ = nh.subscribe("joint_state", 10, &rmInterface::jointStateCallback, this);
-    pose_state_sub_ = nh.subscribe("rm_driver/Pose_State", 10, &rmInterface::poseStateCallback, this);
-    planState_sub_ = nh.subscribe("/rm_driver/Plan_State", 10, &rmInterface::planStateCallback, this);
-    moveJ_P_pub_ = nh.advertise<rm_msgs::MoveJ_P>("/rm_driver/MoveJ_P_Cmd", 10);
-    moveJ_pub_ = nh.advertise<rm_msgs::MoveJ>("/rm_driver/MoveJ_Cmd", 10);
+    jointStateSub_ = nh.subscribe("/joint_states", 10, &rmInterface::jointStateCallback, this);
+    poseStateSub_ = nh.subscribe("rm_driver/Pose_State", 10, &rmInterface::poseStateCallback, this);
+    planStateSub_ = nh.subscribe("/rm_driver/Plan_State", 10, &rmInterface::planStateCallback, this);
+    moveJPPub_ = nh.advertise<rm_msgs::MoveJ_P>("/rm_driver/MoveJ_P_Cmd", 10);
+    moveJPub_ = nh.advertise<rm_msgs::MoveJ>("/rm_driver/MoveJ_Cmd", 10);
 
     ps5Joy_ = std::make_shared<joy::PS5Joy>(nh);
   }
@@ -62,6 +62,7 @@ public:
   void moveToPoseWithEuler(double x, double y, double z, double roll, double pitch, double yaw, double speed);
 
   std::shared_ptr<joy::PS5Joy> ps5Joy_;
+  sensor_msgs::JointState jointStates_;
 
 private:
   // Callback function for joint state updates
@@ -73,9 +74,11 @@ private:
       if (it != msg->name.end())
       {
         int index = std::distance(msg->name.begin(), it);
-        jointStates_.position[index] = msg->position[index];
-        jointStates_.velocity[index] = msg->velocity[index];
-        jointStates_.effort[index] = msg->effort[index];
+        jointStates_.position[i] = msg->position[index];
+        jointStates_.velocity[i] = 0.;
+        jointStates_.effort[i] = 0.;
+        //        jointStates_.velocity[i] = msg->velocity[index];
+        //        jointStates_.effort[i] = msg->effort[index];
       }
     }
   }
@@ -88,28 +91,27 @@ private:
 
   void planStateCallback(const rm_msgs::Plan_State::ConstPtr& msg)
   {
-    // 将接收到的消息打印出来，显示机械臂是否完成运动
-    if (msg->state)
-    {
-      ROS_INFO("*******Plan State OK");
-    }
-    else
-    {
-      ROS_INFO("*******Plan State Fail");
-    }
+    //    // 将接收到的消息打印出来，显示机械臂是否完成运动
+    //    if (msg->state)
+    //    {
+    //      ROS_INFO("*******Plan State OK");
+    //    }
+    //    else
+    //    {
+    //      ROS_INFO("*******Plan State Fail");
+    //    }
   }
 
   // ROS Subscribers
-  ros::Subscriber joint_state_sub_;
-  ros::Subscriber pose_state_sub_;
-  ros::Subscriber planState_sub_;
+  ros::Subscriber jointStateSub_;
+  ros::Subscriber poseStateSub_;
+  ros::Subscriber planStateSub_;
   // ROS Publisher
-  ros::Publisher moveJ_P_pub_;
-  rm_msgs::MoveJ_P moveJ_P_TargetPose_;
-  ros::Publisher moveJ_pub_;
+  ros::Publisher moveJPPub_;
+  rm_msgs::MoveJ_P moveJPTargetPose_;
+  ros::Publisher moveJPub_;
 
   // Data members
   geometry_msgs::Pose EePose_;
-  sensor_msgs::JointState jointStates_;
 };
 }  // namespace rm_interface

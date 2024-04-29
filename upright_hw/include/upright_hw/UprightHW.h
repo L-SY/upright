@@ -9,6 +9,7 @@
 #include <std_msgs/Float64MultiArray.h>
 #include <sensor_msgs/JointState.h>
 #include <geometry_msgs/Twist.h>
+#include <rm_hw/rmInterface.h>
 
 namespace generally
 {
@@ -57,18 +58,6 @@ public:
    */
   void write(const ros::Time& time, const ros::Duration& period) override;
 
-  void rmHWCallBack(const sensor_msgs::JointStateConstPtr& data)
-  {
-    int i = 0;
-    for (auto& RMJoint : position_joint_handles_)
-    {
-      rmMotorData[i].pos_ = data->position[i];
-      rmMotorData[i].vel_ = data->velocity[i];
-      rmMotorData[i].tau_ = data->effort[i];
-      i++;
-    }
-  }
-
   void diabloOdomCallBack(const std_msgs::Float64MultiArrayConstPtr& data)
   {
     //    the msg is build by [ x, y, z, roll, pitch, yaw, vx, vy, vz, v_roll, v_pitch, v_yaw]
@@ -90,6 +79,7 @@ private:
   ros::Subscriber rmJointSub_, diabloOdomSub_;
   ros::Publisher rmMotorPub_, diabloMotorPub_;
   std::vector<std::string> robotMotorName_;
+  std::shared_ptr<rm_interface::rmInterface> rmInterface_;
 };
 
 }  // namespace generally

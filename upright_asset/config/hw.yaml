@@ -1,4 +1,4 @@
 upright_hw:
-  loop_frequency: 1000
+  loop_frequency: 100
   cycle_time_error_threshold: 0.001
   thread_priority: 95

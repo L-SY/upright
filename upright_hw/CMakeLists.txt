@@ -7,6 +7,7 @@ find_package(catkin REQUIRED
         COMPONENTS
         roscpp
 
+        rm_hw
         generally_hw
 )
 
@@ -15,6 +16,7 @@ catkin_package(
         include
         CATKIN_DEPENDS
         roscpp
+        rm_hw
         generally_hw
 )
 

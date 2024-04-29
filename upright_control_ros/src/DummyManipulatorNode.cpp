@@ -58,7 +58,7 @@ int main(int argc, char **argv) {
   initObservation.time = 0.0;
 
   ocs2::vector_t initTarget(7);
-  initTarget.head(3) << 0, 0, 1;
+  initTarget.head(3) << 0.05, 0, 0.42;
   initTarget.tail(4) << Eigen::Quaternion<ocs2::scalar_t>(1, 0, 0, 0).coeffs();
 
   // initial command

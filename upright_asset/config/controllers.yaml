@@ -3,20 +3,9 @@ controllers:
     type: joint_state_controller/JointStateController
     publish_rate: 100
 
-  diablo_qz_controller:
-    type: ddt/DiabloQzController
-    motor_parameter:
-      joint1: { p: 80.0, d: 1 }
-      joint2: { p: 100.0, d: 1 }
-      joint3: { p: 100.0, d: 1 }
-      joint4: { p: 10.0, d: 0.04 }
-      joint5: { p: 10.0, d: 0.04 }
-      joint6: { p: 10.0, d: 0.04 }
-    pinocchio:
-      urdf_filename: /home/lsy/upright_ws/src/upright_asset/description/urdf/manipulator/qz_arm.urdf
-      ff_effort_scale: 1.0
-      send_tau: true
+  upright_controller:
+    type: ddt/UprightController
     init_pos:
-      x: 0.2
+      x: 0.05
       y: 0.0
-      z: 0.3
+      z: 0.42

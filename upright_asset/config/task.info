@@ -16,11 +16,11 @@ robot
     (1,0) 0        ; initial state x0_2
     (2,0) 0        ; initial state x0_3
     (3,0) 0.0  ; initial state x0_4 (0.5pi)
-    (4,0) 0 ; initial state x0_5 (-0.25pi)
-    (5,0) 0   ; initial state x0_6 (0.5pi)
+    (4,0) -1.7 ; initial state x0_5 (-0.25pi)
+    (5,0) 2.23   ; initial state x0_6 (0.5pi)
     (6,0) 0 ; initial state x0_7 (-0.25pi)
-    (7,0) 0  ; initial state x0_8 (0.5pi)
-    (8,0) 0.0 ; initial state x0_9 (0.417pi)
+    (7,0) 1.0  ; initial state x0_8 (0.5pi)
+    (8,0) 1.8 ; initial state x0_9 (0.417pi)
 
     ; init vel
     (9,0) 0.0        ; initial state x0_10
@@ -70,9 +70,9 @@ rollout
 {
   AbsTolODE                       1e-5
   RelTolODE                       1e-3
-  timeStep                        1e-2
+  timeStep                        1e-1
   integratorType                  ODE45
-  maxNumStepsPerSecond            100000
+  maxNumStepsPerSecond            1000
   checkNumericalStability         false
 }
 

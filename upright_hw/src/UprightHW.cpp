@@ -16,6 +16,7 @@ bool UprightHW::init(ros::NodeHandle& root_nh, ros::NodeHandle& robot_hw_nh)
   {
     return false;
   }
+  rmInterface_ = std::make_shared<rm_interface::rmInterface>(root_nh);
   setupJoints();
   setupTopic(robot_hw_nh);
   ROS_INFO_STREAM("upright hw Init Finish!");
@@ -25,6 +26,14 @@ bool UprightHW::init(ros::NodeHandle& root_nh, ros::NodeHandle& robot_hw_nh)
 void UprightHW::read(const ros::Time& time, const ros::Duration& /*period*/)
 {
   is_reading_ = true;
+  int i = 0;
+  for (auto& joint : rmMotorData)
+  {
+    joint.pos_ = rmInterface_->jointStates_.position[i];
+    joint.vel_ = rmInterface_->jointStates_.velocity[i];
+    joint.tau_ = rmInterface_->jointStates_.effort[i];
+    i++;
+  }
 }
 
 void UprightHW::write(const ros::Time& /*time*/, const ros::Duration& /*period*/)
@@ -34,15 +43,19 @@ void UprightHW::write(const ros::Time& /*time*/, const ros::Duration& /*period*/
   diabloCmd.linear.x = velocityJointInterface_.getHandle("diabloX").getCommand();
   diabloCmd.angular.z = velocityJointInterface_.getHandle("diabloYaw").getCommand();
   diabloMotorPub_.publish(diabloCmd);
-
-  std_msgs::Float64MultiArray command;
-  command.data.resize(effort_joint_handles_.size());
-  int i = 0;
-  for (const auto& joint : effort_joint_handles_)
+  if (rmMotorData[0].posDes_ == 0 && rmMotorData[1].posDes_ == 0 && rmMotorData[2].posDes_ == 0 &&
+      rmMotorData[3].posDes_ == 0 && rmMotorData[4].posDes_ == 0 && rmMotorData[5].posDes_ == 0)
   {
-    command.data[i] = joint.getCommand();
-    i++;
+    std::vector<double> jointDes = { 0.0, -1.7, 2.23, 0, 1.0, 1.8 };
+    rmInterface_->moveJ(jointDes, 0.5);
   }
+  else
+  {
+    std::vector<double> jointDes = { rmMotorData[0].posDes_, rmMotorData[1].posDes_, rmMotorData[2].posDes_,
+                                     rmMotorData[3].posDes_, rmMotorData[4].posDes_, rmMotorData[5].posDes_ };
+    rmInterface_->moveJ(jointDes, 0.5);
+  }
+
   is_writing_ = false;
 }
 
@@ -70,7 +83,7 @@ bool UprightHW::setupJoints()
 
   // Six hybrid-joint for rm arm
   for (int i = 0; i < 6; ++i)
-    rmMotorData[i].name_ = "joint" + std::to_string(i + 1);
+    rmMotorData[i].name_ = "rm_joint" + std::to_string(i + 1);
   for (auto& joint : rmMotorData)
   {
     hardware_interface::JointStateHandle state_handle(joint.name_, &joint.pos_, &joint.vel_, &joint.tau_);

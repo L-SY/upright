@@ -5,10 +5,6 @@
 #pragma once
 
 #include <controller_interface/multi_interface_controller.h>
-#include <effort_controllers/joint_effort_controller.h>
-#include <effort_controllers/joint_position_controller.h>
-#include <effort_controllers/joint_velocity_controller.h>
-#include <hardware_interface/imu_sensor_interface.h>
 #include <hardware_interface/joint_command_interface.h>
 
 #include <ocs2_core/Types.h>
@@ -25,9 +21,12 @@
 #include <upright_common/ori_tool.h>
 #include <upright_common/tf_rt_broadcaster.h>
 
+#include "rm_hw/rmInterface.h"
+
 namespace ddt {
 class UprightController : public controller_interface::MultiInterfaceController<
-                              hardware_interface::EffortJointInterface> {
+                              hardware_interface::VelocityJointInterface,
+                              hardware_interface::PositionJointInterface> {
   enum ControllerState {
     NORMAL,  // Only try to achieve EE to reach a specified point in space
     UPRIGHT, // On the basis of normal, increase the importance of keeping the
@@ -100,10 +99,8 @@ private:
   ocs2::vector_t jointVelLast_{};
   ros::Time lastTime_{};
 
-  double baseL_ = 0.683, wheelR_ = 0.15;
-  // QZ hardware
-  std::vector<double> qzJointPos_, qzJointVel_, qzJointEff_;
-  ros::Subscriber qzJointInfoSub_;
-  ros::Publisher qzJointCmdPub_;
+  double init_x_, init_y_, init_z_;
+  std::vector<hardware_interface::JointHandle> positionJointHandles_;
+  std::vector<hardware_interface::JointHandle> velocityJointHandles_;
 };
 } // namespace ddt

@@ -40,16 +40,21 @@ bool UprightController::init(hardware_interface::RobotHW *robot_hw,
   lastTime_ = ros::Time::now();
 
   // Hardware interface
-  auto *effortJointInterface =
-      robot_hw->get<hardware_interface::EffortJointInterface>();
-  jointHandles_.push_back(effortJointInterface->getHandle("left_j3"));
-  jointHandles_.push_back(effortJointInterface->getHandle("right_j3"));
-  jointHandles_.push_back(effortJointInterface->getHandle("joint1"));
-  jointHandles_.push_back(effortJointInterface->getHandle("joint2"));
-  jointHandles_.push_back(effortJointInterface->getHandle("joint3"));
-  jointHandles_.push_back(effortJointInterface->getHandle("joint4"));
-  jointHandles_.push_back(effortJointInterface->getHandle("joint5"));
-  jointHandles_.push_back(effortJointInterface->getHandle("joint6"));
+  auto *positionJointInterface =
+      robot_hw->get<hardware_interface::PositionJointInterface>();
+  std::vector<std::string> rmJointNames{"rm_joint1", "rm_joint2", "rm_joint3",
+                                        "rm_joint4", "rm_joint5", "rm_joint6"};
+  for (const auto &joint_name : rmJointNames) {
+    positionJointHandles_.push_back(
+        positionJointInterface->getHandle(joint_name));
+  }
+  auto *velocityJointInterface =
+      robot_hw->get<hardware_interface::VelocityJointInterface>();
+  velocityJointHandles_.push_back(velocityJointInterface->getHandle("diabloX"));
+  velocityJointHandles_.push_back(velocityJointInterface->getHandle("diabloY"));
+  velocityJointHandles_.push_back(
+      velocityJointInterface->getHandle("diabloYaw"));
+
   controlState_ = UPRIGHT;
 
   // Odom TF
@@ -69,6 +74,10 @@ bool UprightController::init(hardware_interface::RobotHW *robot_hw,
   odom2base_.transform.translation.z = 0;
   tfRtBroadcaster_.init(root_nh);
   tfRtBroadcaster_.sendTransform(odom2base_);
+
+  controller_nh.getParam("init_pos/x", init_x_);
+  controller_nh.getParam("init_pos/y", init_y_);
+  controller_nh.getParam("init_pos/z", init_z_);
 
   ROS_INFO_STREAM("UprightController Init Finish!");
   return true;
@@ -107,12 +116,8 @@ void UprightController::update(const ros::Time &time,
 
 void UprightController::updateTfOdom(const ros::Time &time,
                                      const ros::Duration &period) {
-  ocs2::vector_t position(3);
-  position(0) = odom2base_.transform.translation.x;
-  position(1) = odom2base_.transform.translation.y;
-  position(2) = odom2base_.transform.translation.z;
-  double yaw = yawFromQuat(odom2base_.transform.rotation);
-  yaw += currentObservation_.state(10) * period.toSec();
+  odom2base_.header.stamp = time;
+  double yaw = velocityJointHandles_[2].getPosition();
   tf2::Quaternion quaternion;
   quaternion.setRPY(0, 0, yaw);
   odom2base_.transform.rotation.x = quaternion.x();
@@ -120,51 +125,35 @@ void UprightController::updateTfOdom(const ros::Time &time,
   odom2base_.transform.rotation.z = quaternion.z();
   odom2base_.transform.rotation.w = quaternion.w();
 
-  position(0) += currentObservation_.state(9) * period.toSec() *
-                 cos(currentObservation_.state(2));
-  position(1) += currentObservation_.state(9) * period.toSec() *
-                 sin(currentObservation_.state(2));
+  odom2base_.transform.translation.x = velocityJointHandles_[0].getPosition();
+  odom2base_.transform.translation.y = velocityJointHandles_[1].getPosition();
+  odom2base_.transform.translation.z = 0;
 
-  odom2base_.header.stamp = time;
-  odom2base_.transform.translation.x = position(0);
-  odom2base_.transform.translation.y = position(1);
-  odom2base_.transform.translation.z = position(2);
-  ROS_INFO_STREAM("X = " << position(0));
-  ROS_INFO_STREAM("Y = " << position(1));
   tfRtBroadcaster_.sendTransform(odom2base_);
 }
 
 void UprightController::updateStateEstimation(const ros::Time &time,
                                               const ros::Duration &period) {
-  ocs2::vector_t jointPos(CONTROL_DIM), jointVel(CONTROL_DIM);
-  for (size_t i = 0; i < CONTROL_DIM; ++i) {
-    jointPos(i) = jointHandles_[i].getPosition();
-    jointVel(i) = jointHandles_[i].getVelocity();
-  }
+  //  Diablo odom info
+  currentObservation_.state(0) = velocityJointHandles_[0].getPosition();
+  currentObservation_.state(1) = velocityJointHandles_[1].getPosition();
+  currentObservation_.state(2) = velocityJointHandles_[2].getPosition();
 
-  currentObservation_.state(0) = odom2base_.transform.translation.x;
-  currentObservation_.state(1) = odom2base_.transform.translation.y;
-  double yaw = yawFromQuat(odom2base_.transform.rotation);
-  currentObservation_.state(2) = yaw;
-  double xV = (jointVel(0) + jointVel(1)) * wheelR_ / 2;
-  double wV = (jointVel(0) - jointVel(1)) * wheelR_ / baseL_;
-  currentObservation_.state(9) = xV;
-  currentObservation_.state(10) = wV;
-  double xVLast = (jointVelLast_(0) + jointVelLast_(1)) * wheelR_ / 2;
-  double wVLast = (jointVelLast_(0) - jointVelLast_(1)) * wheelR_ / baseL_;
+  currentObservation_.state(9) = velocityJointHandles_[0].getVelocity();
+  currentObservation_.state(10) = velocityJointHandles_[2].getPosition();
 
+  //  All accs are set to zero due to ros:: inaccurate and unstable time
   currentObservation_.state(17) = 0;
   currentObservation_.state(18) = 0;
 
-  //      for arm
+  //  arm info
   for (int i = 0; i < 6; ++i) {
-    currentObservation_.state(3 + i) = jointPos(2 + i);
-    currentObservation_.state(11 + i) = jointVel(2 + i);
+    currentObservation_.state(3 + i) = positionJointHandles_[i].getPosition();
+    currentObservation_.state(11 + i) = positionJointHandles_[i].getVelocity();
+    //  All accs are set to zero due to ros:: inaccurate and unstable time
     currentObservation_.state(19 + i) = 0.;
   }
   currentObservation_.time += period.toSec();
-  jointVelLast_ = jointVel;
-  lastTime_ = time;
 }
 
 void UprightController::starting(const ros::Time &time) {
@@ -174,7 +163,7 @@ void UprightController::starting(const ros::Time &time) {
   currentObservation_.state = mobileManipulatorInterface_->getInitialState();
   ocs2::vector_t initDesiredState(7);
 
-  initDesiredState.head(3) << 0, 0, 0.5;
+  initDesiredState.head(3) << init_x_, init_y_, init_z_;
   initDesiredState.tail(4)
       << Eigen::Quaternion<ocs2::scalar_t>(1, 0, 0, 0).coeffs();
   ocs2::TargetTrajectories targetTrajectories({currentObservation_.time},
@@ -293,19 +282,13 @@ void UprightController::upright(const ros::Time &time,
                                    optimizedInput, plannedMode);
   currentObservation_.input = optimizedInput;
 
-  //      for wheel control
-  double xV = optimizedState(9);
-  double wV = optimizedState(10);
+  //  for diablo control
+  velocityJointHandles_[0].setCommand(optimizedState(9));
+  velocityJointHandles_[2].setCommand(optimizedState(10));
 
-  jointHandles_[0].setCommand(xV / wheelR_ + baseL_ * wV / (2 * wheelR_));
-  jointHandles_[1].setCommand(xV / wheelR_ - baseL_ * wV / (2 * wheelR_));
-  //  ROS_INFO_STREAM("left V  =" << xV / wheelR_ - baseL_ * wV / (2 *
-  //  wheelR_)); ROS_INFO_STREAM("right V  =" << xV / wheelR_ + baseL_ * wV /
-  //  (2 * wheelR_));
-  //      for arm control
-  for (int i = 0; i < 6; ++i)
-    jointHandles_[i + 2].setCommand(optimizedState(11 + i));
-
+  for (int i = 0; i < 6; ++i) {
+    positionJointHandles_[i].setCommand(optimizedState(3 + i));
+  }
   lastOptimizedState = optimizedState;
 }
 

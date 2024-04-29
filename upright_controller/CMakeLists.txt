@@ -13,6 +13,7 @@ set(CATKIN_PACKAGE_DEPENDENCIES
         pluginlib
 
         rm_hw
+        upright_hw
         upright_common
         upright_control
         upright_control_ros
@@ -85,6 +86,11 @@ install(DIRECTORY include/${PROJECT_NAME}/
 )
 
 install(DIRECTORY launch
+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
+
+install(
+        FILES upright_controller_plugins.xml
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
