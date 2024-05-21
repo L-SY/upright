@@ -14,4 +14,6 @@
     <depend>roscpp</depend>
     <depend>generally_hw</depend>
     <depend>rm_hw</depend>
+    <depend>ocs2_msgs</depend>
+    <depend>visualization_msgs</depend>
 </package>

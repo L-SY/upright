@@ -20,6 +20,19 @@ void rmInterface::moveJ(std::vector<double>& joint_angles, double speed)
   moveJPub_.publish(moveJ_Pose);
 }
 
+void rmInterface::moveJPos(std::vector<double>& joint_angles, double speed)
+{
+  rm_msgs::JointPos moveJ_Pos;
+
+  moveJ_Pos.joint.resize(joint_angles.size());
+  for (size_t i = 0; i < joint_angles.size(); ++i)
+  {
+    moveJ_Pos.joint[i] = joint_angles[i];
+  }
+  moveJ_Pos.expand = 1;
+  moveJPosPub_.publish(moveJ_Pos);
+}
+
 void rmInterface::servoControl(double d_x, double d_y, double d_z, double d_roll, double d_pitch, double d_yaw,
                                double speed)
 {

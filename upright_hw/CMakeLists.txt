@@ -9,6 +9,8 @@ find_package(catkin REQUIRED
 
         rm_hw
         generally_hw
+        ocs2_msgs
+        visualization_msgs
 )
 
 catkin_package(
@@ -18,6 +20,8 @@ catkin_package(
         roscpp
         rm_hw
         generally_hw
+        ocs2_msgs
+        visualization_msgs
 )
 
 ###########

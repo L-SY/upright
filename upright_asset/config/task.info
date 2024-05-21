@@ -16,10 +16,10 @@ robot
     (1,0) 0        ; initial state x0_2
     (2,0) 0        ; initial state x0_3
     (3,0) 0.0  ; initial state x0_4 (0.5pi)
-    (4,0) -1.7 ; initial state x0_5 (-0.25pi)
-    (5,0) 2.23   ; initial state x0_6 (0.5pi)
+    (4,0) -1.1 ; initial state x0_5 (-0.25pi)
+    (5,0) 1.84   ; initial state x0_6 (0.5pi)
     (6,0) 0 ; initial state x0_7 (-0.25pi)
-    (7,0) 1.0  ; initial state x0_8 (0.5pi)
+    (7,0) 0.8  ; initial state x0_8 (0.5pi)
     (8,0) 1.8 ; initial state x0_9 (0.417pi)
 
     ; init vel
@@ -70,29 +70,29 @@ rollout
 {
   AbsTolODE                       1e-5
   RelTolODE                       1e-3
-  timeStep                        1e-1
+  timeStep                        1e-2
   integratorType                  ODE45
-  maxNumStepsPerSecond            1000
+  maxNumStepsPerSecond            100000
   checkNumericalStability         false
 }
 
 ; MPC settings
 mpc
 {
-  timeHorizon                     2 ; [s]
-  solutionTimeWindow              0.2   ; [s]
+  timeHorizon                     3 ; [s]
+  solutionTimeWindow              0.1   ; [s]
   coldStart                       false
 
   debugPrint                      false
 
-  mpcDesiredFrequency             100   ; [Hz]
+  mpcDesiredFrequency             200   ; [Hz]
   mrtDesiredFrequency             500   ; [Hz]
 }
 
 ; settings for the sequential quadratic programming solver
 sqp
 {
-   dt 0.3
+   dt 0.1
    sqp_iteration 1
    init_sqp_iteration 1
    delta_tol 1e-3
@@ -119,7 +119,7 @@ Cost
     (0,0) 0.1    ; M(0,0)
     (1,1) 0.1    ; M(1,1)
     (2,2) 0.1    ; M(2,2)
-    (3,3) 10.0    ; M(3,3)
+    (3,3) 1.0    ; M(3,3)
     (4,4) 1.0    ; M(4,4)
     (5,5) 1.0    ; M(5,5)
     (6,6) 1.0    ; M(6,6)
@@ -133,8 +133,8 @@ Cost
     (0,0) 0.0    ; M(0,0)
     (1,1) 0.0    ; M(1,1)
     (2,2) 0.0    ; M(2,2)
-    (3,3) 2.0    ; M(3,3)
-    (4,4) 2.0    ; M(4,4)
+    (3,3) 0.0    ; M(3,3)
+    (4,4) 0.0    ; M(4,4)
     (5,5) 0.0    ; M(5,5)
     (6,6) 0.0    ; M(6,6)
     (7,7) 0.0    ; M(7,7)
@@ -151,8 +151,8 @@ Cost
     (16,16) 1.0 ; M(16,16)
 
     ; the acc weight
-    (17,17) 0.0  ; M(17,17)
-    (18,18) 0.0  ; M(18,18)
+    (17,17) 1.0  ; M(17,17)
+    (18,18) 1.0  ; M(18,18)
     (19,19) 0.0  ; M(19,19)
     (20,20) 0.0  ; M(20,20)
     (21,21) 0.0  ; M(21,21)
@@ -162,11 +162,11 @@ Cost
   }
   end_effector  ; EE pose weight
   {
-    scaling 1e+2
+    scaling 1e+4
     ; 3 position DOFs, 3 orientation DOFs
-    (0,0) 1.0    ; M(0,0)
+    (0,0) 2.0    ; M(0,0)
     (1,1) 1.0    ; M(1,1)
-    (2,2) 1.0    ; M(2,2)
+    (2,2) 2.0    ; M(2,2)
     (3,3) 0.0    ; M(3,3)
     (4,4) 0.0    ; M(4,4)
     (5,5) 0.0    ; M(5,5)
@@ -192,7 +192,7 @@ Constraint
     ; for safety, the end effector can be restricted to lie inside of a box
     endEffectorBoxConstraint
     {
-        enabled true
+        enabled false
         xyz_lower
         {
           scaling 1e+0
@@ -224,7 +224,7 @@ Constraint
         constraint_type soft
         input_lower
         {
-          scaling 1e+0
+          scaling 1e+1
           (0,0) -2.0  ; input_lower_1
           (1,0) -2.0  ; input_lower_2
           (2,0) -80.0  ; input_lower_3
@@ -237,7 +237,7 @@ Constraint
 
         input_upper
         {
-          scaling 1e+0
+          scaling 1e+1
           (0,0) 2.0   ; input_upper_1
           (1,0) 2.0   ; input_upper_2
           (2,0) 80.0   ; input_upper_3
@@ -250,7 +250,7 @@ Constraint
 
         state_lower
         {
-          scaling 1e+0
+          scaling 1e+1
 
           (0,0) -10.0   ; state_lower_1
           (1,0) -10.0   ; state_lower_2
@@ -281,7 +281,7 @@ Constraint
 
         state_upper
         {
-          scaling 1e+0
+          scaling 1e+1
           (0,0) 10.0   ; state_upper_1
           (1,0) 10.0   ; state_upper_2
           (2,0) 10.0   ; state_upper_3
@@ -342,7 +342,7 @@ inertial_alignment
   ; take angular acceleration into account (only has an affect if com has non-zero height)
   use_angular_acceleration true
   align_with_fixed_vector false  ; set to true to align with the contact_plane_normal
-  cost_weight 100
+  cost_weight 3000
   contact_plane_normal
   {
    scaling 1e+0
@@ -367,7 +367,7 @@ inertial_alignment
    scaling 1e+0
    (0,0) 0   ; x
    (1,0) 0   ; y
-   (2,0) 0.5   ; z
+   (2,0) 0.2   ; z
   }
 }
 

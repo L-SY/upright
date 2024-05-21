@@ -10,6 +10,7 @@
 #include <sensor_msgs/JointState.h>
 #include <geometry_msgs/Twist.h>
 #include <rm_hw/rmInterface.h>
+#include <ocs2_msgs/mpc_flattened_controller.h>
 
 namespace generally
 {
@@ -68,6 +69,12 @@ public:
     diabloMotorData[2].vel_ = data.get()->data[11];
   }
 
+  void optimizedStateTrajectoryCallBack(const ocs2_msgs::mpc_flattened_controllerConstPtr& data)
+  {
+    receiveOptimizedStateTrajectory_ = true;
+    optimizedStateTrajectory_ = *data;
+  }
+
 private:
   bool setupJoints(), is_writing_ = false, is_reading_ = false, recv_one_ = false;
 
@@ -80,6 +87,11 @@ private:
   ros::Publisher rmMotorPub_, diabloMotorPub_;
   std::vector<std::string> robotMotorName_;
   std::shared_ptr<rm_interface::rmInterface> rmInterface_;
+
+  // Sub optimizedStateTrajectory
+  bool receiveOptimizedStateTrajectory_ = false;
+  ros::Subscriber optimizedStateTrajectorySub_;
+  ocs2_msgs::mpc_flattened_controller optimizedStateTrajectory_;
 };
 
 }  // namespace generally

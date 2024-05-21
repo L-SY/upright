@@ -18,6 +18,7 @@ find_package(catkin REQUIRED
         tf2
         tf2_ros
         tf2_geometry_msgs
+        upright_common
 
 )
 
@@ -32,6 +33,7 @@ catkin_package(
         tf2
         tf2_ros
         tf2_geometry_msgs
+        upright_common
         DEPENDS
         LIBRARIES
         rm_hw

@@ -16,7 +16,7 @@ bool UprightHW::init(ros::NodeHandle& root_nh, ros::NodeHandle& robot_hw_nh)
   {
     return false;
   }
-  rmInterface_ = std::make_shared<rm_interface::rmInterface>(root_nh);
+  rmInterface_ = std::make_shared<rm_interface::rmInterface>(robot_hw_nh);
   setupJoints();
   setupTopic(robot_hw_nh);
   ROS_INFO_STREAM("upright hw Init Finish!");
@@ -30,7 +30,10 @@ void UprightHW::read(const ros::Time& time, const ros::Duration& /*period*/)
   for (auto& joint : rmMotorData)
   {
     joint.pos_ = rmInterface_->jointStates_.position[i];
-    joint.vel_ = rmInterface_->jointStates_.velocity[i];
+    if (receiveOptimizedStateTrajectory_)
+      joint.vel_ = optimizedStateTrajectory_.stateTrajectory[1].value[11 + i];
+    else
+      joint.vel_ = rmInterface_->jointStates_.velocity[i];
     joint.tau_ = rmInterface_->jointStates_.effort[i];
     i++;
   }
@@ -46,14 +49,22 @@ void UprightHW::write(const ros::Time& /*time*/, const ros::Duration& /*period*/
   if (rmMotorData[0].posDes_ == 0 && rmMotorData[1].posDes_ == 0 && rmMotorData[2].posDes_ == 0 &&
       rmMotorData[3].posDes_ == 0 && rmMotorData[4].posDes_ == 0 && rmMotorData[5].posDes_ == 0)
   {
-    std::vector<double> jointDes = { 0.0, -1.7, 2.23, 0, 1.0, 1.8 };
+    std::vector<double> jointDes = { 0.0, -1.1, 1.84, 0, 0.8, 1.8 };
     rmInterface_->moveJ(jointDes, 0.5);
   }
   else
   {
+    ros::Time now = ros::Time::now();
+    //    int i = 0;
+    //    for (auto& lp : rmInterface_->jointsLPFilters_)
+    //    {
+    //      lp->input(rmMotorData[i].posDes_, now);
+    //      rmMotorData[i].posDes_ = lp->output();
+    //      i++;
+    //    }
     std::vector<double> jointDes = { rmMotorData[0].posDes_, rmMotorData[1].posDes_, rmMotorData[2].posDes_,
                                      rmMotorData[3].posDes_, rmMotorData[4].posDes_, rmMotorData[5].posDes_ };
-    rmInterface_->moveJ(jointDes, 0.5);
+    rmInterface_->moveJPos(jointDes, 0.5);
   }
 
   is_writing_ = false;
@@ -61,8 +72,10 @@ void UprightHW::write(const ros::Time& /*time*/, const ros::Duration& /*period*/
 
 bool UprightHW::setupTopic(ros::NodeHandle& nh)
 {
-  diabloMotorPub_ = nh.advertise<geometry_msgs::Twist>("/diablo", 1);
+  diabloMotorPub_ = nh.advertise<geometry_msgs::Twist>("/diablo_cmd", 1);
   diabloOdomSub_ = nh.subscribe<std_msgs::Float64MultiArray>("/diablo_odom", 1, &UprightHW::diabloOdomCallBack, this);
+  optimizedStateTrajectorySub_ = nh.subscribe<ocs2_msgs::mpc_flattened_controller>(
+      "/mobile_manipulator_mpc_policy", 1, &UprightHW::optimizedStateTrajectoryCallBack, this);
   return true;
 }
 
