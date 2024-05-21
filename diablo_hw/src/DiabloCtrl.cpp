@@ -189,9 +189,8 @@ void DiabloRobot::write()
 
     movementCtrl_->ctrl_data.forward = cmd.linear.x;
     movementCtrl_->ctrl_data.left = cmd.angular.z;
-    //  ROS_INFO_STREAM(cmd.linear.x);
-
-    uint8_t result = movementCtrl_->SendMovementCtrlCmd();
+    ROS_INFO_STREAM(cmd.linear.x);
+    movementCtrl_->SendMovementCtrlCmd();
   }
 }
 
