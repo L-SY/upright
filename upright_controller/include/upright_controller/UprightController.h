@@ -12,6 +12,8 @@
 #include <ocs2_ddp/GaussNewtonDDP_MPC.h>
 #include <ocs2_mobile_manipulator/MobileManipulatorInterface.h>
 #include <ocs2_mpc/MPC_MRT_Interface.h>
+#include <ocs2_msgs/mpc_flattened_controller.h>
+#include <ocs2_ros_interfaces/mpc/MPC_ROS_Interface.h>
 #include <ros/package.h>
 #include <upright_control/MobileManipulatorInterface.h>
 
@@ -55,6 +57,11 @@ protected:
   virtual void updateStateEstimation(const ros::Time &time,
                                      const ros::Duration &period);
 
+  ocs2_msgs::mpc_flattened_controller
+  createMpcPolicyMsg(const ocs2::PrimalSolution &primalSolution,
+                     const ocs2::CommandData &commandData,
+                     const ocs2::PerformanceIndex &performanceIndices);
+
   void updateTfOdom(const ros::Time &time, const ros::Duration &period);
 
   void normal(const ros::Time &time, const ros::Duration &period);
@@ -89,6 +96,8 @@ protected:
 private:
   int controlState_ = UPRIGHT;
   std::thread mpcThread_;
+
+  ros::Publisher optimizedStateTrajectoryPub_;
   std::atomic_bool controllerRunning_{}, mpcRunning_{};
   ocs2::benchmark::RepeatedTimer mpcTimer_;
 

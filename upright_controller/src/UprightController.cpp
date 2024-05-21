@@ -79,6 +79,9 @@ bool UprightController::init(hardware_interface::RobotHW *robot_hw,
   controller_nh.getParam("init_pos/y", init_y_);
   controller_nh.getParam("init_pos/z", init_z_);
 
+  optimizedStateTrajectoryPub_ =
+      nh.advertise<ocs2_msgs::mpc_flattened_controller>(
+          "/mobile_manipulator_mpc_policy", 10);
   ROS_INFO_STREAM("UprightController Init Finish!");
   return true;
 }
@@ -290,6 +293,104 @@ void UprightController::upright(const ros::Time &time,
     positionJointHandles_[i].setCommand(optimizedState(3 + i));
   }
   lastOptimizedState = optimizedState;
+
+  ocs2_msgs::mpc_flattened_controller mpcPolicyMsg = createMpcPolicyMsg(
+      mpcMrtInterface_->getPolicy(), mpcMrtInterface_->getCommand(),
+      mpcMrtInterface_->getPerformanceIndices());
+  optimizedStateTrajectoryPub_.publish(mpcPolicyMsg);
+}
+
+ocs2_msgs::mpc_flattened_controller UprightController::createMpcPolicyMsg(
+    const ocs2::PrimalSolution &primalSolution,
+    const ocs2::CommandData &commandData,
+    const ocs2::PerformanceIndex &performanceIndices) {
+  ocs2_msgs::mpc_flattened_controller mpcPolicyMsg;
+
+  mpcPolicyMsg.initObservation =
+      ocs2::ros_msg_conversions::createObservationMsg(
+          commandData.mpcInitObservation_);
+  mpcPolicyMsg.planTargetTrajectories =
+      ocs2::ros_msg_conversions::createTargetTrajectoriesMsg(
+          commandData.mpcTargetTrajectories_);
+  mpcPolicyMsg.modeSchedule = ocs2::ros_msg_conversions::createModeScheduleMsg(
+      primalSolution.modeSchedule_);
+  mpcPolicyMsg.performanceIndices =
+      ocs2::ros_msg_conversions::createPerformanceIndicesMsg(
+          commandData.mpcInitObservation_.time, performanceIndices);
+
+  switch (primalSolution.controllerPtr_->getType()) {
+  case ocs2::ControllerType::FEEDFORWARD:
+    mpcPolicyMsg.controllerType =
+        ocs2_msgs::mpc_flattened_controller::CONTROLLER_FEEDFORWARD;
+    break;
+  case ocs2::ControllerType::LINEAR:
+    mpcPolicyMsg.controllerType =
+        ocs2_msgs::mpc_flattened_controller::CONTROLLER_LINEAR;
+    break;
+  default:
+    throw std::runtime_error(
+        "MPC_ROS_Interface::createMpcPolicyMsg: Unknown ControllerType");
+  }
+
+  // maximum length of the message
+  const size_t N = primalSolution.timeTrajectory_.size();
+
+  mpcPolicyMsg.timeTrajectory.clear();
+  mpcPolicyMsg.timeTrajectory.reserve(N);
+  mpcPolicyMsg.stateTrajectory.clear();
+  mpcPolicyMsg.stateTrajectory.reserve(N);
+  mpcPolicyMsg.data.clear();
+  mpcPolicyMsg.data.reserve(N);
+  mpcPolicyMsg.postEventIndices.clear();
+  mpcPolicyMsg.postEventIndices.reserve(
+      primalSolution.postEventIndices_.size());
+
+  // time
+  for (auto t : primalSolution.timeTrajectory_) {
+    mpcPolicyMsg.timeTrajectory.emplace_back(t);
+  }
+
+  // post-event indices
+  for (auto ind : primalSolution.postEventIndices_) {
+    mpcPolicyMsg.postEventIndices.emplace_back(static_cast<uint16_t>(ind));
+  }
+
+  // state
+  for (size_t k = 0; k < N; k++) {
+    ocs2_msgs::mpc_state mpcState;
+    mpcState.value.resize(primalSolution.stateTrajectory_[k].rows());
+    for (size_t j = 0; j < primalSolution.stateTrajectory_[k].rows(); j++) {
+      mpcState.value[j] = primalSolution.stateTrajectory_[k](j);
+    }
+    mpcPolicyMsg.stateTrajectory.emplace_back(mpcState);
+  } // end of k loop
+
+  // input
+  for (size_t k = 0; k < N; k++) {
+    ocs2_msgs::mpc_input mpcInput;
+    mpcInput.value.resize(primalSolution.inputTrajectory_[k].rows());
+    for (size_t j = 0; j < primalSolution.inputTrajectory_[k].rows(); j++) {
+      mpcInput.value[j] = primalSolution.inputTrajectory_[k](j);
+    }
+    mpcPolicyMsg.inputTrajectory.emplace_back(mpcInput);
+  } // end of k loop
+
+  // controller
+  ocs2::scalar_array_t timeTrajectoryTruncated;
+  std::vector<std::vector<float> *> policyMsgDataPointers;
+  policyMsgDataPointers.reserve(N);
+  for (auto t : primalSolution.timeTrajectory_) {
+    mpcPolicyMsg.data.emplace_back(ocs2_msgs::controller_data());
+
+    policyMsgDataPointers.push_back(&mpcPolicyMsg.data.back().data);
+    timeTrajectoryTruncated.push_back(t);
+  } // end of k loop
+
+  // serialize controller into data buffer
+  primalSolution.controllerPtr_->flatten(timeTrajectoryTruncated,
+                                         policyMsgDataPointers);
+
+  return mpcPolicyMsg;
 }
 
 } // namespace ddt

@@ -314,7 +314,6 @@ void MobileManipulatorController::upright(const ros::Time &time,
                                    currentObservation_.state, optimizedState,
                                    optimizedInput, plannedMode);
   currentObservation_.input = optimizedInput;
-
   //      for wheel control
   double xV = optimizedState(9);
   double wV = optimizedState(10);
