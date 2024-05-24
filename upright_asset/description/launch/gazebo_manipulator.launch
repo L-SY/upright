@@ -12,7 +12,7 @@
     <!-- push robot_description to factory and spawn robot in gazebo -->
     <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" clear_params="true"
           output="screen"
-          args="-param manipulator_description -urdf -model rm_arm
+          args="-param manipulator_description -urdf -model swingboy_v1
         -z 0.
         "
     />

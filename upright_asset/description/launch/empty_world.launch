@@ -12,8 +12,8 @@
     <!-- push robot_description to factory and spawn robot in gazebo -->
     <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" clear_params="true"
           output="screen"
-          args="-param wlm_description -urdf -model ddt_diablo
-        -z 0.2
+          args="-param wlm_description -urdf -model wlm
+        -z 0.
         "
     />
 </launch>
