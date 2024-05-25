@@ -40,13 +40,18 @@ bool UprightController::init(hardware_interface::RobotHW *robot_hw,
   lastTime_ = ros::Time::now();
 
   // Hardware interface
-  auto *positionJointInterface =
-      robot_hw->get<hardware_interface::PositionJointInterface>();
-  std::vector<std::string> rmJointNames{"rm_joint1", "rm_joint2", "rm_joint3",
-                                        "rm_joint4", "rm_joint5", "rm_joint6"};
-  for (const auto &joint_name : rmJointNames) {
-    positionJointHandles_.push_back(
-        positionJointInterface->getHandle(joint_name));
+  auto *effortJointInterface =
+      robot_hw->get<hardware_interface::EffortJointInterface>();
+  std::vector<std::string> swingboyJointNames{"joint1_motor", "joint2_motor",
+                                              "joint3_motor", "joint4_motor",
+                                              "joint5_motor", "joint6_motor"};
+  for (size_t i1 = 0; i1 < effortJointInterface->getNames().size(); ++i1) {
+    ROS_INFO_STREAM(effortJointInterface->getNames()[i1]);
+  }
+
+  for (const auto &joint_name : swingboyJointNames) {
+    ROS_INFO_STREAM("1");
+    effortJointHandles_.push_back(effortJointInterface->getHandle(joint_name));
   }
   auto *velocityJointInterface =
       robot_hw->get<hardware_interface::VelocityJointInterface>();
@@ -83,6 +88,18 @@ bool UprightController::init(hardware_interface::RobotHW *robot_hw,
       nh.advertise<ocs2_msgs::mpc_flattened_controller>(
           "/mobile_manipulator_mpc_policy", 10);
   ROS_INFO_STREAM("UprightController Init Finish!");
+
+  // Use for gravity compensation
+  std::string armURDFFile =
+      "/home/lsy/arm_control/src/arm_instance/swingboy_v1/swingboy_v1_assets/"
+      "description/urdf/robot.urdf";
+  std::vector<std::string> endEffectorName = {"link6"};
+  pinocchioInterface_ = std::make_shared<arm_pinocchio::PinocchioInterface>(
+      arm_pinocchio::getPinocchioInterfaceFromUrdfFile(armURDFFile));
+  endEffectorInterface_ =
+      std::make_shared<arm_pinocchio::EndEffectorInterface<double>>(
+          *pinocchioInterface_, endEffectorName);
+  endEffectorInterface_->setPinocchioInterface(*pinocchioInterface_);
   return true;
 }
 
@@ -92,6 +109,17 @@ void UprightController::update(const ros::Time &time,
   updateTfOdom(time, period);
   updateStateEstimation(time, period);
   mpcMrtInterface_->setCurrentObservation(currentObservation_);
+
+  std::vector<double> q;
+  std::vector<double> v;
+  for (size_t i = 0; i < effortJointHandles_.size(); ++i) {
+    q.push_back(effortJointHandles_[i].getPosition());
+    v.push_back(effortJointHandles_[i].getVelocity());
+  }
+  Eigen::VectorXd q_eigen = Eigen::VectorXd::Map(q.data(), q.size());
+  Eigen::VectorXd v_eigen = Eigen::VectorXd::Map(v.data(), v.size());
+
+  endEffectorInterface_->update(q_eigen, v_eigen);
 
   switch (controlState_) {
   case ControllerState::NORMAL:
@@ -151,8 +179,8 @@ void UprightController::updateStateEstimation(const ros::Time &time,
 
   //  arm info
   for (int i = 0; i < 6; ++i) {
-    currentObservation_.state(3 + i) = positionJointHandles_[i].getPosition();
-    currentObservation_.state(11 + i) = positionJointHandles_[i].getVelocity();
+    currentObservation_.state(3 + i) = effortJointHandles_[i].getPosition();
+    currentObservation_.state(11 + i) = effortJointHandles_[i].getVelocity();
     //  All accs are set to zero due to ros:: inaccurate and unstable time
     currentObservation_.state(19 + i) = 0.;
   }
@@ -290,7 +318,13 @@ void UprightController::upright(const ros::Time &time,
   velocityJointHandles_[2].setCommand(optimizedState(10));
 
   for (int i = 0; i < 6; ++i) {
-    positionJointHandles_[i].setCommand(optimizedState(3 + i));
+    double posError =
+        optimizedState(3 + i) - effortJointHandles_[i].getPosition();
+    double velError =
+        optimizedState(11 + i) - effortJointHandles_[i].getVelocity();
+    double gravityFF = endEffectorInterface_->getDynamics().G(i);
+
+    effortJointHandles_[i].setCommand(gravityFF * 0.5);
   }
   lastOptimizedState = optimizedState;
 

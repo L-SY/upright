@@ -12,11 +12,11 @@ set(CATKIN_PACKAGE_DEPENDENCIES
         effort_controllers
         pluginlib
 
-        rm_hw
         upright_hw
         upright_common
         upright_control
         upright_control_ros
+        arm_pinocchio_interface
 )
 find_package(pinocchio REQUIRED)
 add_definitions(-DBOOST_MPL_LIMIT_LIST_SIZE=30)

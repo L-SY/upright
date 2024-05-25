@@ -23,7 +23,10 @@
 #include <upright_common/ori_tool.h>
 #include <upright_common/tf_rt_broadcaster.h>
 
-#include "rm_hw/rmInterface.h"
+// Use for gravity compensation
+#include <arm_pinocchio_interface/EndEffectorInterface.h>
+#include <arm_pinocchio_interface/PinocchioInterface.h>
+#include <arm_pinocchio_interface/urdf.h>
 
 namespace ddt {
 class UprightController : public controller_interface::MultiInterfaceController<
@@ -109,7 +112,12 @@ private:
   ros::Time lastTime_{};
 
   double init_x_, init_y_, init_z_;
-  std::vector<hardware_interface::JointHandle> positionJointHandles_;
+  std::vector<hardware_interface::JointHandle> effortJointHandles_;
   std::vector<hardware_interface::JointHandle> velocityJointHandles_;
+
+  // Use for gravity compensation
+  std::shared_ptr<arm_pinocchio::PinocchioInterface> pinocchioInterface_;
+  std::shared_ptr<arm_pinocchio::EndEffectorInterface<double>>
+      endEffectorInterface_;
 };
 } // namespace ddt

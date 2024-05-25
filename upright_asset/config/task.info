@@ -13,14 +13,14 @@ robot
   {
     ; init pos
     (0,0) 0.0       ; initial state x0_1
-    (1,0) 0        ; initial state x0_2
-    (2,0) 0        ; initial state x0_3
+    (1,0) 0.0        ; initial state x0_2
+    (2,0) 0.0       ; initial state x0_3
     (3,0) 0.0  ; initial state x0_4 (0.5pi)
-    (4,0) -1.1 ; initial state x0_5 (-0.25pi)
-    (5,0) 1.84   ; initial state x0_6 (0.5pi)
-    (6,0) 0 ; initial state x0_7 (-0.25pi)
-    (7,0) 0.8  ; initial state x0_8 (0.5pi)
-    (8,0) 1.8 ; initial state x0_9 (0.417pi)
+    (4,0) 0.0 ; initial state x0_5 (-0.25pi)
+    (5,0) 0.0   ; initial state x0_6 (0.5pi)
+    (6,0) 0.0 ; initial state x0_7 (-0.25pi)
+    (7,0) 0.0  ; initial state x0_8 (0.5pi)
+    (8,0) 0.0 ; initial state x0_9 (0.417pi)
 
     ; init vel
     (9,0) 0.0        ; initial state x0_10
@@ -43,7 +43,7 @@ robot
     (24,0) 0.0       ; initial state x0_25
   }
 
-  tool_link_name "Link6"  ; the name of the link representing the tool (i.e., the tray)
+  tool_link_name "link6"  ; the name of the link representing the tool (i.e., the tray)
   base_link_name "diablo_base_link"
 
   arm_dim 6 ; the dof of arm
@@ -133,16 +133,16 @@ Cost
     (0,0) 0.0    ; M(0,0)
     (1,1) 0.0    ; M(1,1)
     (2,2) 0.0    ; M(2,2)
-    (3,3) 0.0    ; M(3,3)
-    (4,4) 0.0    ; M(4,4)
-    (5,5) 0.0    ; M(5,5)
-    (6,6) 0.0    ; M(6,6)
-    (7,7) 0.0    ; M(7,7)
-    (8,8) 0.0    ; M(8,8)
+    (3,3) 0.2    ; M(3,3)
+    (4,4) 0.2    ; M(4,4)
+    (5,5) 0.2    ; M(5,5)
+    (6,6) 0.2    ; M(6,6)
+    (7,7) 0.2    ; M(7,7)
+    (8,8) 0.2    ; M(8,8)
 
     ; the vel weight
-    (9,9) 5.0   ; M(9,9)
-    (10,10) 5.0 ; M(10,10)
+    (9,9) 1.0   ; M(9,9)
+    (10,10) 1.0 ; M(10,10)
     (11,11) 1.0 ; M(11,11)
     (12,12) 1.0 ; M(12,12)
     (13,13) 1.0 ; M(13,13)
@@ -342,7 +342,7 @@ inertial_alignment
   ; take angular acceleration into account (only has an affect if com has non-zero height)
   use_angular_acceleration true
   align_with_fixed_vector false  ; set to true to align with the contact_plane_normal
-  cost_weight 3000
+  cost_weight 1000
   contact_plane_normal
   {
    scaling 1e+0
@@ -354,11 +354,11 @@ inertial_alignment
   contact_plane_span
   {
     scaling 1e+0
-    (0,0) 1   ;
-    (0,1) 0   ;
+    (0,0) 0   ;
+    (0,1) -1   ;
     (0,2) 0   ;
-    (1,0) 0   ;
-    (1,2) 1   ;
+    (1,0) 1   ;
+    (1,2) 0   ;
     (1,3) 0   ;
   }
   ; set CoM offset

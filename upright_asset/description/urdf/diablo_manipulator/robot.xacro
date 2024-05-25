@@ -25,12 +25,4 @@
             <rpyOffsets>0 0 0</rpyOffsets>
         </plugin>
     </gazebo>
-    <!-- ros_control plugin -->
-    <!--    <gazebo>-->
-    <!--        <plugin name="gazebo_ros_control" filename="libqm_hw_sim.so">-->
-    <!--            <robotNamespace>/</robotNamespace>-->
-    <!--            <robotParam>upright_asset</robotParam>-->
-    <!--            <robotSimType>qm_gazebo/QMHWSim</robotSimType>-->
-    <!--        </plugin>-->
-    <!--    </gazebo>-->
 </robot>
