@@ -4,8 +4,13 @@
     <param name="robot_description"
            command="$(find xacro)/xacro $(find upright_asset)/description/urdf/diablo_manipulator/robot_pinocchio.urdf"/>
 
+    <param name="/swingboy_description"
+           command="$(find xacro)/xacro $(find upright_asset)/description/urdf/manipulator/robot.xacro"/>
+
     <param name="robot_type" value="$(arg robot_type)"/>
     <rosparam file="$(find upright_asset)/config/hw.yaml" command="load"/>
+
+    <rosparam file="$(find can_hw)/config/actuator_coefficient.yaml" command="load" ns="upright_hw"/>
     <node name="upright_hw" pkg="upright_hw" type="upright_hw" respawn="false"
           clear_params="true"/>
 </launch>

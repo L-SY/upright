@@ -39,26 +39,34 @@ bool UprightController::init(hardware_interface::RobotHW *robot_hw,
   jointVelLast_.resize(10);
   lastTime_ = ros::Time::now();
 
-  // Hardware interface
-  auto *effortJointInterface =
-      robot_hw->get<hardware_interface::EffortJointInterface>();
-  std::vector<std::string> swingboyJointNames{"joint1_motor", "joint2_motor",
-                                              "joint3_motor", "joint4_motor",
-                                              "joint5_motor", "joint6_motor"};
-  for (size_t i1 = 0; i1 < effortJointInterface->getNames().size(); ++i1) {
-    ROS_INFO_STREAM(effortJointInterface->getNames()[i1]);
-  }
+  ROS_INFO_STREAM("before");
 
-  for (const auto &joint_name : swingboyJointNames) {
-    ROS_INFO_STREAM("1");
-    effortJointHandles_.push_back(effortJointInterface->getHandle(joint_name));
-  }
   auto *velocityJointInterface =
       robot_hw->get<hardware_interface::VelocityJointInterface>();
   velocityJointHandles_.push_back(velocityJointInterface->getHandle("diabloX"));
   velocityJointHandles_.push_back(velocityJointInterface->getHandle("diabloY"));
   velocityJointHandles_.push_back(
       velocityJointInterface->getHandle("diabloYaw"));
+  ROS_INFO_STREAM(velocityJointInterface->getHandle("diabloX").getPosition());
+
+  auto *effort_joint_interface =
+      robot_hw->get<hardware_interface::EffortJointInterface>();
+  ROS_INFO_STREAM("after");
+  ROS_INFO_STREAM(effort_joint_interface->getHandle("joint1").getPosition());
+
+  // Hardware interface
+  //  auto *effortJointInterface =
+  //      robot_hw->get<hardware_interface::EffortJointInterface>();
+  //  std::vector<std::string> swingboyJointNames{"joint1", "joint2", "joint3",
+  //                                              "joint4", "joint5", "joint6"};
+  //  for (size_t i1 = 0; i1 < effortJointInterface->getNames().size(); ++i1) {
+  //    ROS_INFO_STREAM(effortJointInterface->getNames()[i1]);
+  //  }
+  //
+  //  for (const auto &joint_name : swingboyJointNames) {
+  //    ROS_INFO_STREAM("1");
+  //    effortJointHandles_.push_back(effortJointInterface->getHandle(joint_name));
+  //  }
 
   controlState_ = UPRIGHT;
 

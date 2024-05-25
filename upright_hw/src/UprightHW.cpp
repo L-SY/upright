@@ -21,19 +21,6 @@ bool UprightHW::init(ros::NodeHandle& root_nh, ros::NodeHandle& robot_hw_nh)
   swingboyHwPtr_->init(root_nh, robot_hw_nh);
   setupJoints();
   setupTopic(robot_hw_nh);
-
-  for (auto name : swingboyHwPtr_->get<hardware_interface::JointStateInterface>()->getNames())
-  {
-    ROS_INFO_STREAM(name);
-    auto jointHandle = swingboyHwPtr_->get<hardware_interface::JointStateInterface>()->getHandle(name);
-    auto effJointHandle = swingboyHwPtr_->get<hardware_interface::EffortJointInterface>()->getHandle(name);
-    this->get<hardware_interface::JointStateInterface>()->registerHandle(jointHandle);
-    this->get<hardware_interface::EffortJointInterface>()->registerHandle(effJointHandle);
-  }
-  auto effort_joint_interface = this->get<hardware_interface::JointStateInterface>();
-  std::vector<std::string> names = effort_joint_interface->getNames();
-  for (const auto& name : names)
-    ROS_INFO_STREAM(name);
   ROS_INFO_STREAM("upright hw Init Finish!");
   return true;
 }
@@ -77,6 +64,14 @@ bool UprightHW::setupJoints()
     hardware_interface::JointHandle joint_handle(state_handle, &joint.velDes_);
     velocityJointInterface_.registerHandle(joint_handle);
     velocity_joint_handles_.push_back(velocityJointInterface_.getHandle(joint.name_));
+  }
+
+  for (auto name : swingboyHwPtr_->get<hardware_interface::JointStateInterface>()->getNames())
+  {
+    this->get<hardware_interface::JointStateInterface>()->registerHandle(
+        swingboyHwPtr_->get<hardware_interface::JointStateInterface>()->getHandle(name));
+    this->get<hardware_interface::EffortJointInterface>()->registerHandle(
+        swingboyHwPtr_->get<hardware_interface::EffortJointInterface>()->getHandle(name));
   }
 
   return true;
