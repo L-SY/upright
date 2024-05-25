@@ -50,9 +50,12 @@ bool UprightController::init(hardware_interface::RobotHW *robot_hw,
   ROS_INFO_STREAM(velocityJointInterface->getHandle("diabloX").getPosition());
 
   auto *effort_joint_interface =
-      robot_hw->get<hardware_interface::EffortJointInterface>();
+      robot_hw->get<hardware_interface::JointStateInterface>();
   ROS_INFO_STREAM("after");
-  ROS_INFO_STREAM(effort_joint_interface->getHandle("joint1").getPosition());
+  for (size_t i1 = 0; i1 < effort_joint_interface->getNames().size(); ++i1) {
+    ROS_INFO_STREAM("!!!!!!!!!!!!");
+    ROS_INFO_STREAM(effort_joint_interface->getNames()[i1]);
+  }
 
   // Hardware interface
   //  auto *effortJointInterface =

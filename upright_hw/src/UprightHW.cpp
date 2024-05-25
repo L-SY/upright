@@ -68,9 +68,8 @@ bool UprightHW::setupJoints()
 
   for (auto name : swingboyHwPtr_->get<hardware_interface::JointStateInterface>()->getNames())
   {
-    this->get<hardware_interface::JointStateInterface>()->registerHandle(
-        swingboyHwPtr_->get<hardware_interface::JointStateInterface>()->getHandle(name));
-    this->get<hardware_interface::EffortJointInterface>()->registerHandle(
+    jointStateInterface_.registerHandle(swingboyHwPtr_->get<hardware_interface::JointStateInterface>()->getHandle(name));
+    effortJointInterface_.registerHandle(
         swingboyHwPtr_->get<hardware_interface::EffortJointInterface>()->getHandle(name));
   }
 
