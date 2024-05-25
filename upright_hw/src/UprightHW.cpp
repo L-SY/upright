@@ -16,57 +16,42 @@ bool UprightHW::init(ros::NodeHandle& root_nh, ros::NodeHandle& robot_hw_nh)
   {
     return false;
   }
-  rmInterface_ = std::make_shared<rm_interface::rmInterface>(robot_hw_nh);
+  swingboyHwPtr_ = std::make_shared<can_hw::CanHW>();
+  swingboyHwPtr_->setCanBusThreadPriority(95);
+  swingboyHwPtr_->init(root_nh, robot_hw_nh);
   setupJoints();
   setupTopic(robot_hw_nh);
+
+  for (auto name : swingboyHwPtr_->get<hardware_interface::JointStateInterface>()->getNames())
+  {
+    ROS_INFO_STREAM(name);
+    auto jointHandle = swingboyHwPtr_->get<hardware_interface::JointStateInterface>()->getHandle(name);
+    auto effJointHandle = swingboyHwPtr_->get<hardware_interface::EffortJointInterface>()->getHandle(name);
+    this->get<hardware_interface::JointStateInterface>()->registerHandle(jointHandle);
+    this->get<hardware_interface::EffortJointInterface>()->registerHandle(effJointHandle);
+  }
+  auto effort_joint_interface = this->get<hardware_interface::JointStateInterface>();
+  std::vector<std::string> names = effort_joint_interface->getNames();
+  for (const auto& name : names)
+    ROS_INFO_STREAM(name);
   ROS_INFO_STREAM("upright hw Init Finish!");
   return true;
 }
 
-void UprightHW::read(const ros::Time& time, const ros::Duration& /*period*/)
+void UprightHW::read(const ros::Time& time, const ros::Duration& period)
 {
   is_reading_ = true;
-  int i = 0;
-  for (auto& joint : rmMotorData)
-  {
-    joint.pos_ = rmInterface_->jointStates_.position[i];
-    if (receiveOptimizedStateTrajectory_)
-      joint.vel_ = optimizedStateTrajectory_.stateTrajectory[1].value[11 + i];
-    else
-      joint.vel_ = rmInterface_->jointStates_.velocity[i];
-    joint.tau_ = rmInterface_->jointStates_.effort[i];
-    i++;
-  }
+  swingboyHwPtr_->read(time, period);
 }
 
-void UprightHW::write(const ros::Time& /*time*/, const ros::Duration& /*period*/)
+void UprightHW::write(const ros::Time& time, const ros::Duration& period)
 {
   is_writing_ = true;
   geometry_msgs::Twist diabloCmd;
   diabloCmd.linear.x = velocityJointInterface_.getHandle("diabloX").getCommand();
   diabloCmd.angular.z = velocityJointInterface_.getHandle("diabloYaw").getCommand();
   diabloMotorPub_.publish(diabloCmd);
-  if (rmMotorData[0].posDes_ == 0 && rmMotorData[1].posDes_ == 0 && rmMotorData[2].posDes_ == 0 &&
-      rmMotorData[3].posDes_ == 0 && rmMotorData[4].posDes_ == 0 && rmMotorData[5].posDes_ == 0)
-  {
-    std::vector<double> jointDes = { 0.0, -1.1, 1.84, 0, 0.8, 1.8 };
-    rmInterface_->moveJ(jointDes, 0.5);
-  }
-  else
-  {
-    ros::Time now = ros::Time::now();
-    //    int i = 0;
-    //    for (auto& lp : rmInterface_->jointsLPFilters_)
-    //    {
-    //      lp->input(rmMotorData[i].posDes_, now);
-    //      rmMotorData[i].posDes_ = lp->output();
-    //      i++;
-    //    }
-    std::vector<double> jointDes = { rmMotorData[0].posDes_, rmMotorData[1].posDes_, rmMotorData[2].posDes_,
-                                     rmMotorData[3].posDes_, rmMotorData[4].posDes_, rmMotorData[5].posDes_ };
-    rmInterface_->moveJPos(jointDes, 0.5);
-  }
-
+  swingboyHwPtr_->write(time, period);
   is_writing_ = false;
 }
 
@@ -92,17 +77,6 @@ bool UprightHW::setupJoints()
     hardware_interface::JointHandle joint_handle(state_handle, &joint.velDes_);
     velocityJointInterface_.registerHandle(joint_handle);
     velocity_joint_handles_.push_back(velocityJointInterface_.getHandle(joint.name_));
-  }
-
-  // Six hybrid-joint for rm arm
-  for (int i = 0; i < 6; ++i)
-    rmMotorData[i].name_ = "rm_joint" + std::to_string(i + 1);
-  for (auto& joint : rmMotorData)
-  {
-    hardware_interface::JointStateHandle state_handle(joint.name_, &joint.pos_, &joint.vel_, &joint.tau_);
-    jointStateInterface_.registerHandle(state_handle);
-    positionJointInterface_.registerHandle(hardware_interface::JointHandle(state_handle, &joint.posDes_));
-    position_joint_handles_.push_back(positionJointInterface_.getHandle(joint.name_));
   }
 
   return true;

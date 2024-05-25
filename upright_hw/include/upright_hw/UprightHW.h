@@ -9,8 +9,8 @@
 #include <std_msgs/Float64MultiArray.h>
 #include <sensor_msgs/JointState.h>
 #include <geometry_msgs/Twist.h>
-#include <rm_hw/rmInterface.h>
 #include <ocs2_msgs/mpc_flattened_controller.h>
+#include <can_hw/hardware_interface.h>
 
 namespace generally
 {
@@ -19,13 +19,6 @@ struct DiabloMotorData
   std::string name_;
   double pos_, vel_, tau_;  // state
   double velDes_;           // command
-};
-
-struct RMMotorData
-{
-  std::string name_;
-  double pos_, vel_, tau_;  // state
-  double posDes_;
 };
 
 class UprightHW : public GenerallyHW
@@ -82,16 +75,15 @@ private:
   std::vector<double> rmJointPos_, rmJointVel_, rmJointEff_;
   const int jointNum = 8;
   DiabloMotorData diabloMotorData[3]{};
-  RMMotorData rmMotorData[6]{};  // NOLINT(modernize-avoid-c-arrays)
-  ros::Subscriber rmJointSub_, diabloOdomSub_;
-  ros::Publisher rmMotorPub_, diabloMotorPub_;
+  ros::Subscriber diabloOdomSub_;
+  ros::Publisher diabloMotorPub_;
   std::vector<std::string> robotMotorName_;
-  std::shared_ptr<rm_interface::rmInterface> rmInterface_;
 
   // Sub optimizedStateTrajectory
   bool receiveOptimizedStateTrajectory_ = false;
   ros::Subscriber optimizedStateTrajectorySub_;
   ocs2_msgs::mpc_flattened_controller optimizedStateTrajectory_;
+  std::shared_ptr<can_hw::CanHW> swingboyHwPtr_;
 };
 
 }  // namespace generally

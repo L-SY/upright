@@ -7,7 +7,7 @@ find_package(catkin REQUIRED
         COMPONENTS
         roscpp
 
-        rm_hw
+        can_hw
         generally_hw
         ocs2_msgs
         visualization_msgs
@@ -18,7 +18,7 @@ catkin_package(
         include
         CATKIN_DEPENDS
         roscpp
-        rm_hw
+        can_hw
         generally_hw
         ocs2_msgs
         visualization_msgs
