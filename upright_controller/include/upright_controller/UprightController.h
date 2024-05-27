@@ -6,6 +6,7 @@
 
 #include <controller_interface/multi_interface_controller.h>
 #include <hardware_interface/joint_command_interface.h>
+#include <control_toolbox/pid.h>
 
 #include <ocs2_core/Types.h>
 #include <ocs2_core/misc/Benchmark.h>
@@ -126,5 +127,8 @@ private:
   // Use for gravity compensation
   std::shared_ptr<arm_pinocchio::PinocchioInterface> pinocchioInterface_;
   std::shared_ptr<arm_pinocchio::EndEffectorInterface<double>> endEffectorInterface_;
+
+  // Low level controller
+  std::vector<control_toolbox::Pid> pids_;
 };
 }  // namespace ddt

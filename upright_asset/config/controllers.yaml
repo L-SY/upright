@@ -8,5 +8,12 @@ controllers:
     init_pos:
       x: 0.2
       y: 0.0
-      z: 0.7
+      z: 0.5
     arm_urdf: /home/lsy/upright_ws/src/upright_asset/description/urdf/manipulator/robot.urdf
+    gains:
+      joint1: { p: 1, i: 0., d: 0.01, i_clamp_max: 1., i_clamp_min: -1., antiwindup: true, publish_state: true }
+      joint2: { p: 1.8, i: 0., d: 0.01, i_clamp_max: 1., i_clamp_min: -1., antiwindup: true, publish_state: true }
+      joint3: { p: 1.8, i: 0., d: 0.01, i_clamp_max: 2.5, i_clamp_min: -2.5, antiwindup: true, publish_state: true }
+      joint4: { p: 1.8, i: 0., d: 0.01, i_clamp_max: 1, i_clamp_min: -1, antiwindup: true, publish_state: true }
+      joint5: { p: 1, i: 0., d: 0.01, i_clamp_max: 1, i_clamp_min: -1, antiwindup: true, publish_state: true }
+      joint6: { p: 0, i: 0., d: 0, i_clamp_max: 0.5, i_clamp_min: -0.5, antiwindup: true, publish_state: true }

@@ -90,6 +90,20 @@ bool UprightController::init(hardware_interface::RobotHW* robot_hw, ros::NodeHan
   endEffectorInterface_ =
       std::make_shared<arm_pinocchio::EndEffectorInterface<double>>(*pinocchioInterface_, endEffectorName);
   endEffectorInterface_->setPinocchioInterface(*pinocchioInterface_);
+
+  // Low level controller
+  std::vector<std::string> joint_names = { "joint1", "joint2", "joint3", "joint4", "joint5", "joint6" };
+  for (const auto& joint_name : joint_names)
+  {
+    control_toolbox::Pid pid;
+    ros::NodeHandle joint_nh(controller_nh, "gains/" + joint_name);
+    if (!pid.init(joint_nh))
+    {
+      ROS_ERROR_STREAM("Failed to initialize PID for " << joint_name);
+      return false;
+    }
+    pids_.push_back(pid);
+  }
   return true;
 }
 
@@ -307,13 +321,30 @@ void UprightController::upright(const ros::Time& time, const ros::Duration& peri
   velocityJointHandles_[0].setCommand(optimizedState(9));
   velocityJointHandles_[2].setCommand(optimizedState(10));
 
+  //  TODO : ADD gravity compensation
+  //  std::vector<double> q;
+  //  std::vector<double> v;
+  //  for (auto& effortJointHandle : effortJointHandles_)
+  //  {
+  //    q.push_back(effortJointHandle.getPosition());
+  //    v.push_back(effortJointHandle.getVelocity());
+  //  }
+  //  Eigen::VectorXd q_eigen = Eigen::VectorXd::Map(q.data(), q.size());
+  //  Eigen::VectorXd v_eigen = Eigen::VectorXd::Map(v.data(), v.size());
+  //  Eigen::VectorXd a_eigen;
+  //  a_eigen.setZero(q.size());
+  //  auto model = endEffectorInterface_->getPinocchioInterface().getModel();
+  //  auto data = endEffectorInterface_->getPinocchioInterface().getData();
+  //  Eigen::VectorXd gravity_torques = pinocchio::rnea(model, data, q_eigen, v_eigen, a_eigen);
+
   for (int i = 0; i < 6; ++i)
   {
     double posError = optimizedState(3 + i) - effortJointHandles_[i].getPosition();
     double velError = optimizedState(11 + i) - effortJointHandles_[i].getVelocity();
+    double commanded_effort = pids_[i].computeCommand(posError, period);
     //    double gravityFF = endEffectorInterface_->getDynamics().G(i);
 
-    effortJointHandles_[i].setCommand(0);
+    effortJointHandles_[i].setCommand(commanded_effort);
   }
   lastOptimizedState = optimizedState;
 
