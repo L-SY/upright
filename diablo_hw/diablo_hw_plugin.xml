@@ -1,0 +1,7 @@
+<library path="lib/libdiablo_hw">
+    <class name="diablo_hw/DiabloHW" type="diablo_hw::DiabloHW" base_class_type="hardware_interface::RobotHW">
+        <description>
+            Diablo hw for combined robot hw.
+        </description>
+    </class>
+</library>

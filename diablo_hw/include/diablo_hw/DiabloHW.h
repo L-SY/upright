@@ -9,8 +9,9 @@
 #include <ocs2_msgs/mpc_flattened_controller.h>
 #include <sensor_msgs/JointState.h>
 #include <std_msgs/Float64MultiArray.h>
+#include <pluginlib/class_list_macros.hpp>
 
-namespace generally
+namespace diablo_hw
 {
 struct DiabloMotorData
 {
@@ -19,7 +20,7 @@ struct DiabloMotorData
   double velDes_;           // command
 };
 
-class DiabloHW : public GenerallyHW
+class DiabloHW : public generally::GenerallyHW
 {
 public:
   DiabloHW() = default;
@@ -84,4 +85,4 @@ private:
   ocs2_msgs::mpc_flattened_controller optimizedStateTrajectory_;
 };
 
-}  // namespace generally
+}  // namespace diablo_hw

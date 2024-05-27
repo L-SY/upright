@@ -6,7 +6,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 find_package(catkin REQUIRED
         COMPONENTS
         roscpp
-
+        pluginlib
         generally_hw
         ocs2_msgs
         visualization_msgs
@@ -16,6 +16,7 @@ catkin_package(
         INCLUDE_DIRS
         include
         CATKIN_DEPENDS
+        pluginlib
         roscpp
         generally_hw
         ocs2_msgs

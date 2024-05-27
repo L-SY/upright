@@ -8,7 +8,7 @@
 #include <std_msgs/Float64MultiArray.h>
 #include <std_msgs/Int16MultiArray.h>
 
-namespace generally
+namespace diablo_hw
 {
 bool DiabloHW::init(ros::NodeHandle& root_nh, ros::NodeHandle& robot_hw_nh)
 {
@@ -64,4 +64,6 @@ bool DiabloHW::setupJoints()
   return true;
 }
 
-}  // namespace generally
+}  // namespace diablo_hw
+
+PLUGINLIB_EXPORT_CLASS(diablo_hw::DiabloHW, hardware_interface::RobotHW)
