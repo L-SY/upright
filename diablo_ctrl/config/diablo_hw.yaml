@@ -1,4 +1,4 @@
-diablo_hw:
+diablo_ctrl:
   loop_frequency: 500
   cycle_time_error_threshold: 0.001
   thread_priority: 95

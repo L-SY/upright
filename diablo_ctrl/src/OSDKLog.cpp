@@ -1,7 +1,7 @@
 #include <cstring>
 
-#include "diablo_hw/OSDKVehicle.h"
-#include "diablo_hw/OSDKTelemetry.h"
+#include "diablo_ctrl/OSDKVehicle.h"
+#include "diablo_ctrl/OSDKTelemetry.h"
 
 using namespace std;
 using namespace DIABLO::OSDK;

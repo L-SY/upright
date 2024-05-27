@@ -14,11 +14,11 @@
 #include <chrono>
 #include <thread>
 
-#include "diablo_hw/OSDKVehicle.h"
-#include "diablo_hw/OnboardSDKUartProtocol.h"
+#include "diablo_ctrl/OSDKVehicle.h"
+#include "diablo_ctrl/OnboardSDKUartProtocol.h"
 #include "realtime_tools/realtime_buffer.h"
 
-namespace diablo_hw
+namespace diablo_ctrl
 {
 enum ctrl_mode
 {
@@ -102,4 +102,4 @@ private:
   ctrl_mode Mode_ = NONE;
   ros::Time lastJoyCmdTime_, lastTopicCmdTime_;
 };
-}  // namespace diablo_hw
+}  // namespace diablo_ctrl

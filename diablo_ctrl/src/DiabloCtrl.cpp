@@ -1,11 +1,11 @@
 //
 // Created by lsy on 24-4-18.
 //
-#include "diablo_hw/VulcanSerial/SerialPort.h"
-#include "diablo_hw/OSDKVehicle.h"
-#include "diablo_hw/DiabloCtrl.h"
+#include "diablo_ctrl/VulcanSerial/SerialPort.h"
+#include "diablo_ctrl/OSDKVehicle.h"
+#include "diablo_ctrl/DiabloCtrl.h"
 
-namespace diablo_hw
+namespace diablo_ctrl
 {
 DiabloRobot::DiabloRobot(DIABLO::OSDK::Vehicle* vehicle, DIABLO::OSDK::Movement_Ctrl* movementCtrl,
                          ros::NodeHandle nodeHandle)
@@ -38,9 +38,9 @@ DiabloRobot::DiabloRobot(DIABLO::OSDK::Vehicle* vehicle, DIABLO::OSDK::Movement_
   int error = 0;
   int threadPriority = 0;
   ros::NodeHandle nhP("~");
-  error += static_cast<int>(!nhP.getParam("/diablo_hw/loop_frequency", loopHz_));
-  error += static_cast<int>(!nhP.getParam("/diablo_hw/cycle_time_error_threshold", cycleTimeErrorThreshold_));
-  error += static_cast<int>(!nhP.getParam("/diablo_hw/thread_priority", threadPriority));
+  error += static_cast<int>(!nhP.getParam("/diablo_ctrl/loop_frequency", loopHz_));
+  error += static_cast<int>(!nhP.getParam("/diablo_ctrl/cycle_time_error_threshold", cycleTimeErrorThreshold_));
+  error += static_cast<int>(!nhP.getParam("/diablo_ctrl/thread_priority", threadPriority));
   ROS_INFO_STREAM("loop_frequency = " << loopHz_);
   if (error > 0)
   {
@@ -226,4 +226,4 @@ void DiabloRobot::update()
   std::this_thread::sleep_until(sleepTill);
 }
 
-}  // namespace diablo_hw
+}  // namespace diablo_ctrl

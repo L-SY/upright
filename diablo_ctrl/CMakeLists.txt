@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.6.2)
-project(diablo_hw)
+project(diablo_ctrl)
 
 find_package(catkin REQUIRED COMPONENTS
         roscpp

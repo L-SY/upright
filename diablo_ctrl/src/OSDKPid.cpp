@@ -1,5 +1,5 @@
 #include <math.h>
-#include "diablo_hw/OSDKPid.h"
+#include "diablo_ctrl/OSDKPid.h"
 
 PositionPID::PositionPID(float target, float max, float min, float dt, float k_p, float k_i, float k_d, bool l_limit)
 {

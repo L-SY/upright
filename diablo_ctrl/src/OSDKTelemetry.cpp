@@ -1,6 +1,6 @@
-#include "diablo_hw/OSDKHeader.h"
-#include "diablo_hw/OSDKVehicle.h"
-#include "diablo_hw/OSDKTelemetry.h"
+#include "diablo_ctrl/OSDKHeader.h"
+#include "diablo_ctrl/OSDKVehicle.h"
+#include "diablo_ctrl/OSDKTelemetry.h"
 
 using namespace DIABLO::OSDK;
 

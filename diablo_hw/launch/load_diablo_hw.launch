@@ -1,8 +1,0 @@
-<launch>
-    <arg name="robot_type" default="diablo"/>
-
-    <rosparam file="$(find diablo_hw)/config/diablo_hw.yaml" command="load"/>
-
-    <node name="diablo_hw" pkg="diablo_hw" type="diablo_hw" respawn="false"
-          clear_params="true"/>
-</launch>
