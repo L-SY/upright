@@ -12,13 +12,12 @@
 
     <build_depend>cmake_clang_tools</build_depend>
     <depend>roscpp</depend>
-    <depend>generally_hw</depend>
-    <depend>can_hw</depend>
     <depend>ocs2_msgs</depend>
     <depend>visualization_msgs</depend>
     <depend>pluginlib</depend>
+    <depend>hardware_interface</depend>
 
     <export>
-        <hardware_interface plugin="${prefix}/diablo_hw.xml"/>
+        <hardware_interface plugin="${prefix}/diablo_hw_plugin.xml"/>
     </export>
 </package>

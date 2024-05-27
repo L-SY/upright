@@ -12,10 +12,8 @@ namespace diablo_hw
 {
 bool DiabloHW::init(ros::NodeHandle& root_nh, ros::NodeHandle& robot_hw_nh)
 {
-  if (!GenerallyHW::init(root_nh, robot_hw_nh))
-  {
-    return false;
-  }
+  registerInterface(&jointStateInterface_);
+  registerInterface(&velocityJointInterface_);
   setupJoints();
   setupTopic(robot_hw_nh);
   ROS_INFO_STREAM("Diablo hw Init Finish!");
@@ -58,7 +56,6 @@ bool DiabloHW::setupJoints()
     jointStateInterface_.registerHandle(state_handle);
     hardware_interface::JointHandle joint_handle(state_handle, &joint.velDes_);
     velocityJointInterface_.registerHandle(joint_handle);
-    velocity_joint_handles_.push_back(velocityJointInterface_.getHandle(joint.name_));
   }
 
   return true;

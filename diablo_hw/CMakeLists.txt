@@ -7,9 +7,9 @@ find_package(catkin REQUIRED
         COMPONENTS
         roscpp
         pluginlib
-        generally_hw
         ocs2_msgs
         visualization_msgs
+        hardware_interface
 )
 
 catkin_package(
@@ -18,9 +18,9 @@ catkin_package(
         CATKIN_DEPENDS
         pluginlib
         roscpp
-        generally_hw
         ocs2_msgs
         visualization_msgs
+        hardware_interface
 )
 
 ###########
@@ -33,7 +33,12 @@ include_directories(
 )
 
 add_library(${PROJECT_NAME}
+        SHARED
         src/DiabloHW.cpp
+)
+
+add_dependencies(${PROJECT_NAME}
+        ${catkin_EXPORTED_TARGETS}
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -73,7 +78,6 @@ install(DIRECTORY include/${PROJECT_NAME}
         FILES_MATCHING PATTERN "*.h"
 )
 
-# Mark other files for installation
-install(DIRECTORY launch
+install(FILES diablo_hw_plugin.xml
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )

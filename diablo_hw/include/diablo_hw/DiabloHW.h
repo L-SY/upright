@@ -4,12 +4,14 @@
 
 #pragma once
 
-#include <generally_hw/GenerallyHW.h>
 #include <geometry_msgs/Twist.h>
 #include <ocs2_msgs/mpc_flattened_controller.h>
 #include <sensor_msgs/JointState.h>
 #include <std_msgs/Float64MultiArray.h>
 #include <pluginlib/class_list_macros.hpp>
+#include <hardware_interface/robot_hw.h>
+#include <hardware_interface/joint_command_interface.h>
+#include <hardware_interface/joint_state_interface.h>
 
 namespace diablo_hw
 {
@@ -20,7 +22,7 @@ struct DiabloMotorData
   double velDes_;           // command
 };
 
-class DiabloHW : public generally::GenerallyHW
+class DiabloHW : public hardware_interface::RobotHW
 {
 public:
   DiabloHW() = default;
@@ -72,8 +74,6 @@ private:
   bool setupJoints(), is_writing_ = false, is_reading_ = false, recv_one_ = false;
 
   bool setupTopic(ros::NodeHandle& nh);
-  std::vector<double> rmJointPos_, rmJointVel_, rmJointEff_;
-  const int jointNum = 8;
   DiabloMotorData diabloMotorData[3]{};
   ros::Subscriber diabloOdomSub_;
   ros::Publisher diabloMotorPub_;
@@ -83,6 +83,11 @@ private:
   bool receiveOptimizedStateTrajectory_ = false;
   ros::Subscriber optimizedStateTrajectorySub_;
   ocs2_msgs::mpc_flattened_controller optimizedStateTrajectory_;
+
+  hardware_interface::VelocityJointInterface
+      velocityJointInterface_;  // NOLINT(misc-non-private-member-variables-in-classes)
+
+  hardware_interface::JointStateInterface jointStateInterface_;  // NOLINT(misc-non-private-member-variables-in-classes)
 };
 
 }  // namespace diablo_hw
