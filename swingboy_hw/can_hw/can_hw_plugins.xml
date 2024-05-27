@@ -1,0 +1,7 @@
+<library path="lib/libcan_hw">
+    <class name="can_hw/CanHW" type="can_hw::CanHW" base_class_type="hardware_interface::RobotHW">
+        <description>
+            CanHW type for combination hw.
+        </description>
+    </class>
+</library>

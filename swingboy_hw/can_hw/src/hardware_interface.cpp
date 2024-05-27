@@ -67,7 +67,7 @@ bool CanHW::init(ros::NodeHandle& root_nh, ros::NodeHandle& robot_hw_nh)
   }
 
   actuator_state_pub_.reset(
-          new realtime_tools::RealtimePublisher<arm_msgs::ActuatorState>(root_nh, "/actuator_states", 100));
+      new realtime_tools::RealtimePublisher<arm_msgs::ActuatorState>(root_nh, "/actuator_states", 100));
 
   return true;
 }
@@ -280,43 +280,43 @@ void CanHW::setCanBusThreadPriority(int thread_priority)
 
 void CanHW::publishActuatorState(const ros::Time& time)
 {
-    if (!is_actuator_specified_)
-        return;
-    if (last_publish_time_ + ros::Duration(1.0 / 100.0) < time)
+  if (!is_actuator_specified_)
+    return;
+  if (last_publish_time_ + ros::Duration(1.0 / 100.0) < time)
+  {
+    if (actuator_state_pub_->trylock())
     {
-        if (actuator_state_pub_->trylock())
+      arm_msgs::ActuatorState actuator_state;
+      for (const auto& id2act_datas : can_motor_.bus_id2act_data_)
+        for (const auto& act_data : id2act_datas.second)
         {
-            arm_msgs::ActuatorState actuator_state;
-            for (const auto& id2act_datas : can_motor_.bus_id2act_data_)
-                for (const auto& act_data : id2act_datas.second)
-                {
-                    actuator_state.stamp.push_back(act_data.second.stamp);
-                    actuator_state.name.push_back(act_data.second.name);
-                    actuator_state.type.push_back(act_data.second.type);
-                    actuator_state.bus.push_back(id2act_datas.first);
-                    actuator_state.id.push_back(act_data.first);
-                    actuator_state.halted.push_back(act_data.second.halted);
-                    actuator_state.need_calibration.push_back(act_data.second.need_calibration);
-                    actuator_state.calibrated.push_back(act_data.second.calibrated);
-                    actuator_state.calibration_reading.push_back(act_data.second.calibration_reading);
-                    actuator_state.position_raw.push_back(act_data.second.q_raw);
-                    actuator_state.velocity_raw.push_back(act_data.second.qd_raw);
-                    actuator_state.temperature.push_back(act_data.second.temp);
-                    actuator_state.circle.push_back(act_data.second.q_circle);
-                    actuator_state.last_position_raw.push_back(act_data.second.q_last);
-                    actuator_state.frequency.push_back(act_data.second.frequency);
-                    actuator_state.position.push_back(act_data.second.pos);
-                    actuator_state.velocity.push_back(act_data.second.vel);
-                    actuator_state.effort.push_back(act_data.second.effort);
-                    actuator_state.commanded_effort.push_back(act_data.second.cmd_effort);
-                    actuator_state.executed_effort.push_back(act_data.second.exe_effort);
-                    actuator_state.offset.push_back(act_data.second.act_offset);
-                }
-            actuator_state_pub_->msg_ = actuator_state;
-            actuator_state_pub_->unlockAndPublish();
-            last_publish_time_ = time;
+          actuator_state.stamp.push_back(act_data.second.stamp);
+          actuator_state.name.push_back(act_data.second.name);
+          actuator_state.type.push_back(act_data.second.type);
+          actuator_state.bus.push_back(id2act_datas.first);
+          actuator_state.id.push_back(act_data.first);
+          actuator_state.halted.push_back(act_data.second.halted);
+          actuator_state.need_calibration.push_back(act_data.second.need_calibration);
+          actuator_state.calibrated.push_back(act_data.second.calibrated);
+          actuator_state.calibration_reading.push_back(act_data.second.calibration_reading);
+          actuator_state.position_raw.push_back(act_data.second.q_raw);
+          actuator_state.velocity_raw.push_back(act_data.second.qd_raw);
+          actuator_state.temperature.push_back(act_data.second.temp);
+          actuator_state.circle.push_back(act_data.second.q_circle);
+          actuator_state.last_position_raw.push_back(act_data.second.q_last);
+          actuator_state.frequency.push_back(act_data.second.frequency);
+          actuator_state.position.push_back(act_data.second.pos);
+          actuator_state.velocity.push_back(act_data.second.vel);
+          actuator_state.effort.push_back(act_data.second.effort);
+          actuator_state.commanded_effort.push_back(act_data.second.cmd_effort);
+          actuator_state.executed_effort.push_back(act_data.second.exe_effort);
+          actuator_state.offset.push_back(act_data.second.act_offset);
         }
+      actuator_state_pub_->msg_ = actuator_state;
+      actuator_state_pub_->unlockAndPublish();
+      last_publish_time_ = time;
     }
+  }
 }
 
 void CanHW::testMotor()
@@ -331,3 +331,5 @@ void CanHW::close()
     bus->close();
 }
 }  // namespace can_hw
+
+PLUGINLIB_EXPORT_CLASS(can_hw::CanHW, hardware_interface::RobotHW)

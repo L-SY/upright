@@ -62,8 +62,7 @@
 #include <joint_limits_interface/joint_limits_urdf.h>
 #include <joint_limits_interface/joint_limits_rosparam.h>
 #include "realtime_tools/realtime_publisher.h"
-
-// #include
+#include <pluginlib/class_list_macros.hpp>
 
 namespace can_hw
 {

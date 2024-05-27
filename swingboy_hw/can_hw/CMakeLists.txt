@@ -10,6 +10,7 @@ set(CATKIN_PACKAGE_DEPENDENCIES
         transmission_interface
         joint_limits_interface
         controller_manager
+        pluginlib
 
         arm_msgs
         arm_common
