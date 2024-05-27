@@ -8,7 +8,9 @@ find_package(catkin REQUIRED
         roscpp
 
         can_hw
+        diablo_hw
         generally_hw
+        combined_robot_hw
         ocs2_msgs
         visualization_msgs
 )
@@ -19,6 +21,8 @@ catkin_package(
         CATKIN_DEPENDS
         roscpp
         can_hw
+        diablo_hw
+        combined_robot_hw
         generally_hw
         ocs2_msgs
         visualization_msgs
@@ -35,7 +39,6 @@ include_directories(
 
 add_executable(${PROJECT_NAME}
         src/upright_hw.cpp
-        src/UprightHW.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}

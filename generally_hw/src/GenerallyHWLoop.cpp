@@ -6,7 +6,8 @@
 
 namespace generally {
 GenerallyHWLoop::GenerallyHWLoop(
-    ros::NodeHandle &nh, std::shared_ptr<GenerallyHW> hardware_interface)
+    ros::NodeHandle &nh,
+    std::shared_ptr<hardware_interface::RobotHW> hardware_interface)
     : nh_(nh), hardwareInterface_(std::move(hardware_interface)),
       loopRunning_(true) {
   // Create the controller manager

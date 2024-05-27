@@ -16,4 +16,6 @@
     <depend>can_hw</depend>
     <depend>ocs2_msgs</depend>
     <depend>visualization_msgs</depend>
+    <depend>diablo_hw</depend>
+    <depend>combined_robot_hw</depend>
 </package>

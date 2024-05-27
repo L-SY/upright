@@ -2,8 +2,7 @@
 // Created by lsy on 24-3-7.
 //
 
-#include "upright_hw/UprightHW.h"
-
+#include <combined_robot_hw/combined_robot_hw.h>
 #include <generally_hw/GenerallyHWLoop.h>
 
 int main(int argc, char** argv)
@@ -24,7 +23,8 @@ int main(int argc, char** argv)
   try
   {
     // Create the hardware interface specific to your robot
-    std::shared_ptr<generally::UprightHW> UprightHW = std::make_shared<generally::UprightHW>();
+    std::shared_ptr<combined_robot_hw::CombinedRobotHW> UprightHW =
+        std::make_shared<combined_robot_hw::CombinedRobotHW>();
     // Initialize the hardware interface:
     // 1. retrieve configuration from rosparam
     // 2. initialize the hardware and interface it with ros_control
