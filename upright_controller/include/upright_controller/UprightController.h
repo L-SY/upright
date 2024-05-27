@@ -28,18 +28,21 @@
 #include <arm_pinocchio_interface/PinocchioInterface.h>
 #include <arm_pinocchio_interface/urdf.h>
 
-namespace ddt {
-class UprightController : public controller_interface::MultiInterfaceController<
-                              hardware_interface::VelocityJointInterface,
-                              hardware_interface::PositionJointInterface> {
-  enum ControllerState {
-    NORMAL,  // Only try to achieve EE to reach a specified point in space
-    UPRIGHT, // On the basis of normal, increase the importance of keeping the
-             // objects on EE upright
-    UPRIGHT_AVOID, // On the basis of upright, increase the function of avoid
-                   // obstacle
-    EE_SPACE_LOCK  // Try to lock the EE on a space point while move the  robot
-                   // base
+namespace ddt
+{
+class UprightController
+  : public controller_interface::MultiInterfaceController<hardware_interface::VelocityJointInterface,
+                                                          hardware_interface::EffortJointInterface>
+{
+  enum ControllerState
+  {
+    NORMAL,         // Only try to achieve EE to reach a specified point in space
+    UPRIGHT,        // On the basis of normal, increase the importance of keeping the
+                    // objects on EE upright
+    UPRIGHT_AVOID,  // On the basis of upright, increase the function of avoid
+                    // obstacle
+    EE_SPACE_LOCK   // Try to lock the EE on a space point while move the  robot
+                    // base
   };
 
 public:
@@ -47,37 +50,37 @@ public:
 
   ~UprightController() override;
 
-  bool init(hardware_interface::RobotHW *robot_hw, ros::NodeHandle &root_nh,
-            ros::NodeHandle &controller_nh) override;
+  bool init(hardware_interface::RobotHW* robot_hw, ros::NodeHandle& root_nh, ros::NodeHandle& controller_nh) override;
 
-  void update(const ros::Time &time, const ros::Duration &period) override;
+  void update(const ros::Time& time, const ros::Duration& period) override;
 
-  void starting(const ros::Time &time) override;
+  void starting(const ros::Time& time) override;
 
-  void stopping(const ros::Time & /*time*/) override { mpcRunning_ = false; }
+  void stopping(const ros::Time& /*time*/) override
+  {
+    mpcRunning_ = false;
+  }
 
 protected:
-  virtual void updateStateEstimation(const ros::Time &time,
-                                     const ros::Duration &period);
+  virtual void updateStateEstimation(const ros::Time& time, const ros::Duration& period);
 
-  ocs2_msgs::mpc_flattened_controller
-  createMpcPolicyMsg(const ocs2::PrimalSolution &primalSolution,
-                     const ocs2::CommandData &commandData,
-                     const ocs2::PerformanceIndex &performanceIndices);
+  ocs2_msgs::mpc_flattened_controller createMpcPolicyMsg(const ocs2::PrimalSolution& primalSolution,
+                                                         const ocs2::CommandData& commandData,
+                                                         const ocs2::PerformanceIndex& performanceIndices);
 
-  void updateTfOdom(const ros::Time &time, const ros::Duration &period);
+  void updateTfOdom(const ros::Time& time, const ros::Duration& period);
 
-  void normal(const ros::Time &time, const ros::Duration &period);
+  void normal(const ros::Time& time, const ros::Duration& period);
 
-  void upright(const ros::Time &time, const ros::Duration &period);
+  void upright(const ros::Time& time, const ros::Duration& period);
 
-  void uprightAvoid(const ros::Time &time, const ros::Duration &period);
+  void uprightAvoid(const ros::Time& time, const ros::Duration& period);
 
-  void EESpaceLock(const ros::Time &time, const ros::Duration &period);
+  void EESpaceLock(const ros::Time& time, const ros::Duration& period);
 
   void worldV2BaseV();
 
-  virtual void setupMpc(ros::NodeHandle &nh);
+  virtual void setupMpc(ros::NodeHandle& nh);
 
   virtual void setupMrt();
 
@@ -117,7 +120,6 @@ private:
 
   // Use for gravity compensation
   std::shared_ptr<arm_pinocchio::PinocchioInterface> pinocchioInterface_;
-  std::shared_ptr<arm_pinocchio::EndEffectorInterface<double>>
-      endEffectorInterface_;
+  std::shared_ptr<arm_pinocchio::EndEffectorInterface<double>> endEffectorInterface_;
 };
-} // namespace ddt
+}  // namespace ddt
