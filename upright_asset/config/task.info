@@ -79,14 +79,14 @@ rollout
 ; MPC settings
 mpc
 {
-  timeHorizon                     3 ; [s]
-  solutionTimeWindow              0.1   ; [s]
+  timeHorizon                     1 ; [s]
+  solutionTimeWindow              0.2   ; [s]
   coldStart                       false
 
   debugPrint                      false
 
-  mpcDesiredFrequency             200   ; [Hz]
-  mrtDesiredFrequency             500   ; [Hz]
+  mpcDesiredFrequency             100   ; [Hz]
+  mrtDesiredFrequency             200   ; [Hz]
 }
 
 ; settings for the sequential quadratic programming solver

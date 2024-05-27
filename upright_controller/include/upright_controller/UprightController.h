@@ -28,6 +28,11 @@
 #include <arm_pinocchio_interface/PinocchioInterface.h>
 #include <arm_pinocchio_interface/urdf.h>
 
+#include <pinocchio/algorithm/rnea.hpp>
+#include <pinocchio/parsers/urdf.hpp>
+#include <pinocchio/multibody/model.hpp>
+#include <pinocchio/multibody/data.hpp>
+
 namespace ddt
 {
 class UprightController

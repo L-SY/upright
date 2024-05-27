@@ -81,11 +81,12 @@ bool UprightController::init(hardware_interface::RobotHW* robot_hw, ros::NodeHan
   ROS_INFO_STREAM("UprightController Init Finish!");
 
   // Use for gravity compensation
-  std::string armURDFFile =
-      "/home/lsy/arm_control/src/arm_instance/swingboy_v1/swingboy_v1_assets/description/urdf/robot.urdf";
+  std::string armURDFFile;
+  controller_nh.getParam("arm_urdf", armURDFFile);
   std::vector<std::string> endEffectorName = { "link6" };
   pinocchioInterface_ = std::make_shared<arm_pinocchio::PinocchioInterface>(
       arm_pinocchio::getPinocchioInterfaceFromUrdfFile(armURDFFile));
+  std::cout << *pinocchioInterface_ << std::endl;
   endEffectorInterface_ =
       std::make_shared<arm_pinocchio::EndEffectorInterface<double>>(*pinocchioInterface_, endEffectorName);
   endEffectorInterface_->setPinocchioInterface(*pinocchioInterface_);
@@ -101,10 +102,10 @@ void UprightController::update(const ros::Time& time, const ros::Duration& perio
 
   std::vector<double> q;
   std::vector<double> v;
-  for (size_t i = 0; i < effortJointHandles_.size(); ++i)
+  for (auto& effortJointHandle : effortJointHandles_)
   {
-    q.push_back(effortJointHandles_[i].getPosition());
-    v.push_back(effortJointHandles_[i].getVelocity());
+    q.push_back(effortJointHandle.getPosition());
+    v.push_back(effortJointHandle.getVelocity());
   }
   Eigen::VectorXd q_eigen = Eigen::VectorXd::Map(q.data(), q.size());
   Eigen::VectorXd v_eigen = Eigen::VectorXd::Map(v.data(), v.size());
@@ -117,9 +118,7 @@ void UprightController::update(const ros::Time& time, const ros::Duration& perio
       normal(time, period);
       break;
     case ControllerState::UPRIGHT:  // Add when normal is useful
-      ROS_INFO_STREAM("before upright update");
       upright(time, period);
-      ROS_INFO_STREAM("after upright update");
       break;
     case ControllerState::UPRIGHT_AVOID:  // Add when normal is useful
       uprightAvoid(time, period);
@@ -310,12 +309,11 @@ void UprightController::upright(const ros::Time& time, const ros::Duration& peri
 
   for (int i = 0; i < 6; ++i)
   {
-    ROS_INFO_STREAM(i);
     double posError = optimizedState(3 + i) - effortJointHandles_[i].getPosition();
     double velError = optimizedState(11 + i) - effortJointHandles_[i].getVelocity();
-    double gravityFF = endEffectorInterface_->getDynamics().G(i);
+    //    double gravityFF = endEffectorInterface_->getDynamics().G(i);
 
-    effortJointHandles_[i].setCommand(gravityFF * 0.3);
+    effortJointHandles_[i].setCommand(0);
   }
   lastOptimizedState = optimizedState;
 

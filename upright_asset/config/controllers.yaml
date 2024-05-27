@@ -9,3 +9,4 @@ controllers:
       x: 0.2
       y: 0.0
       z: 0.7
+    arm_urdf: /home/lsy/upright_ws/src/upright_asset/description/urdf/manipulator/robot.urdf

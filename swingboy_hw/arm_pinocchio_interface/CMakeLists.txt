@@ -62,7 +62,7 @@ target_link_libraries(${PROJECT_NAME}
         ${catkin_LIBRARIES}
         ${pinocchio_LIBRARIES}
 )
-target_compile_options(${PROJECT_NAME} PUBLIC ${arm_PINOCCHIO_FLAGS})
+target_compile_options(${PROJECT_NAME} PUBLIC ${OSC2_PINOCCHIO_FLAGS})
 
 ####################
 ## Clang tooling ###

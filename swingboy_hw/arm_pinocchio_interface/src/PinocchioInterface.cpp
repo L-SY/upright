@@ -30,19 +30,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <arm_pinocchio_interface/PinocchioInterface.h>
 
-namespace arm_pinocchio
-{
+namespace arm_pinocchio {
 
 /******************************************************************************************************/
 /******************************************************************************************************/
 /******************************************************************************************************/
-PinocchioInterface::PinocchioInterface(const Model& model,
-                                       const std::shared_ptr<const ::urdf::ModelInterface> urdfModelPtr)
-  : robotModelPtr_(std::make_shared<Model>(model))
-  , robotDataPtr_(std::make_unique<Data>(*robotModelPtr_))
-  , urdfModelPtr_(urdfModelPtr)
-{
-}
+PinocchioInterface::PinocchioInterface(
+    const Model &model,
+    const std::shared_ptr<const ::urdf::ModelInterface> urdfModelPtr)
+    : robotModelPtr_(std::make_shared<Model>(model)),
+      robotDataPtr_(std::make_unique<Data>(*robotModelPtr_)),
+      urdfModelPtr_(urdfModelPtr) {}
 
 /******************************************************************************************************/
 /******************************************************************************************************/
@@ -52,30 +50,25 @@ PinocchioInterface::~PinocchioInterface() = default;
 /******************************************************************************************************/
 /******************************************************************************************************/
 /******************************************************************************************************/
-PinocchioInterface::PinocchioInterface(const PinocchioInterface& rhs)
-  : robotModelPtr_(rhs.robotModelPtr_)
-  , robotDataPtr_(std::make_unique<Data>(*rhs.robotDataPtr_))
-  , urdfModelPtr_(rhs.urdfModelPtr_)
-{
-}
+PinocchioInterface::PinocchioInterface(const PinocchioInterface &rhs)
+    : robotModelPtr_(rhs.robotModelPtr_),
+      robotDataPtr_(std::make_unique<Data>(*rhs.robotDataPtr_)),
+      urdfModelPtr_(rhs.urdfModelPtr_) {}
 
 /******************************************************************************************************/
 /******************************************************************************************************/
 /******************************************************************************************************/
-PinocchioInterface::PinocchioInterface(PinocchioInterface&& rhs) noexcept
-  : robotModelPtr_(std::move(rhs.robotModelPtr_))
-  , robotDataPtr_(std::move(rhs.robotDataPtr_))
-  , urdfModelPtr_(std::move(rhs.urdfModelPtr_))
-{
-}
+PinocchioInterface::PinocchioInterface(PinocchioInterface &&rhs) noexcept
+    : robotModelPtr_(std::move(rhs.robotModelPtr_)),
+      robotDataPtr_(std::move(rhs.robotDataPtr_)),
+      urdfModelPtr_(std::move(rhs.urdfModelPtr_)) {}
 
 /******************************************************************************************************/
 /******************************************************************************************************/
 /******************************************************************************************************/
-PinocchioInterface& PinocchioInterface::operator=(const PinocchioInterface& rhs)
-{
-  if (this != &rhs)
-  {
+PinocchioInterface &
+PinocchioInterface::operator=(const PinocchioInterface &rhs) {
+  if (this != &rhs) {
     robotModelPtr_ = rhs.robotModelPtr_;
     robotDataPtr_ = std::make_unique<Data>(*rhs.robotDataPtr_);
     urdfModelPtr_ = rhs.urdfModelPtr_;
@@ -86,10 +79,9 @@ PinocchioInterface& PinocchioInterface::operator=(const PinocchioInterface& rhs)
 /******************************************************************************************************/
 /******************************************************************************************************/
 /******************************************************************************************************/
-PinocchioInterface& PinocchioInterface::operator=(PinocchioInterface&& rhs) noexcept
-{
-  if (this != &rhs)
-  {
+PinocchioInterface &
+PinocchioInterface::operator=(PinocchioInterface &&rhs) noexcept {
+  if (this != &rhs) {
     robotModelPtr_ = std::move(rhs.robotModelPtr_);
     robotDataPtr_ = std::move(rhs.robotDataPtr_);
     urdfModelPtr_ = std::move(rhs.urdfModelPtr_);
@@ -100,9 +92,8 @@ PinocchioInterface& PinocchioInterface::operator=(PinocchioInterface&& rhs) noex
 /******************************************************************************************************/
 /******************************************************************************************************/
 /******************************************************************************************************/
-std::ostream& operator<<(std::ostream& os, const PinocchioInterface& p)
-{
-  const auto& model = p.getModel();
+std::ostream &operator<<(std::ostream &os, const PinocchioInterface &p) {
+  const auto &model = p.getModel();
   os << "model.nv = " << model.nv << '\n';
   os << "model.nq = " << model.nq << '\n';
   os << "model.njoints = " << model.njoints << '\n';
@@ -110,40 +101,33 @@ std::ostream& operator<<(std::ostream& os, const PinocchioInterface& p)
   os << "model.nframes = " << model.nframes << '\n';
 
   os << "\nJoints:\n";
-  for (int k = 0; k < model.njoints; ++k)
-  {
+  for (int k = 0; k < model.njoints; ++k) {
     os << std::setw(20) << model.names[k] << ":  ";
     os << " ID = " << k;
     os << '\n';
   }
 
   os << "\nFrames:\n";
-  for (int k = 0; k < model.nframes; ++k)
-  {
+  for (int k = 0; k < model.nframes; ++k) {
     os << std::setw(20) << model.frames[k].name << ":  ";
     os << " ID = " << k;
     os << ", parent = " << model.frames[k].parent;
     os << ", type = ";
 
     std::string frameType;
-    if ((model.frames[k].type & pinocchio::FrameType::OP_FRAME) != 0)
-    {
+    if ((model.frames[k].type & pinocchio::FrameType::OP_FRAME) != 0) {
       frameType += "OP_FRAME ";
     }
-    if ((model.frames[k].type & pinocchio::FrameType::JOINT) != 0)
-    {
+    if ((model.frames[k].type & pinocchio::FrameType::JOINT) != 0) {
       frameType += "JOINT ";
     }
-    if ((model.frames[k].type & pinocchio::FrameType::FIXED_JOINT) != 0)
-    {
+    if ((model.frames[k].type & pinocchio::FrameType::FIXED_JOINT) != 0) {
       frameType += "FIXED_JOINT ";
     }
-    if ((model.frames[k].type & pinocchio::FrameType::BODY) != 0)
-    {
+    if ((model.frames[k].type & pinocchio::FrameType::BODY) != 0) {
       frameType += "BODY ";
     }
-    if ((model.frames[k].type & pinocchio::FrameType::SENSOR) != 0)
-    {
+    if ((model.frames[k].type & pinocchio::FrameType::SENSOR) != 0) {
       frameType += "SENSOR ";
     }
     os << "\"" << frameType << "\"\n";
@@ -151,4 +135,4 @@ std::ostream& operator<<(std::ostream& os, const PinocchioInterface& p)
   return os;
 }
 
-}  // namespace arm_pinocchio
+} // namespace arm_pinocchio

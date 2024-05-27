@@ -47,6 +47,7 @@ bool CanHW::init(ros::NodeHandle& root_nh, ros::NodeHandle& robot_hw_nh)
   // Parse actuator coefficient specified by user (stored on ROS parameter server)
   can_motor_.init(actuator_coefficient_value, actuators_value, robot_hw_nh);
   can_motor_.startMotor();
+  setCanBusThreadPriority(95);
   // for ros_control interface
   registerROSInterface(actuators_value);
   if (!loadUrdf(root_nh))
@@ -115,7 +116,7 @@ bool CanHW::loadUrdf(ros::NodeHandle& root_nh)
   if (urdf_model_ == nullptr)
     urdf_model_ = std::make_shared<urdf::Model>();
   // get the urdf param on param server
-  root_nh.getParam("/robot_description", urdf_string_);
+  root_nh.getParam("/swingboy_description", urdf_string_);
   return !urdf_string_.empty() && urdf_model_->initString(urdf_string_);
 }
 bool CanHW::setupTransmission(ros::NodeHandle& root_nh)
