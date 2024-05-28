@@ -93,16 +93,17 @@ bool UprightController::init(hardware_interface::RobotHW* robot_hw, ros::NodeHan
 
   // Low level controller
   std::vector<std::string> joint_names = { "joint1", "joint2", "joint3", "joint4", "joint5", "joint6" };
-  for (const auto& joint_name : joint_names)
+  pids_.resize(joint_names.size());
+  for (unsigned int i = 0; i < pids_.size(); ++i)
   {
-    control_toolbox::Pid pid;
-    ros::NodeHandle joint_nh(controller_nh, "gains/" + joint_name);
-    if (!pid.init(joint_nh))
+    ros::NodeHandle joint_nh(controller_nh, std::string("gains/") + joint_names[i]);
+
+    pids_[i].reset();
+    if (!pids_[i].init(joint_nh))
     {
-      ROS_ERROR_STREAM("Failed to initialize PID for " << joint_name);
+      ROS_WARN_STREAM("Failed to initialize PID gains from ROS parameter server.");
       return false;
     }
-    pids_.push_back(pid);
   }
   return true;
 }

@@ -6,6 +6,7 @@ set(CATKIN_PACKAGE_DEPENDENCIES
         visualization_msgs
         ocs2_ros_interfaces
         controller_interface
+        position_controllers
         angles
         tf2_ros
         tf2_geometry_msgs
@@ -71,11 +72,23 @@ target_link_libraries(upright_controller
 )
 target_compile_options(upright_controller PUBLIC ${OCS2_CXX_FLAGS})
 
+# Interpolation library
+add_library(spline_interpolation
+        src/interpolation/CubicSpline.cpp
+        src/interpolation/SplineCpg.cpp
+)
+add_dependencies(spline_interpolation
+        ${catkin_EXPORTED_TARGETS}
+)
+target_link_libraries(spline_interpolation
+        ${catkin_LIBRARIES}
+)
+
 #############
 ## Install ##
 #############
 
-install(TARGETS ${PROJECT_NAME}
+install(TARGETS ${PROJECT_NAME} spline_interpolation
         ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
