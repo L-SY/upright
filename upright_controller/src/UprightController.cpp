@@ -337,14 +337,19 @@ void UprightController::upright(const ros::Time& time, const ros::Duration& peri
   //  auto data = endEffectorInterface_->getPinocchioInterface().getData();
   //  Eigen::VectorXd gravity_torques = pinocchio::rnea(model, data, q_eigen, v_eigen, a_eigen);
 
+  ocs2::PrimalSolution wholeSolution = mpcMrtInterface_->getPolicy();
+
   for (int i = 0; i < 6; ++i)
   {
-    double posError = optimizedState(3 + i) - effortJointHandles_[i].getPosition();
+    //    double posError = optimizedState(3 + i) - effortJointHandles_[i].getPosition();
+    double posError = wholeSolution.stateTrajectory_[2](3 + i) - effortJointHandles_[i].getPosition();
     double velError = optimizedState(11 + i) - effortJointHandles_[i].getVelocity();
     double commanded_effort = pids_[i].computeCommand(posError, period);
-    //    double gravityFF = endEffectorInterface_->getDynamics().G(i);
-
-    effortJointHandles_[i].setCommand(commanded_effort);
+    double gravityFF = endEffectorInterface_->getDynamics().G(i);
+    ROS_INFO_STREAM(commanded_effort);
+    //    ROS_INFO_STREAM(gravityFF);
+    effortJointHandles_[i].setCommand(commanded_effort + gravityFF);
+    //    effortJointHandles_[i].setCommand(gravityFF);
   }
   lastOptimizedState = optimizedState;
 

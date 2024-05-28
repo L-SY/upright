@@ -5,6 +5,7 @@
 #pragma once
 
 #include <controller_interface/multi_interface_controller.h>
+#include <position_controllers/joint_group_position_controller.h>
 #include <hardware_interface/joint_command_interface.h>
 #include <control_toolbox/pid.h>
 
@@ -28,11 +29,6 @@
 #include <arm_pinocchio_interface/EndEffectorInterface.h>
 #include <arm_pinocchio_interface/PinocchioInterface.h>
 #include <arm_pinocchio_interface/urdf.h>
-
-#include <pinocchio/algorithm/rnea.hpp>
-#include <pinocchio/parsers/urdf.hpp>
-#include <pinocchio/multibody/model.hpp>
-#include <pinocchio/multibody/data.hpp>
 
 namespace ddt
 {
@@ -130,5 +126,6 @@ private:
 
   // Low level controller
   std::vector<control_toolbox::Pid> pids_;
+  position_controllers::JointGroupPositionController armPositionController_;
 };
 }  // namespace ddt
