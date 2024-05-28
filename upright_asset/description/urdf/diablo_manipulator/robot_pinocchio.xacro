@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="wlm">
+
+    <xacro:arg name="robot_type" default="ddt"/>
+    <xacro:include filename="$(find upright_asset)/description/urdf/diablo/robot_pinocchio.xacro"/>
+
+    <!-- manipulatior -->
+    <xacro:include filename="$(find upright_asset)/description/urdf/manipulator/robot.xacro"/>
+
+    <joint name="manipulator_joint" type="fixed">
+        <parent link="diablo_base_link"/>
+        <child link="arm_base_link"/>
+        <origin xyz="0.0 0.0 0.1" rpy="0.0 0.0 0.0"/>
+    </joint>
+
+    <gazebo>
+        <plugin name="p3d_base_controller" filename="libgazebo_ros_p3d.so">
+            <alwaysOn>true</alwaysOn>
+            <updateRate>1000.0</updateRate>
+            <bodyName>diablo_base_link</bodyName>
+            <topicName>ground_truth/state</topicName>
+            <gaussianNoise>0</gaussianNoise>
+            <frameName>world</frameName>
+            <xyzOffsets>0 0 0</xyzOffsets>
+            <rpyOffsets>0 0 0</rpyOffsets>
+        </plugin>
+    </gazebo>
+</robot>

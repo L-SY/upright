@@ -17,19 +17,20 @@
                        material_name="silver"
                        inertial_xyz="0.000002 -0.00531 0.034685"/>
 
-    <xacro:create_link name="link2" mass="0.534276"
+    <xacro:create_link name="link2" mass="0.2"
                        ixx="383700" ixy="-26179.433" ixz="693.218"
                        iyy="1888000" iyz="-585.018" izz="2050000"
                        mesh_file="package://upright_asset/description/meshes/manipulator/link2.stl"
                        material_name="silver"
                        inertial_xyz="-0.197351 -0.002165 0.000057"/>
 
-    <xacro:create_link name="link3" mass="0.474451"
-                       ixx="322900" ixy="8650.968" ixz="-231700"
-                       iyy="2226000" iyz="1036.356" izz="2291000"
+    <xacro:create_link name="link3" mass="0.903213"
+                       ixx="1204000" ixy="-51994.358" ixz="-2550000"
+                       iyy="11300000" iyz="-16633.832" izz="10760000"
                        mesh_file="package://upright_asset/description/meshes/manipulator/link3.stl"
                        material_name="silver"
-                       inertial_xyz="0.191296 -0.001405 0.053882"/>
+                       inertial_xyz="0.100486 -0.002073 0.028338"/>
+
 
     <xacro:create_link name="link4" mass="0.056678"
                        ixx="1262.246" ixy="32.61" ixz="-553.334"

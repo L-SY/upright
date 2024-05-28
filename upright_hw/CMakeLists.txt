@@ -17,7 +17,6 @@ find_package(catkin REQUIRED
 
 catkin_package(
         INCLUDE_DIRS
-        include
         CATKIN_DEPENDS
         roscpp
         can_hw
@@ -33,7 +32,6 @@ catkin_package(
 ###########
 
 include_directories(
-        include
         ${catkin_INCLUDE_DIRS}
 )
 
@@ -69,12 +67,6 @@ install(TARGETS ${PROJECT_NAME}
         ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
-
-# Mark cpp header files for installation
-install(DIRECTORY include/${PROJECT_NAME}
-        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-        FILES_MATCHING PATTERN "*.h"
 )
 
 # Mark other files for installation

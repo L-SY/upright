@@ -14,6 +14,7 @@
     <depend>visualization_msgs</depend>
     <depend>ocs2_ros_interfaces</depend>
     <depend>controller_interface</depend>
+    <depend>position_controllers</depend>
     <depend>angles</depend>
     <depend>tf2_ros</depend>
     <depend>tf2_geometry_msgs</depend>
