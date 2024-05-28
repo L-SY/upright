@@ -31,7 +31,7 @@ void EndEffectorInterface<SCALAR_T>::update(const vector_t &q,
   pinocchio::computeJointJacobians(model, data);
   pinocchio::updateGlobalPlacements(model, data);
 
-  //  updateDynamics(q, v);
+  updateDynamics(q, v);
   //  updateKinematics();
 }
 
@@ -43,48 +43,48 @@ void EndEffectorInterface<SCALAR_T>::updateDynamics(const vector_t &q,
   assert(q.size() == model.nq && "Dimension of q does not match model.nq");
   assert(v.size() == model.nv && "Dimension of v does not match model.nv");
 
-  std::cout << "Inter update Dyanmics" << std::endl;
-  // 打印调试信息
-  std::cout << "Model nq: " << model.nq << std::endl;
-  std::cout << "Model nv: " << model.nv << std::endl;
-  std::cout << "Input q size: " << q.size() << std::endl;
-  std::cout << "Input v size: " << v.size() << std::endl;
-
-  // 打印关节名称和ID
-  for (size_t i = 0; i < model.names.size(); ++i) {
-    std::cout << "Joint " << i << ": " << model.names[i] << std::endl;
-  }
-  // 计算惯性矩阵
-  try {
-    pinocchio::crba(model, data, q);
-    std::cout << "Inertia Matrix M:\n" << data.M << std::endl;
-  } catch (const std::exception &e) {
-    std::cerr << "Error during crba computation: " << e.what() << std::endl;
-  }
-  auto M = data.M;
-  std::cout << "Inertia Matrix M before symmetry adjustment:\n"
-            << M << std::endl;
-  M.triangularView<Eigen::StrictlyLower>() =
-      M.transpose().triangularView<Eigen::StrictlyLower>();
-  std::cout << "Inertia Matrix M after symmetry adjustment:\n"
-            << M << std::endl;
-
-  dynamics_.M = data.M.template cast<SCALAR_T>();
-  std::cout << "Dynamics Inertia Matrix M:\n" << dynamics_.M << std::endl;
-
-  // 计算科氏力和离心力
-  auto C = pinocchio::nonLinearEffects(model, data, q, v);
-  assert(C.size() == model.nv && "Dimension of C does not match model.nv");
-  dynamics_.C = C.template cast<SCALAR_T>();
-  std::cout << "Coriolis and Centrifugal Forces C:\n"
-            << dynamics_.C << std::endl;
+  //  std::cout << "Inter update Dyanmics" << std::endl;
+  //  // 打印调试信息
+  //  std::cout << "Model nq: " << model.nq << std::endl;
+  //  std::cout << "Model nv: " << model.nv << std::endl;
+  //  std::cout << "Input q size: " << q.size() << std::endl;
+  //  std::cout << "Input v size: " << v.size() << std::endl;
+  //
+  //  // 打印关节名称和ID
+  //  for (size_t i = 0; i < model.names.size(); ++i) {
+  //    std::cout << "Joint " << i << ": " << model.names[i] << std::endl;
+  //  }
+  //  // 计算惯性矩阵
+  //  try {
+  //    pinocchio::crba(model, data, q);
+  //    std::cout << "Inertia Matrix M:\n" << data.M << std::endl;
+  //  } catch (const std::exception &e) {
+  //    std::cerr << "Error during crba computation: " << e.what() << std::endl;
+  //  }
+  //  auto M = data.M;
+  //  std::cout << "Inertia Matrix M before symmetry adjustment:\n"
+  //            << M << std::endl;
+  //  M.triangularView<Eigen::StrictlyLower>() =
+  //      M.transpose().triangularView<Eigen::StrictlyLower>();
+  //  std::cout << "Inertia Matrix M after symmetry adjustment:\n"
+  //            << M << std::endl;
+  //
+  //  dynamics_.M = data.M.template cast<SCALAR_T>();
+  //  std::cout << "Dynamics Inertia Matrix M:\n" << dynamics_.M << std::endl;
+  //
+  //  // 计算科氏力和离心力
+  //  auto C = pinocchio::nonLinearEffects(model, data, q, v);
+  //  assert(C.size() == model.nv && "Dimension of C does not match model.nv");
+  //  dynamics_.C = C.template cast<SCALAR_T>();
+  //  std::cout << "Coriolis and Centrifugal Forces C:\n"
+  //            << dynamics_.C << std::endl;
 
   // 计算重力
   pinocchio::computeGeneralizedGravity(model, data, q);
   auto G = data.g;
   assert(G.size() == model.nv && "Dimension of G does not match model.nv");
   dynamics_.G = G.template cast<SCALAR_T>();
-  std::cout << "Gravity Forces G:\n" << dynamics_.G << std::endl;
+  //  std::cout << "Gravity Forces G:\n" << dynamics_.G << std::endl;
 }
 
 template <typename SCALAR_T>
