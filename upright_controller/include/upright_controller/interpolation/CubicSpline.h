@@ -56,6 +56,16 @@ public:
 
   scalar_t finalTimeDerivative(scalar_t t) const;
 
+  scalar_t startTime() const
+  {
+    return t0_;
+  }
+
+  scalar_t endTime() const
+  {
+    return t1_;
+  }
+
 private:
   scalar_t normalizedTime(scalar_t t) const;
 

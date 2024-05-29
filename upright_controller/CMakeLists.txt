@@ -75,6 +75,7 @@ target_compile_options(upright_controller PUBLIC ${OCS2_CXX_FLAGS})
 # Interpolation library
 add_library(spline_interpolation
         src/interpolation/CubicSpline.cpp
+        src/interpolation/MultiJointTrajectory.cpp
 )
 add_dependencies(spline_interpolation
         ${catkin_EXPORTED_TARGETS}
