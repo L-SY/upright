@@ -46,8 +46,6 @@ std::vector<CubicSpline::Node> MultiJointTrajectory::getStateAtTime(scalar_t tim
         break;
       }
     }
-    throw std::runtime_error("No valid spline found for joint " + std::to_string(jointId) + " at time " +
-                             std::to_string(time));
   }
 
   return states;

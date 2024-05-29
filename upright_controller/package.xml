@@ -21,7 +21,7 @@
     <depend>effort_controllers</depend>
     <depend>pluginlib</depend>
     <depend>upright_common</depend>
-
+    <depend>realtime_tools</depend>
     <depend>upright_hw</depend>
 
     <depend>upright_control</depend>

@@ -33,8 +33,24 @@
 // Interpolation
 #include <upright_controller/interpolation/MultiJointTrajectory.h>
 
+// Realtime_tools
+#include <realtime_tools/realtime_box.h>
+#include <realtime_tools/realtime_buffer.h>
+#include <realtime_tools/realtime_publisher.h>
+
 namespace ddt
 {
+struct TimeData
+{
+  TimeData() : time(0.0), period(0.0), uptime(0.0)
+  {
+  }
+
+  ros::Time time;        ///< Time of last update cycle
+  ros::Duration period;  ///< Period of last update cycle
+  ros::Time uptime;      ///< Controller uptime. Set to zero at every restart.
+};
+
 class UprightController
   : public controller_interface::MultiInterfaceController<hardware_interface::VelocityJointInterface,
                                                           hardware_interface::EffortJointInterface>
@@ -132,5 +148,9 @@ private:
   position_controllers::JointGroupPositionController armPositionController_;
   // interpolation
   std::shared_ptr<interpolation::MultiJointTrajectory> splineTrajectory_;
+
+  // Iner time
+  realtime_tools::RealtimeBuffer<TimeData> time_data_;
+  TimeData old_time_data_;
 };
 }  // namespace ddt

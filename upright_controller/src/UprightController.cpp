@@ -110,6 +110,14 @@ bool UprightController::init(hardware_interface::RobotHW* robot_hw, ros::NodeHan
 
 void UprightController::update(const ros::Time& time, const ros::Duration& period)
 {
+  old_time_data_ = *(time_data_.readFromRT());
+  // Update time data
+  TimeData time_data;
+  time_data.time = time;                              // Cache current time
+  time_data.period = period;                          // Cache current control period
+  time_data.uptime = old_time_data_.uptime + period;  // Update controller uptime
+  time_data_.writeFromNonRT(time_data);
+
   // Update the current state of the system
   updateTfOdom(time, period);
   updateStateEstimation(time, period);
@@ -195,6 +203,12 @@ void UprightController::updateStateEstimation(const ros::Time& time, const ros::
 
 void UprightController::starting(const ros::Time& time)
 {
+  // Update time data
+  TimeData time_data;
+  time_data.time = time;
+  time_data.uptime = ros::Time(0.0);
+  time_data_.initRT(time_data);
+
   updateTfOdom(time, ros::Duration(0.001));
   updateStateEstimation(time, ros::Duration(0.001));
   currentObservation_.input.setZero(INPUT_DIM);
@@ -354,18 +368,15 @@ void UprightController::upright(const ros::Time& time, const ros::Duration& peri
 
   for (int i = 0; i < 6; ++i)
   {
-    ROS_INFO_STREAM("into cmd");
     double posError = wholeSolution.stateTrajectory_[2](3 + i) - effortJointHandles_[i].getPosition();
     double velError = optimizedState(11 + i) - effortJointHandles_[i].getVelocity();
     //    double commanded_effort = pids_[i].computeCommand(posError, period);
-    auto desJointStates = splineTrajectory_->getStateAtTime(time.toSec())[i];
-    ROS_INFO_STREAM("get desJointStates");
+    auto desJointStates = splineTrajectory_->getStateAtTime(time_data_.readFromRT()->uptime.toSec())[i];
     double commanded_effort =
         pids_[i].computeCommand(desJointStates.position - effortJointHandles_[i].getPosition(), period);
     double gravityFF = endEffectorInterface_->getDynamics().G(i);
-    ROS_INFO_STREAM(commanded_effort);
     //    ROS_INFO_STREAM(gravityFF);
-    effortJointHandles_[i].setCommand(gravityFF);
+    effortJointHandles_[i].setCommand(commanded_effort + gravityFF);
     //    effortJointHandles_[i].setCommand(gravityFF);
   }
   lastOptimizedState = optimizedState;

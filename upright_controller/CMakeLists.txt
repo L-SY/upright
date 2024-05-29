@@ -12,6 +12,7 @@ set(CATKIN_PACKAGE_DEPENDENCIES
         tf2_geometry_msgs
         effort_controllers
         pluginlib
+        realtime_tools
 
         upright_hw
         upright_common
