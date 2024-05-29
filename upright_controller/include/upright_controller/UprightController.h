@@ -30,6 +30,9 @@
 #include <arm_pinocchio_interface/PinocchioInterface.h>
 #include <arm_pinocchio_interface/urdf.h>
 
+// Interpolation
+#include <upright_controller/interpolation/MultiJointTrajectory.h>
+
 namespace ddt
 {
 class UprightController
@@ -127,5 +130,7 @@ private:
   // Low level controller
   std::vector<control_toolbox::Pid> pids_;
   position_controllers::JointGroupPositionController armPositionController_;
+  // interpolation
+  std::shared_ptr<interpolation::MultiJointTrajectory> splineTrajectory_;
 };
 }  // namespace ddt

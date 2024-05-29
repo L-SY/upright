@@ -63,6 +63,8 @@ include_directories(
 # Controller library
 add_library(upright_controller
         src/UprightController.cpp
+        src/interpolation/CubicSpline.cpp
+        src/interpolation/MultiJointTrajectory.cpp
 )
 add_dependencies(upright_controller
         ${catkin_EXPORTED_TARGETS}

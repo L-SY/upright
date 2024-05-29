@@ -86,7 +86,7 @@ bool UprightController::init(hardware_interface::RobotHW* robot_hw, ros::NodeHan
   std::vector<std::string> endEffectorName = { "link6" };
   pinocchioInterface_ = std::make_shared<arm_pinocchio::PinocchioInterface>(
       arm_pinocchio::getPinocchioInterfaceFromUrdfFile(armURDFFile));
-  std::cout << *pinocchioInterface_ << std::endl;
+  //  std::cout << *pinocchioInterface_ << std::endl;
   endEffectorInterface_ =
       std::make_shared<arm_pinocchio::EndEffectorInterface<double>>(*pinocchioInterface_, endEffectorName);
   endEffectorInterface_->setPinocchioInterface(*pinocchioInterface_);
@@ -318,45 +318,57 @@ void UprightController::upright(const ros::Time& time, const ros::Duration& peri
                                    plannedMode);
   currentObservation_.input = optimizedInput;
 
+  ocs2_msgs::mpc_flattened_controller mpcPolicyMsg = createMpcPolicyMsg(
+      mpcMrtInterface_->getPolicy(), mpcMrtInterface_->getCommand(), mpcMrtInterface_->getPerformanceIndices());
+  optimizedStateTrajectoryPub_.publish(mpcPolicyMsg);
+
   //  for diablo control
   velocityJointHandles_[0].setCommand(optimizedState(9));
   velocityJointHandles_[2].setCommand(optimizedState(10));
 
-  //  TODO : ADD gravity compensation
-  //  std::vector<double> q;
-  //  std::vector<double> v;
-  //  for (auto& effortJointHandle : effortJointHandles_)
-  //  {
-  //    q.push_back(effortJointHandle.getPosition());
-  //    v.push_back(effortJointHandle.getVelocity());
-  //  }
-  //  Eigen::VectorXd q_eigen = Eigen::VectorXd::Map(q.data(), q.size());
-  //  Eigen::VectorXd v_eigen = Eigen::VectorXd::Map(v.data(), v.size());
-  //  Eigen::VectorXd a_eigen;
-  //  a_eigen.setZero(q.size());
-  //  auto model = endEffectorInterface_->getPinocchioInterface().getModel();
-  //  auto data = endEffectorInterface_->getPinocchioInterface().getData();
-  //  Eigen::VectorXd gravity_torques = pinocchio::rnea(model, data, q_eigen, v_eigen, a_eigen);
-
   ocs2::PrimalSolution wholeSolution = mpcMrtInterface_->getPolicy();
+  auto stateTrajectory = wholeSolution.stateTrajectory_;
+  auto timeTrajectory = wholeSolution.timeTrajectory_;
+  // Creat Spline
+  std::map<int, std::vector<interpolation::CubicSpline::Node>> jointTrajectorys;
+  for (size_t i = 0; i < effortJointHandles_.size(); ++i)
+  {
+    int jointId = static_cast<int>(i);
+    std::vector<interpolation::CubicSpline::Node> trajectoryPoints;
+    for (size_t j = 0; j < stateTrajectory.size(); ++j)
+    {
+      if (3 + i >= stateTrajectory[j].size() || 11 + i >= stateTrajectory[j].size())
+      {
+        throw std::out_of_range("State trajectory index out of range.");
+      }
+      interpolation::CubicSpline::Node jointPoint{};
+      jointPoint.position = stateTrajectory[j](3 + i);
+      jointPoint.velocity = stateTrajectory[j](11 + i);
+      jointPoint.time = timeTrajectory[j];
+      trajectoryPoints.push_back(jointPoint);
+    }
+    jointTrajectorys[jointId] = trajectoryPoints;
+  }
+
+  splineTrajectory_ = std::make_shared<interpolation::MultiJointTrajectory>(jointTrajectorys);
 
   for (int i = 0; i < 6; ++i)
   {
-    //    double posError = optimizedState(3 + i) - effortJointHandles_[i].getPosition();
+    ROS_INFO_STREAM("into cmd");
     double posError = wholeSolution.stateTrajectory_[2](3 + i) - effortJointHandles_[i].getPosition();
     double velError = optimizedState(11 + i) - effortJointHandles_[i].getVelocity();
-    double commanded_effort = pids_[i].computeCommand(posError, period);
+    //    double commanded_effort = pids_[i].computeCommand(posError, period);
+    auto desJointStates = splineTrajectory_->getStateAtTime(time.toSec())[i];
+    ROS_INFO_STREAM("get desJointStates");
+    double commanded_effort =
+        pids_[i].computeCommand(desJointStates.position - effortJointHandles_[i].getPosition(), period);
     double gravityFF = endEffectorInterface_->getDynamics().G(i);
     ROS_INFO_STREAM(commanded_effort);
     //    ROS_INFO_STREAM(gravityFF);
-    effortJointHandles_[i].setCommand(commanded_effort + gravityFF);
+    effortJointHandles_[i].setCommand(gravityFF);
     //    effortJointHandles_[i].setCommand(gravityFF);
   }
   lastOptimizedState = optimizedState;
-
-  ocs2_msgs::mpc_flattened_controller mpcPolicyMsg = createMpcPolicyMsg(
-      mpcMrtInterface_->getPolicy(), mpcMrtInterface_->getCommand(), mpcMrtInterface_->getPerformanceIndices());
-  optimizedStateTrajectoryPub_.publish(mpcPolicyMsg);
 }
 
 ocs2_msgs::mpc_flattened_controller
