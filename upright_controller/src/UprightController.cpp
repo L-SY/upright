@@ -132,9 +132,7 @@ void UprightController::update(const ros::Time& time, const ros::Duration& perio
   }
   Eigen::VectorXd q_eigen = Eigen::VectorXd::Map(q.data(), q.size());
   Eigen::VectorXd v_eigen = Eigen::VectorXd::Map(v.data(), v.size());
-  ROS_INFO_STREAM("before dynamics update");
   endEffectorInterface_->update(q_eigen, v_eigen);
-  ROS_INFO_STREAM("after dynamics update");
   switch (controlState_)
   {
     case ControllerState::NORMAL:
@@ -321,6 +319,7 @@ void UprightController::normal(const ros::Time& time, const ros::Duration& perio
 
 void UprightController::upright(const ros::Time& time, const ros::Duration& period)
 {
+  ROS_INFO_STREAM("upright");
   static ocs2::vector_t lastOptimizedState(25);
 
   // Load the latest MPC policy
@@ -371,13 +370,13 @@ void UprightController::upright(const ros::Time& time, const ros::Duration& peri
     double posError = wholeSolution.stateTrajectory_[2](3 + i) - effortJointHandles_[i].getPosition();
     double velError = optimizedState(11 + i) - effortJointHandles_[i].getVelocity();
     //    double commanded_effort = pids_[i].computeCommand(posError, period);
-    auto desJointStates = splineTrajectory_->getStateAtTime(time_data_.readFromRT()->uptime.toSec())[i];
+    auto desJointStates = splineTrajectory_->getStateAtTime(time_data_.readFromRT()->uptime.toSec() + 0.03)[i];
     double commanded_effort =
         pids_[i].computeCommand(desJointStates.position - effortJointHandles_[i].getPosition(), period);
     double gravityFF = endEffectorInterface_->getDynamics().G(i);
-    //    ROS_INFO_STREAM(gravityFF);
+    ROS_INFO_STREAM(gravityFF);
     effortJointHandles_[i].setCommand(commanded_effort + gravityFF);
-    //    effortJointHandles_[i].setCommand(gravityFF);
+    //    effortJointHandles_[i].setCommand(commanded_effort);
   }
   lastOptimizedState = optimizedState;
 }

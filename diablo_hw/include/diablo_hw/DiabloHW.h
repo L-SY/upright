@@ -57,11 +57,16 @@ public:
   {
     //    the msg is build by [ x, y, z, roll, pitch, yaw, vx, vy, vz, v_roll,
     //    v_pitch, v_yaw]
-    diabloMotorData[0].pos_ = data.get()->data[0];
-    diabloMotorData[0].vel_ = data.get()->data[6];
-    diabloMotorData[1].pos_ = data.get()->data[1];
-    diabloMotorData[2].pos_ = data.get()->data[5];
-    diabloMotorData[2].vel_ = data.get()->data[11];
+    diabloMotorData[0].pos_ = 0;
+    diabloMotorData[0].vel_ = 0;
+    diabloMotorData[1].pos_ = 0;
+    diabloMotorData[2].pos_ = 0;
+    diabloMotorData[2].vel_ = 0;
+    //    diabloMotorData[0].pos_ = data.get()->data[0];
+    //    diabloMotorData[0].vel_ = data.get()->data[6];
+    //    diabloMotorData[1].pos_ = data.get()->data[1];
+    //    diabloMotorData[2].pos_ = data.get()->data[5];
+    //    diabloMotorData[2].vel_ = data.get()->data[11];
   }
 
   void optimizedStateTrajectoryCallBack(const ocs2_msgs::mpc_flattened_controllerConstPtr& data)
